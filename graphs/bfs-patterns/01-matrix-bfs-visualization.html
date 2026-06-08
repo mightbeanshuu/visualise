@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>01 Matrix — Multi-Source BFS Visualizer</title>
+<style>
+  :root{
+    --bg:#0f1419; --panel:#171c24; --panel2:#1d2530; --border:#2a3240;
+    --text:#e6edf3; --muted:#8b97a7; --accent:#4ea1ff;
+    --teal:#1aab9c; --teal-d:#0e7d72;
+    --amber:#f0a500; --amber-d:#a87400;
+    --green:#3ecf8e; --green-d:#1f8f5f;
+    --blue:#4ea1ff; --blue-d:#1c5fa8;
+    --red:#e8617a; --red-bg:#3a1f27;
+    --cell:#222b36;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    padding:24px;
+  }
+  .wrap{max-width:1040px;margin:0 auto;}
+  h1{font-size:22px;margin:0 0 2px;font-weight:650;}
+  .sub{color:var(--muted);font-size:13px;margin-bottom:20px;}
+  .sub code{background:var(--panel2);padding:1px 6px;border-radius:4px;font-size:12px;}
+
+  .main{display:grid;grid-template-columns:minmax(290px,300px) 1fr;gap:20px;align-items:start;}
+
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:16px;}
+  .card h2{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:0 0 12px;font-weight:600;}
+
+  /* grid */
+  .grid{display:flex;flex-direction:column;gap:4px;}
+  .grow{display:flex;gap:4px;align-items:center;}
+  .rlabel,.clabel{color:var(--muted);font-size:10px;width:16px;text-align:center;font-variant-numeric:tabular-nums;}
+  .clabels{display:flex;gap:4px;margin-left:20px;}
+  .clabels .clabel{width:58px;}
+  .cell{
+    width:58px;height:58px;border-radius:8px;position:relative;
+    display:flex;align-items:center;justify-content:center;
+    font-size:22px;font-weight:700;font-variant-numeric:tabular-nums;
+    background:var(--cell);color:var(--muted);
+    border:2px solid transparent;transition:background .18s,border-color .18s,color .18s,transform .12s;
+  }
+  .cell .coord{position:absolute;top:3px;left:5px;font-size:9px;font-weight:600;opacity:.55;}
+  .cell.s    {background:var(--teal-d); color:#eafffb; border-color:var(--teal);}        /* source, queued */
+  .cell.sc   {background:var(--blue-d); color:#eaf3ff; border-color:var(--blue);}        /* source, current */
+  .cell.q    {background:var(--amber-d);color:#fff4dd; border-color:var(--amber);}       /* queued */
+  .cell.c    {background:var(--blue-d); color:#eaf3ff; border-color:var(--blue);transform:scale(1.06);} /* current */
+  .cell.ok   {background:var(--green-d);color:#eafff3; border-color:var(--green);transform:scale(1.06);} /* just discovered */
+  .cell.bad  {background:var(--red-bg); color:var(--red); border-color:var(--red);}      /* skipped neighbor */
+  .cell.v    {background:#1a2a22;       color:#9fe6c4; border-color:#2c4a3b;}             /* visited (settled) */
+  .cell.u    {background:var(--cell);   color:#5a6675;}                                  /* unvisited */
+
+  /* queue */
+  .queue-card{margin-top:16px;}
+  .queue{display:flex;flex-wrap:wrap;gap:6px;min-height:32px;align-items:center;}
+  .qpill{
+    background:var(--amber-d);color:#fff4dd;border:1px solid var(--amber);
+    padding:3px 9px;border-radius:14px;font-size:12px;font-weight:600;
+    font-variant-numeric:tabular-nums;
+  }
+  .qpill.src{background:var(--teal-d);border-color:var(--teal);color:#eafffb;}
+  .qempty{color:var(--muted);font-size:12px;font-style:italic;}
+  .qhead{color:var(--muted);font-size:11px;margin-right:2px;}
+
+  /* legend */
+  .legend{display:flex;flex-wrap:wrap;gap:10px 16px;margin-top:14px;}
+  .lg{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);}
+  .sw{width:13px;height:13px;border-radius:4px;border:1px solid;}
+
+  /* code */
+  .code{background:#0c1118;border:1px solid var(--border);border-radius:10px;padding:14px 12px;overflow:auto;}
+  .code pre{margin:0;font-family:"SF Mono",ui-monospace,Menlo,Monaco,Consolas,monospace;font-size:12.5px;line-height:1.55;}
+  .ln{display:block;padding:1px 8px;border-radius:5px;white-space:pre;color:#c2cbd6;border-left:2px solid transparent;}
+  .ln .kw{color:#ff8bbf;} .ln .fn{color:#8be9fd;} .ln .ty{color:#7ee787;} .ln .nm{color:#ffd479;} .ln .cm{color:#6a7480;font-style:italic;} .ln .op{color:#d2a8ff;}
+  .ln.hot{background:rgba(240,165,0,.16);border-left-color:var(--amber);}
+
+  /* controls */
+  .controls{display:flex;align-items:center;gap:8px;margin-top:16px;flex-wrap:wrap;}
+  button{
+    background:var(--panel2);color:var(--text);border:1px solid var(--border);
+    border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer;
+    transition:background .15s,border-color .15s;
+  }
+  button:hover{background:#28323f;border-color:#3a4555;}
+  button.primary{background:var(--accent);border-color:var(--accent);color:#06223f;}
+  button.primary:hover{background:#6cb2ff;}
+  button:disabled{opacity:.4;cursor:not-allowed;}
+  .spacer{flex:1;}
+  select{background:var(--panel2);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:7px 8px;font-size:12px;}
+
+  .desc{background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-top:16px;font-size:13.5px;line-height:1.5;min-height:44px;}
+  .desc .tag{display:inline-block;background:var(--accent);color:#06223f;font-size:10px;font-weight:700;padding:2px 7px;border-radius:5px;margin-right:8px;text-transform:uppercase;letter-spacing:.05em;}
+  .desc b{color:#fff;}
+
+  .progress{height:5px;background:var(--panel2);border-radius:3px;margin-top:14px;overflow:hidden;}
+  .pbar{height:100%;background:var(--accent);width:0;transition:width .2s;}
+  .frameno{color:var(--muted);font-size:12px;font-variant-numeric:tabular-nums;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>01 Matrix — Multi-Source BFS</h1>
+  <div class="sub">LeetCode 542 · for each cell, distance to the nearest <code>0</code>. All zeros seed the queue at once, so one BFS sweep computes every minimum distance.</div>
+
+  <div class="main">
+    <!-- LEFT: grid + queue -->
+    <div>
+      <div class="card">
+        <h2>Grid &nbsp;<span style="color:var(--muted);text-transform:none;letter-spacing:0;font-weight:400;">(coord · distance)</span></h2>
+        <div class="clabels" id="clabels"></div>
+        <div class="grid" id="grid"></div>
+        <div class="legend">
+          <div class="lg"><span class="sw" style="background:var(--teal-d);border-color:var(--teal)"></span>source 0 (queued)</div>
+          <div class="lg"><span class="sw" style="background:var(--blue-d);border-color:var(--blue)"></span>processing</div>
+          <div class="lg"><span class="sw" style="background:var(--green-d);border-color:var(--green)"></span>discovered</div>
+          <div class="lg"><span class="sw" style="background:var(--amber-d);border-color:var(--amber)"></span>in queue</div>
+          <div class="lg"><span class="sw" style="background:#1a2a22;border-color:#2c4a3b"></span>settled</div>
+          <div class="lg"><span class="sw" style="background:var(--red-bg);border-color:var(--red)"></span>skipped</div>
+        </div>
+      </div>
+
+      <div class="card queue-card">
+        <h2>Queue (front → back)</h2>
+        <div class="queue" id="queue"></div>
+      </div>
+    </div>
+
+    <!-- RIGHT: code + desc + controls -->
+    <div>
+      <div class="card">
+        <h2>C++ &nbsp;<span style="color:var(--muted);text-transform:none;letter-spacing:0;font-weight:400;">updateMatrix</span></h2>
+        <div class="code"><pre id="code"></pre></div>
+
+        <div class="desc" id="desc"></div>
+
+        <div class="progress"><div class="pbar" id="pbar"></div></div>
+
+        <div class="controls">
+          <button id="reset">⟲ Reset</button>
+          <button id="prev">‹ Prev</button>
+          <button id="play" class="primary">▶ Play</button>
+          <button id="next">Next ›</button>
+          <span class="spacer"></span>
+          <select id="speed">
+            <option value="1100">0.5×</option>
+            <option value="650" selected>1×</option>
+            <option value="350">2×</option>
+            <option value="160">4×</option>
+          </select>
+          <span class="frameno" id="frameno">0 / 0</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  // ---- input grid: 1 = land, 0 = source ----
+  const INIT = [
+    [0,1,1,1],
+    [1,1,1,0],
+    [1,1,1,1],
+    [0,1,1,1],
+  ];
+  const R = INIT.length, C = INIT[0].length;
+  const DR = [-1,1,0,0], DC = [0,0,-1,1];
+  const DNAME = ["up","down","left","right"];
+
+  // ---- C++ source lines (idx -> {html}) ----
+  const CODE = [
+    `<span class="ty">int</span> R = mat.size(), C = mat[<span class="nm">0</span>].size();`,                       //0
+    `<span class="ty">vector</span>&lt;<span class="ty">vector</span>&lt;<span class="ty">int</span>&gt;&gt; dist(R, ...,-<span class="nm">1</span>);`,//1
+    `<span class="ty">queue</span>&lt;...&gt; q;`,                                                                  //2
+    `<span class="cm">// seed every 0-cell</span>`,                                                                //3
+    `<span class="kw">for</span> (r,c) <span class="kw">if</span> (mat[r][c]==<span class="nm">0</span>) {`,           //4
+    `    dist[r][c]=<span class="nm">0</span>; q.push({r,c});`,                                                     //5
+    `}`,                                                                                                           //6
+    `<span class="kw">while</span> (!q.empty()) {`,                                                                 //7
+    `    <span class="kw">auto</span> [r,c] = q.front(); q.pop();`,                                                 //8
+    `    <span class="kw">for</span> (<span class="ty">int</span> k=<span class="nm">0</span>; k&lt;<span class="nm">4</span>; k++) {`, //9
+    `        <span class="ty">int</span> nr=r+dr[k], nc=c+dc[k];`,                                                  //10
+    `        <span class="kw">if</span> (out of bounds) <span class="kw">continue</span>;`,                          //11
+    `        <span class="kw">if</span> (dist[nr][nc]!=-<span class="nm">1</span>) <span class="kw">continue</span>;`,//12
+    `        dist[nr][nc] = dist[r][c]+<span class="nm">1</span>;`,                                                 //13
+    `        q.push({nr,nc});`,                                                                                    //14
+    `    }`,                                                                                                       //15
+    `}`,                                                                                                          //16
+    `<span class="kw">return</span> dist;`,                                                                        //17
+  ];
+
+  // ---- build frames by simulating BFS ----
+  const frames = [];
+  const dist  = Array.from({length:R},()=>Array(C).fill(-1));
+  const state = Array.from({length:R},(_,r)=>Array.from({length:C},(_,c)=>INIT[r][c]===0?'src':'u'));
+
+  function snap(o){
+    frames.push({
+      dist: dist.map(r=>r.slice()),
+      state: state.map(r=>r.slice()),
+      queue: o.queue.slice(),
+      desc: o.desc,
+      tag: o.tag,
+      line: o.line,
+    });
+  }
+  const qstr = ([r,c])=>`(${r},${c})`;
+
+  // frame 0: raw input
+  snap({queue:[], desc:`Input matrix. <b>0</b>-cells are sources; every <b>1</b>-cell needs its distance to the nearest 0. We run one BFS from all sources at once.`, tag:"start", line:0});
+
+  // seed queue with all 0-cells
+  const q = [];
+  for(let r=0;r<R;r++)for(let c=0;c<C;c++){
+    if(INIT[r][c]===0){
+      dist[r][c]=0; state[r][c]='src'; q.push([r,c]);
+    }
+  }
+  snap({queue:q.map(qstr), desc:`Seeded the queue with all <b>${q.length}</b> source cells (distance <b>0</b>). They expand simultaneously — that's what makes this <b>multi-source</b> BFS.`, tag:"seed", line:5});
+
+  let lv = 0;
+  while(q.length){
+    lv++;
+    const levelSize = q.length;
+    snap({queue:q.map(qstr), desc:`<b>BFS layer ${lv}</b> — processing the <b>${levelSize}</b> cell(s) currently at distance <b>${lv-1}</b>. Their unvisited neighbours become distance <b>${lv}</b>.`, tag:`layer ${lv}`, line:7});
+
+    for(let i=0;i<levelSize;i++){
+      const [r,c] = q.shift();
+      const wasSrc = INIT[r][c]===0;
+      state[r][c] = wasSrc ? 'sc' : 'c';
+      snap({queue:q.map(qstr), desc:`Dequeue <b>(${r},${c})</b>, distance <b>${dist[r][c]}</b>. Examine its 4 neighbours.`, tag:"dequeue", line:8});
+
+      for(let k=0;k<4;k++){
+        const nr=r+DR[k], nc=c+DC[k];
+        if(nr<0||nr>=R||nc<0||nc>=C) continue; // skip OOB silently
+        if(dist[nr][nc]!==-1){
+          // already visited / a source — show why we skip
+          const prev = state[nr][nc];
+          state[nr][nc]='bad';
+          const why = INIT[nr][nc]===0
+            ? `it's a <b>source</b> (already distance 0)`
+            : `already settled at distance <b>${dist[nr][nc]}</b>`;
+          snap({queue:q.map(qstr), desc:`Neighbour <b>${DNAME[k]}</b> → <b>(${nr},${nc})</b>: skip, ${why}. BFS never overwrites — first visit is the shortest.`, tag:"skip", line:12});
+          state[nr][nc]=prev;
+          continue;
+        }
+        // valid: discover
+        dist[nr][nc]=dist[r][c]+1;
+        state[nr][nc]='ok';
+        snap({queue:q.map(qstr).concat(`(${nr},${nc})`), desc:`Neighbour <b>${DNAME[k]}</b> → <b>(${nr},${nc})</b>: unvisited! Set distance <b>${dist[nr][nc]}</b> and enqueue.`, tag:"discover", line:13});
+        state[nr][nc]='q';
+        q.push([nr,nc]);
+      }
+      // current cell is now settled
+      state[r][c]='v';
+    }
+  }
+
+  snap({queue:[], desc:`Queue empty — <b>BFS complete</b>. Every cell now holds its minimum distance to the nearest 0. Time <b>O(R·C)</b>, space <b>O(R·C)</b>.`, tag:"done", line:17});
+
+  // ---------- render ----------
+  const gridEl=document.getElementById('grid');
+  const clEl=document.getElementById('clabels');
+  const codeEl=document.getElementById('code');
+  const queueEl=document.getElementById('queue');
+  const descEl=document.getElementById('desc');
+  const pbar=document.getElementById('pbar');
+  const frameno=document.getElementById('frameno');
+
+  // column labels
+  for(let c=0;c<C;c++){const d=document.createElement('div');d.className='clabel';d.textContent=c;clEl.appendChild(d);}
+
+  // build cells once
+  const cells=[];
+  for(let r=0;r<R;r++){
+    const row=document.createElement('div'); row.className='grow';
+    const rl=document.createElement('div'); rl.className='rlabel'; rl.textContent=r; row.appendChild(rl);
+    cells[r]=[];
+    for(let c=0;c<C;c++){
+      const el=document.createElement('div'); el.className='cell';
+      const co=document.createElement('span'); co.className='coord'; co.textContent=`${r},${c}`;
+      const val=document.createElement('span'); val.className='val';
+      el.appendChild(co); el.appendChild(val);
+      row.appendChild(el); cells[r][c]=el;
+    }
+    gridEl.appendChild(row);
+  }
+
+  // build code once
+  CODE.forEach((html,i)=>{
+    const s=document.createElement('span'); s.className='ln'; s.id='ln'+i; s.innerHTML=html||'&nbsp;';
+    codeEl.appendChild(s);
+  });
+
+  function cellText(r,c,f){
+    const st=f.state[r][c], d=f.dist[r][c];
+    if(st==='u') return INIT[r][c]===0?'0':'?';
+    if(d>=0) return String(d);
+    return INIT[r][c]===0?'0':'?';
+  }
+  function cellClass(r,c,f){
+    const st=f.state[r][c];
+    const map={src:'s',sc:'sc',q:'q',c:'c',ok:'ok',bad:'bad',v:'v',u:'u'};
+    return 'cell '+(map[st]||'u');
+  }
+
+  let idx=0, timer=null;
+  function render(){
+    const f=frames[idx];
+    for(let r=0;r<R;r++)for(let c=0;c<C;c++){
+      const el=cells[r][c];
+      el.className=cellClass(r,c,f);
+      el.querySelector('.val').textContent=cellText(r,c,f);
+    }
+    // queue
+    queueEl.innerHTML='';
+    const head=document.createElement('span'); head.className='qhead'; head.textContent='q ='; queueEl.appendChild(head);
+    if(f.queue.length===0){
+      const e=document.createElement('span'); e.className='qempty'; e.textContent='empty'; queueEl.appendChild(e);
+    } else {
+      f.queue.forEach(s=>{
+        const isSrc = /\((\d+),(\d+)\)/.test(s) && (()=>{const m=s.match(/\((\d+),(\d+)\)/);return INIT[+m[1]][+m[2]]===0 && f.dist[+m[1]][+m[2]]===0;})();
+        const p=document.createElement('span'); p.className='qpill'+(isSrc?' src':''); p.textContent=s; queueEl.appendChild(p);
+      });
+    }
+    // code highlight
+    CODE.forEach((_,i)=>document.getElementById('ln'+i).classList.toggle('hot', i===f.line));
+    // desc
+    descEl.innerHTML=`<span class="tag">${f.tag}</span>${f.desc}`;
+    // progress
+    pbar.style.width=((idx)/(frames.length-1)*100)+'%';
+    frameno.textContent=`${idx+1} / ${frames.length}`;
+    document.getElementById('prev').disabled = idx===0;
+    document.getElementById('next').disabled = idx===frames.length-1;
+  }
+
+  function stop(){ if(timer){clearInterval(timer);timer=null;} document.getElementById('play').textContent='▶ Play'; }
+  function play(){
+    if(timer){stop();return;}
+    if(idx>=frames.length-1) idx=0;
+    document.getElementById('play').textContent='❚❚ Pause';
+    const ms=+document.getElementById('speed').value;
+    timer=setInterval(()=>{
+      if(idx>=frames.length-1){stop();return;}
+      idx++; render();
+    },ms);
+  }
+
+  document.getElementById('next').onclick=()=>{stop(); if(idx<frames.length-1){idx++;render();}};
+  document.getElementById('prev').onclick=()=>{stop(); if(idx>0){idx--;render();}};
+  document.getElementById('reset').onclick=()=>{stop(); idx=0; render();};
+  document.getElementById('play').onclick=play;
+  document.getElementById('speed').onchange=()=>{ if(timer){stop();play();} };
+  document.addEventListener('keydown',e=>{
+    if(e.key==='ArrowRight'){document.getElementById('next').click();}
+    else if(e.key==='ArrowLeft'){document.getElementById('prev').click();}
+    else if(e.key===' '){e.preventDefault();play();}
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>01 Matrix — Level-by-Level Multi-Source BFS</title>
+<style>
+  :root{
+    --bg:#0f1419; --panel:#171c24; --panel2:#1d2530; --border:#2a3240;
+    --text:#e6edf3; --muted:#8b97a7; --accent:#4ea1ff;
+    --teal:#1aab9c; --teal-d:#0e7d72;
+    --amber:#f0a500; --amber-d:#a87400;
+    --green:#3ecf8e; --green-d:#1f8f5f;
+    --blue:#4ea1ff; --blue-d:#1c5fa8;
+    --red:#e8617a; --red-bg:#3a1f27;
+    --purple:#b388ff;
+    --cell:#222b36;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:24px;}
+  .wrap{max-width:1060px;margin:0 auto;}
+  h1{font-size:22px;margin:0 0 2px;font-weight:650;}
+  .sub{color:var(--muted);font-size:13px;margin-bottom:20px;}
+  .sub code{background:var(--panel2);padding:1px 6px;border-radius:4px;font-size:12px;}
+  /* problem statement */
+  .problem{margin-bottom:20px;}
+  .ptext{font-size:13.5px;line-height:1.6;color:#cdd6e0;margin-bottom:16px;}
+  .ptext code{background:var(--panel2);padding:1px 6px;border-radius:4px;font-size:12px;}
+  .ptext b{color:#fff;}
+  .example{display:flex;align-items:center;gap:22px;flex-wrap:wrap;}
+  .exblock{text-align:center;}
+  .excap{font-size:10.5px;color:var(--muted);margin:8px 0 0;}
+  .excap code{background:var(--panel2);padding:0 4px;border-radius:3px;}
+  .exarrow{font-size:26px;color:var(--accent);}
+  .ic{background:var(--cell);color:#cdd6e0;}
+  .ic.zero{background:var(--teal-d);color:#eafffb;border-color:var(--teal);}
+  .oc{background:#1a2a22;color:#9fe6c4;border-color:#2c4a3b;}
+  .oc.zero{background:var(--teal-d);color:#eafffb;border-color:var(--teal);}
+
+  .main{display:grid;grid-template-columns:minmax(300px,310px) 1fr;gap:20px;align-items:start;}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:16px;}
+  .card h2{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:0 0 12px;font-weight:600;}
+
+  /* grids */
+  .grids{display:flex;gap:18px;flex-wrap:wrap;}
+  .gtitle{font-size:11px;color:var(--muted);margin:0 0 6px;text-align:center;font-weight:600;}
+  .grid{display:flex;flex-direction:column;gap:4px;}
+  .grow{display:flex;gap:4px;align-items:center;}
+  .rlabel,.clabel{color:var(--muted);font-size:10px;width:14px;text-align:center;font-variant-numeric:tabular-nums;}
+  .clabels{display:flex;gap:4px;margin-left:18px;}
+  .clabels .clabel{width:50px;}
+  .cell{width:50px;height:50px;border-radius:8px;position:relative;display:flex;align-items:center;justify-content:center;
+    font-size:19px;font-weight:700;font-variant-numeric:tabular-nums;background:var(--cell);color:var(--muted);
+    border:2px solid transparent;transition:background .18s,border-color .18s,color .18s,transform .12s;}
+  .cell .coord{position:absolute;top:2px;left:4px;font-size:8px;font-weight:600;opacity:.55;}
+  /* vis grid cells */
+  .vc.on {background:#243; color:#9fe6c4; border-color:#3a6b52;}
+  .vc.off{background:var(--cell); color:#5a6675;}
+  .vc.now{background:var(--blue-d); color:#eaf3ff; border-color:var(--blue);transform:scale(1.06);}
+  .vc.new{background:var(--green-d);color:#eafff3; border-color:var(--green);transform:scale(1.06);}
+  /* mat grid cells */
+  .cell.s    {background:var(--teal-d); color:#eafffb; border-color:var(--teal);}
+  .cell.sc   {background:var(--blue-d); color:#eaf3ff; border-color:var(--blue);transform:scale(1.06);}
+  .cell.q    {background:var(--amber-d);color:#fff4dd; border-color:var(--amber);}
+  .cell.c    {background:var(--blue-d); color:#eaf3ff; border-color:var(--blue);transform:scale(1.06);}
+  .cell.ok   {background:var(--green-d);color:#eafff3; border-color:var(--green);transform:scale(1.06);}
+  .cell.bad  {background:var(--red-bg); color:var(--red); border-color:var(--red);}
+  .cell.v    {background:#1a2a22;       color:#9fe6c4; border-color:#2c4a3b;}
+  .cell.u    {background:var(--cell);   color:#5a6675;}
+
+  .queue-card{margin-top:16px;}
+  .queue{display:flex;flex-wrap:wrap;gap:6px;min-height:30px;align-items:center;}
+  .qpill{background:var(--amber-d);color:#fff4dd;border:1px solid var(--amber);padding:3px 9px;border-radius:14px;
+    font-size:12px;font-weight:600;font-variant-numeric:tabular-nums;}
+  .qpill.src{background:var(--teal-d);border-color:var(--teal);color:#eafffb;}
+  .qpill.lvl{box-shadow:0 0 0 2px var(--purple);}
+  .qempty{color:var(--muted);font-size:12px;font-style:italic;}
+  .qhead{color:var(--muted);font-size:11px;margin-right:2px;}
+  .qsz{margin-left:auto;font-size:11px;color:var(--purple);font-weight:600;}
+
+  .legend{display:flex;flex-wrap:wrap;gap:9px 14px;margin-top:14px;}
+  .lg{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);}
+  .sw{width:13px;height:13px;border-radius:4px;border:1px solid;}
+
+  .code{background:#0c1118;border:1px solid var(--border);border-radius:10px;padding:12px 10px;overflow:auto;}
+  .code pre{margin:0;font-family:"SF Mono",ui-monospace,Menlo,Monaco,Consolas,monospace;font-size:12px;line-height:1.5;}
+  .ln{display:block;padding:0 8px;border-radius:5px;white-space:pre;color:#c2cbd6;border-left:2px solid transparent;}
+  .ln .kw{color:#ff8bbf;} .ln .fn{color:#8be9fd;} .ln .ty{color:#7ee787;} .ln .nm{color:#ffd479;} .ln .cm{color:#6a7480;font-style:italic;}
+  .ln.hot{background:rgba(240,165,0,.16);border-left-color:var(--amber);}
+
+  .controls{display:flex;align-items:center;gap:8px;margin-top:16px;flex-wrap:wrap;}
+  button{background:var(--panel2);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:8px 14px;
+    font-size:13px;font-weight:600;cursor:pointer;transition:background .15s,border-color .15s;}
+  button:hover{background:#28323f;border-color:#3a4555;}
+  button.primary{background:var(--accent);border-color:var(--accent);color:#06223f;}
+  button.primary:hover{background:#6cb2ff;}
+  button:disabled{opacity:.4;cursor:not-allowed;}
+  .spacer{flex:1;}
+  select{background:var(--panel2);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:7px 8px;font-size:12px;}
+  .desc{background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-top:16px;font-size:13.5px;line-height:1.5;min-height:42px;}
+  .desc .tag{display:inline-block;background:var(--accent);color:#06223f;font-size:10px;font-weight:700;padding:2px 7px;border-radius:5px;margin-right:8px;text-transform:uppercase;letter-spacing:.05em;}
+  .desc .tag.lvl{background:var(--purple);}
+  .desc b{color:#fff;}
+  .progress{height:5px;background:var(--panel2);border-radius:3px;margin-top:14px;overflow:hidden;}
+  .pbar{height:100%;background:var(--accent);width:0;transition:width .2s;}
+  .frameno{color:var(--muted);font-size:12px;font-variant-numeric:tabular-nums;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>01 Matrix — Level-by-Level Multi-Source BFS</h1>
+  <div class="sub">Your exact solution: a <code>vis[][]</code> array, the <code>sz = q.size()</code> layer counter, and distances written straight into <code>mat</code> via <code>mat[nr][nc] = mat[r][c] + 1</code>.</div>
+
+  <!-- PROBLEM STATEMENT -->
+  <div class="card problem">
+    <h2>Problem &nbsp;<span style="color:var(--muted);text-transform:none;letter-spacing:0;font-weight:400;">LeetCode 542 · 01 Matrix · Medium</span></h2>
+    <div class="ptext">
+      Given an <code>m × n</code> binary matrix <code>mat</code>, return a matrix of the same size where
+      each cell holds the distance to the <b>nearest <code>0</code></b>. The distance between two adjacent
+      cells (sharing an edge — up / down / left / right) is <b>1</b>.
+    </div>
+    <div class="example">
+      <div class="exblock">
+        <p class="gtitle">Input&nbsp;mat[][]</p>
+        <div class="clabels" id="clabelsI"></div>
+        <div class="grid" id="gridI"></div>
+        <p class="excap">3 source <code>0</code>s · the rest are <code>1</code>s to be measured</p>
+      </div>
+      <div class="exarrow">⟶</div>
+      <div class="exblock">
+        <p class="gtitle">Expected output (nearest-0 distance)</p>
+        <div class="clabels" id="clabelsO"></div>
+        <div class="grid" id="gridO"></div>
+        <p class="excap">each value = min Manhattan steps to any <code>0</code></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="main">
+    <div>
+      <div class="card">
+        <div class="grids">
+          <div>
+            <p class="gtitle">mat[][] &nbsp;(distances)</p>
+            <div class="clabels" id="clabelsM"></div>
+            <div class="grid" id="gridM"></div>
+          </div>
+          <div>
+            <p class="gtitle">vis[][]</p>
+            <div class="clabels" id="clabelsV"></div>
+            <div class="grid" id="gridV"></div>
+          </div>
+        </div>
+        <div class="legend">
+          <div class="lg"><span class="sw" style="background:var(--teal-d);border-color:var(--teal)"></span>source 0</div>
+          <div class="lg"><span class="sw" style="background:var(--blue-d);border-color:var(--blue)"></span>processing</div>
+          <div class="lg"><span class="sw" style="background:var(--green-d);border-color:var(--green)"></span>discovered</div>
+          <div class="lg"><span class="sw" style="background:var(--amber-d);border-color:var(--amber)"></span>in queue</div>
+          <div class="lg"><span class="sw" style="background:#1a2a22;border-color:#2c4a3b"></span>settled</div>
+          <div class="lg"><span class="sw" style="background:var(--red-bg);border-color:var(--red)"></span>skipped</div>
+        </div>
+      </div>
+
+      <div class="card queue-card">
+        <h2>Queue &nbsp;<span style="color:var(--purple);text-transform:none;letter-spacing:0;">(purple ring = current layer)</span></h2>
+        <div class="queue" id="queue"></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="card">
+        <h2>C++ &nbsp;<span style="color:var(--muted);text-transform:none;letter-spacing:0;font-weight:400;">updateMatrix</span></h2>
+        <div class="code"><pre id="code"></pre></div>
+        <div class="desc" id="desc"></div>
+        <div class="progress"><div class="pbar" id="pbar"></div></div>
+        <div class="controls">
+          <button id="reset">⟲ Reset</button>
+          <button id="prev">‹ Prev</button>
+          <button id="play" class="primary">▶ Play</button>
+          <button id="next">Next ›</button>
+          <span class="spacer"></span>
+          <select id="speed">
+            <option value="1100">0.5×</option>
+            <option value="650" selected>1×</option>
+            <option value="350">2×</option>
+            <option value="160">4×</option>
+          </select>
+          <span class="frameno" id="frameno">0 / 0</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const INIT=[
+    [0,1,1,1],
+    [1,1,1,0],
+    [1,1,1,1],
+    [0,1,1,1],
+  ];
+  const m=INIT.length, n=INIT[0].length;
+  const DR=[-1,1,0,0], DC=[0,0,-1,1], DNAME=["up","down","left","right"];
+
+  const CODE=[
+    `<span class="kw">for</span> (i,j) <span class="cm">// seed all 0-cells</span>`,                                   //0
+    `  <span class="kw">if</span> (mat[i][j]==<span class="nm">0</span> &amp;&amp; !vis[i][j]) {`,                       //1
+    `    vis[i][j]=<span class="nm">1</span>; q.push({i,j});`,                                                         //2
+    `  }`,                                                                                                            //3
+    `<span class="kw">while</span> (!q.empty()) {`,                                                                   //4
+    `  <span class="ty">int</span> sz = q.size();          <span class="cm">// one BFS layer</span>`,                 //5
+    `  <span class="kw">while</span> (sz--) {`,                                                                       //6
+    `    <span class="kw">auto</span> [r,c] = q.front(); q.pop();`,                                                   //7
+    `    <span class="kw">for</span> (<span class="ty">int</span> i=<span class="nm">0</span>; i&lt;<span class="nm">4</span>; i++) {`,//8
+    `      <span class="ty">int</span> nr=dr[i]+r, nc=dc[i]+c;`,                                                      //9
+    `      <span class="kw">if</span> (inBounds &amp;&amp; mat[nr][nc]==<span class="nm">1</span> &amp;&amp; !vis[nr][nc]) {`,//10
+    `        vis[nr][nc]=<span class="nm">1</span>;`,                                                                 //11
+    `        mat[nr][nc] = mat[r][c]+<span class="nm">1</span>;`,                                                     //12
+    `        q.push({nr,nc});`,                                                                                      //13
+    `      }`,                                                                                                       //14
+    `    }`,                                                                                                         //15
+    `  }`,                                                                                                           //16
+    `}`,                                                                                                            //17
+    `<span class="kw">return</span> mat;`,                                                                           //18
+  ];
+
+  const frames=[];
+  const mat=INIT.map(r=>r.slice());
+  const vis=Array.from({length:m},()=>Array(n).fill(0));
+  const state=Array.from({length:m},(_,r)=>Array.from({length:n},(_,c)=>INIT[r][c]===0?'src':'u'));
+
+  // queue stored as objects {r,c,layer} so we can ring the current layer
+  function snap(o){
+    frames.push({
+      mat:mat.map(r=>r.slice()),
+      vis:vis.map(r=>r.slice()),
+      state:state.map(r=>r.slice()),
+      queue:o.queue.map(x=>({r:x.r,c:x.c,layer:x.layer})),
+      curLayer:o.curLayer,
+      sz:o.sz,
+      desc:o.desc, tag:o.tag, line:o.line, lvlTag:!!o.lvlTag,
+    });
+  }
+
+  snap({queue:[], desc:`Input <b>mat</b>. <b>0</b>-cells are sources; every <b>1</b> needs its distance to the nearest 0. <b>vis</b> starts all-zero.`, tag:"start", line:18, curLayer:-1});
+
+  const q=[];
+  for(let i=0;i<m;i++)for(let j=0;j<n;j++){
+    if(mat[i][j]===0 && !vis[i][j]){
+      vis[i][j]=1; q.push({r:i,c:j,layer:0}); state[i][j]='src';
+    }
+  }
+  snap({queue:q, desc:`Seeding done: all <b>${q.length}</b> source cells marked <b>vis=1</b> and pushed. They sit at distance <b>0</b> in <b>mat</b>.`, tag:"seed", line:2, curLayer:0});
+
+  let layer=0;
+  while(q.length){
+    layer++;
+    const sz=q.length;
+    snap({queue:q, sz, curLayer:layer-1, lvlTag:true,
+      desc:`<b>sz = q.size() = ${sz}</b>. We'll pop exactly these <b>${sz}</b> cell(s) (currently distance <b>${layer-1}</b>) as one layer. Their new neighbours become distance <b>${layer}</b>.`,
+      tag:`layer ${layer}`, line:5});
+
+    let toProcess=sz;
+    while(toProcess--){
+      const {r,c}=q.shift();
+      const wasSrc=INIT[r][c]===0;
+      state[r][c]= wasSrc?'sc':'c';
+      snap({queue:q, sz:toProcess, curLayer:layer-1,
+        desc:`Pop <b>(${r},${c})</b>, mat=<b>${mat[r][c]}</b>. Scan 4 neighbours. <b>sz</b> now ${toProcess+1}→${toProcess} for this layer.`,
+        tag:"pop", line:7});
+
+      for(let i=0;i<4;i++){
+        const nr=DR[i]+r, nc=DC[i]+c;
+        if(nr<0||nr>=m||nc<0||nc>=n) continue; // OOB silently
+        const inb=true;
+        if(mat[nr][nc]!==1 || vis[nr][nc]){
+          const prev=state[nr][nc];
+          state[nr][nc]='bad';
+          let why;
+          if(INIT[nr][nc]===0) why=`it's a <b>source</b> (mat==0, not ==1)`;
+          else if(vis[nr][nc]) why=`<b>vis=1</b> already — settled at distance <b>${mat[nr][nc]}</b>`;
+          else why=`skip`;
+          snap({queue:q, sz:toProcess+1, curLayer:layer-1,
+            desc:`Neighbour <b>${DNAME[i]}</b> → <b>(${nr},${nc})</b>: skip — ${why}. The <b>!vis</b> guard keeps the first (shortest) distance.`,
+            tag:"skip", line:10});
+          state[nr][nc]=prev;
+          continue;
+        }
+        // valid
+        vis[nr][nc]=1;
+        mat[nr][nc]=mat[r][c]+1;
+        state[nr][nc]='new';
+        snap({queue:q, sz:toProcess+1, curLayer:layer-1,
+          desc:`Neighbour <b>${DNAME[i]}</b> → <b>(${nr},${nc})</b>: valid! Set <b>vis=1</b>, <b>mat[${nr}][${nc}] = ${mat[r][c]} + 1 = ${mat[nr][nc]}</b>, enqueue.`,
+          tag:"discover", line:12});
+        state[nr][nc]='q';
+        q.push({r:nr,c:nc,layer});
+      }
+      state[r][c]='v';
+    }
+  }
+
+  snap({queue:[], desc:`Queue empty — <b>done</b>. <b>mat</b> now holds every cell's distance to the nearest 0. The <b>sz</b> loop made the layers explicit; correctness also follows from the <b>mat[r][c]+1</b> values alone.`, tag:"done", line:18, curLayer:-1});
+
+  // ---------- render ----------
+  const codeEl=document.getElementById('code');
+  const queueEl=document.getElementById('queue');
+  const descEl=document.getElementById('desc');
+  const pbar=document.getElementById('pbar');
+  const frameno=document.getElementById('frameno');
+
+  function buildGrid(gridId,clId){
+    const cl=document.getElementById(clId);
+    for(let c=0;c<n;c++){const d=document.createElement('div');d.className='clabel';d.textContent=c;cl.appendChild(d);}
+    const g=document.getElementById(gridId); const cells=[];
+    for(let r=0;r<m;r++){
+      const row=document.createElement('div');row.className='grow';
+      const rl=document.createElement('div');rl.className='rlabel';rl.textContent=r;row.appendChild(rl);
+      cells[r]=[];
+      for(let c=0;c<n;c++){
+        const el=document.createElement('div');el.className='cell';
+        const co=document.createElement('span');co.className='coord';co.textContent=`${r},${c}`;
+        const val=document.createElement('span');val.className='val';
+        el.appendChild(co);el.appendChild(val);row.appendChild(el);cells[r][c]=el;
+      }
+      g.appendChild(row);
+    }
+    return cells;
+  }
+  const cellsM=buildGrid('gridM','clabelsM');
+  const cellsV=buildGrid('gridV','clabelsV');
+
+  // static example grids (problem statement): input + expected output
+  const OUT=mat.map(r=>r.slice()); // mat holds the final result after BFS above
+  (function(){
+    const cI=buildGrid('gridI','clabelsI');
+    const cO=buildGrid('gridO','clabelsO');
+    for(let r=0;r<m;r++)for(let c=0;c<n;c++){
+      const iz=INIT[r][c]===0;
+      cI[r][c].className='cell ic'+(iz?' zero':'');
+      cI[r][c].querySelector('.val').textContent=INIT[r][c];
+      cO[r][c].className='cell oc'+(OUT[r][c]===0?' zero':'');
+      cO[r][c].querySelector('.val').textContent=OUT[r][c];
+    }
+  })();
+
+  CODE.forEach((html,i)=>{const s=document.createElement('span');s.className='ln';s.id='ln'+i;s.innerHTML=html||'&nbsp;';codeEl.appendChild(s);});
+
+  const matMap={src:'s',sc:'sc',q:'q',c:'c',ok:'ok',new:'ok',bad:'bad',v:'v',u:'u'};
+  function matText(r,c,f){
+    const st=f.state[r][c];
+    if(st==='u') return INIT[r][c]===0?'0':'?';
+    return String(f.mat[r][c]);
+  }
+
+  let idx=0,timer=null;
+  function render(){
+    const f=frames[idx];
+    for(let r=0;r<m;r++)for(let c=0;c<n;c++){
+      // mat grid
+      const em=cellsM[r][c];
+      em.className='cell '+(matMap[f.state[r][c]]||'u');
+      em.querySelector('.val').textContent=matText(r,c,f);
+      // vis grid
+      const ev=cellsV[r][c];
+      const st=f.state[r][c];
+      let vcls='off';
+      if(st==='c'||st==='sc') vcls='now';
+      else if(st==='new') vcls='new';
+      else if(f.vis[r][c]) vcls='on';
+      ev.className='cell vc '+vcls;
+      ev.querySelector('.val').textContent=f.vis[r][c]?'1':'0';
+    }
+    // queue
+    queueEl.innerHTML='';
+    const head=document.createElement('span');head.className='qhead';head.textContent='q =';queueEl.appendChild(head);
+    if(f.queue.length===0){
+      const e=document.createElement('span');e.className='qempty';e.textContent='empty';queueEl.appendChild(e);
+    } else {
+      f.queue.forEach(it=>{
+        const isSrc=INIT[it.r][it.c]===0 && f.mat[it.r][it.c]===0;
+        const inLayer=it.layer===f.curLayer;
+        const p=document.createElement('span');
+        p.className='qpill'+(isSrc?' src':'')+(inLayer?' lvl':'');
+        p.textContent=`(${it.r},${it.c})`;
+        queueEl.appendChild(p);
+      });
+    }
+    if(f.sz!==undefined && f.sz!==null && f.curLayer>=0){
+      const s=document.createElement('span');s.className='qsz';s.textContent=`sz left: ${f.sz}`;queueEl.appendChild(s);
+    }
+    // code
+    CODE.forEach((_,i)=>document.getElementById('ln'+i).classList.toggle('hot', i===f.line));
+    // desc
+    descEl.innerHTML=`<span class="tag${f.lvlTag?' lvl':''}">${f.tag}</span>${f.desc}`;
+    pbar.style.width=(idx/(frames.length-1)*100)+'%';
+    frameno.textContent=`${idx+1} / ${frames.length}`;
+    document.getElementById('prev').disabled=idx===0;
+    document.getElementById('next').disabled=idx===frames.length-1;
+  }
+
+  function stop(){if(timer){clearInterval(timer);timer=null;}document.getElementById('play').textContent='▶ Play';}
+  function play(){
+    if(timer){stop();return;}
+    if(idx>=frames.length-1) idx=0;
+    document.getElementById('play').textContent='❚❚ Pause';
+    const ms=+document.getElementById('speed').value;
+    timer=setInterval(()=>{if(idx>=frames.length-1){stop();return;}idx++;render();},ms);
+  }
+  document.getElementById('next').onclick=()=>{stop();if(idx<frames.length-1){idx++;render();}};
+  document.getElementById('prev').onclick=()=>{stop();if(idx>0){idx--;render();}};
+  document.getElementById('reset').onclick=()=>{stop();idx=0;render();};
+  document.getElementById('play').onclick=play;
+  document.getElementById('speed').onchange=()=>{if(timer){stop();play();}};
+  document.addEventListener('keydown',e=>{
+    if(e.key==='ArrowRight')document.getElementById('next').click();
+    else if(e.key==='ArrowLeft')document.getElementById('prev').click();
+    else if(e.key===' '){e.preventDefault();play();}
+  });
+  render();
+})();
+</script>
+</body>
+</html>

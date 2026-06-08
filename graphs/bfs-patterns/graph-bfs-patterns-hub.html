@@ -1,0 +1,1290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Graph & Grid BFS — Pattern Revision Hub</title>
+<style>
+  :root{
+    --bg:#0d0f14; --bg2:#0a0c11; --panel:#141920; --border:#1e2a38;
+    --text:#c9d1d9; --txt2:#8b949e; --muted:#586069; --faint:#444d56;
+    --head:#e6edf3;
+    --grid:#69ff47; --multi:#00e5ff; --level:#ffd60a; --boundary:#ff9f0a; --graph:#bf5af2;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'JetBrains Mono','Fira Code','SF Mono',ui-monospace,Menlo,monospace;
+    background:var(--bg); color:var(--text); min-height:100vh;
+  }
+  ::-webkit-scrollbar{width:9px;height:9px;}
+  ::-webkit-scrollbar-thumb{background:#26303d;border-radius:5px;}
+  ::-webkit-scrollbar-track{background:transparent;}
+
+  .top{background:linear-gradient(135deg,#0d0f14,#141920);border-bottom:1px solid var(--border);padding:18px 26px 14px;}
+  .top .row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+  .badge{background:#00e5ff22;border:1px solid #00e5ff55;color:var(--multi);font-size:10px;font-weight:700;letter-spacing:2px;padding:3px 10px;border-radius:3px;}
+  h1{margin:0;font-size:19px;font-weight:700;color:var(--head);letter-spacing:-.3px;}
+  .top .meta{color:var(--faint);font-size:12px;}
+  .top p{margin:6px 0 0;font-size:11px;color:var(--muted);letter-spacing:.3px;}
+
+  .shell{display:flex;min-height:calc(100vh - 84px);}
+
+  .side{width:248px;min-width:248px;background:var(--bg2);border-right:1px solid var(--border);overflow-y:auto;padding:10px 0 30px;}
+  .catlabel{font-size:9px;letter-spacing:1.6px;color:var(--faint);padding:14px 18px 6px;font-weight:700;}
+  .navitem{padding:9px 16px;cursor:pointer;border-left:3px solid transparent;transition:background .15s,border-color .15s;}
+  .navitem:hover{background:#10151c;}
+  .navitem.on{background:var(--panel);}
+  .navitem .tag{font-size:8.5px;font-weight:700;letter-spacing:1.3px;opacity:.65;}
+  .navitem.on .tag{opacity:1;}
+  .navitem .nm{font-size:12px;color:var(--txt2);margin-top:2px;line-height:1.3;}
+  .navitem.on .nm{color:var(--head);font-weight:600;}
+
+  .main{flex:1;overflow-y:auto;padding:24px 30px 60px;max-width:980px;}
+  .fade{animation:fade .35s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+
+  .phead{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:18px;}
+  .ptag{font-size:9px;font-weight:700;letter-spacing:2px;padding:3px 10px;border-radius:3px;}
+  .pcount{color:var(--faint);font-size:11px;margin-left:8px;}
+  .phead h2{margin:8px 0 0;font-size:23px;font-weight:700;color:var(--head);letter-spacing:-.5px;}
+  .copy{background:var(--panel);border:1px solid #30363d;color:var(--txt2);padding:8px 15px;border-radius:6px;cursor:pointer;font-size:11px;font-family:inherit;letter-spacing:.5px;white-space:nowrap;transition:.2s;}
+  .copy:hover{border-color:#475569;color:var(--head);}
+  .copy.done{background:#1a3a1a;border-color:#69ff47;color:#69ff47;}
+
+  .cards{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;}
+  .ic{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:13px 15px;}
+  .ic .h{font-size:9px;letter-spacing:1.5px;margin-bottom:6px;color:var(--muted);font-weight:700;}
+  .ic p{margin:0;font-size:12px;line-height:1.6;color:var(--text);}
+  .ic.analogy{grid-column:1/3;}
+  .ic.analogy .h{color:var(--multi);}
+  .ic.bugs{grid-column:1/3;border-color:#ff6b6b33;}
+  .ic.bugs .h{color:#ff6b6b;}
+  .ic.bugs ul{margin:0;padding-left:16px;}
+  .ic.bugs li{font-size:12px;line-height:1.75;color:var(--text);}
+  .ic.bugs code{background:#1c2530;color:#ffd479;padding:0 4px;border-radius:3px;font-size:11px;}
+  .ic b{color:var(--head);}
+  .ic .keyword{color:var(--multi);}
+
+  .probs{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:11px 15px;margin-bottom:14px;}
+  .probs .h{font-size:9px;letter-spacing:1.5px;color:var(--muted);margin-bottom:8px;font-weight:700;}
+  .chip{display:inline-block;background:var(--panel);border:1px solid #30363d;color:var(--txt2);font-size:11px;padding:4px 10px;border-radius:4px;margin:0 6px 6px 0;}
+  .chip .done{color:#69ff47;}
+
+  .cb{background:var(--bg2);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:14px;}
+  .cbbar{background:var(--panel);border-bottom:1px solid var(--border);padding:9px 14px;display:flex;align-items:center;gap:8px;}
+  .dots{display:flex;gap:6px;}
+  .dots i{width:10px;height:10px;border-radius:50%;display:inline-block;}
+  .cbtitle{font-size:11px;color:var(--muted);margin-left:6px;}
+  .method{font-size:8.5px;font-weight:700;letter-spacing:1px;padding:2px 8px;border-radius:3px;margin-left:4px;}
+  pre{margin:0;padding:18px 18px;font-size:12.3px;line-height:1.85;overflow-x:auto;white-space:pre;font-family:inherit;}
+  .kw{color:#ff7b72;} .nm{color:#79c0ff;} .cm{color:#586069;font-style:italic;} .star{color:#ffd60a;font-weight:700;} .str{color:#a5d6ff;}
+
+  .demo{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:14px;}
+  .demo .h{font-size:9px;letter-spacing:1.5px;color:var(--multi);margin-bottom:12px;font-weight:700;}
+  .demowrap{display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap;}
+  .gd{display:flex;flex-direction:column;gap:3px;}
+  .gdrow{display:flex;gap:3px;}
+  .gc{width:42px;height:42px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;background:#1a212b;color:#3a4452;border:1.5px solid transparent;transition:background .35s,color .35s,border-color .35s,transform .25s;}
+  .demoside{flex:1;min-width:190px;}
+  .demoinfo{font-size:12px;line-height:1.6;color:var(--text);min-height:46px;background:var(--panel);border:1px solid var(--border);border-radius:6px;padding:10px 12px;margin-bottom:10px;}
+  .demoinfo b{color:var(--head);}
+  .counter{font-size:13px;color:var(--multi);font-weight:700;margin-bottom:10px;}
+  .dctrl{display:flex;gap:7px;align-items:center;flex-wrap:wrap;}
+  .dctrl button{background:var(--panel);border:1px solid #30363d;color:var(--text);padding:6px 12px;border-radius:6px;cursor:pointer;font-size:12px;font-family:inherit;font-weight:600;transition:.15s;}
+  .dctrl button:hover{background:#1c2530;}
+  .dctrl button.play{background:var(--multi);border-color:var(--multi);color:#06223f;}
+
+  /* code-traversal panel synced to animation */
+  .trace{margin-top:14px;background:#070a0e;border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+  .trace .th{background:var(--panel);border-bottom:1px solid var(--border);padding:7px 13px;font-size:10px;letter-spacing:1px;color:var(--muted);font-weight:700;}
+  .trace .th b{color:var(--multi);}
+  .trace pre{padding:12px 8px;font-size:12px;line-height:1.7;}
+  .tln{display:block;padding:1px 12px;border-left:3px solid transparent;white-space:pre;color:#7d8895;border-radius:0;transition:background .2s,color .2s,border-color .2s;}
+  .tln.hot{background:#0f2a33;border-left-color:var(--multi);color:#dff6ff;}
+  .tln.hot .nm{color:#9fe0ff;}
+
+  .pnav{display:flex;justify-content:space-between;align-items:center;margin-top:18px;padding-top:16px;border-top:1px solid var(--border);}
+  .pnav button{background:transparent;border:1px solid #30363d;color:var(--txt2);padding:8px 18px;border-radius:6px;cursor:pointer;font-size:12px;font-family:inherit;transition:.15s;}
+  .pnav button:hover:not(:disabled){border-color:#475569;color:var(--head);}
+  .pnav button:disabled{color:#2a323d;cursor:not-allowed;}
+  .pnav .pos{font-size:11px;color:var(--faint);}
+
+  .hint{font-size:10.5px;color:var(--faint);margin-top:4px;}
+
+  .menuToggle{display:none;}
+  @media(max-width:860px){
+    .shell{flex-direction:column;}
+    .side{width:100%;min-width:0;border-right:none;border-bottom:1px solid var(--border);max-height:0;overflow:hidden;padding:0;transition:max-height .3s ease;}
+    .side.open{max-height:1400px;padding:10px 0 20px;}
+    .menuToggle{display:inline-block;}
+    .cards{grid-template-columns:1fr;}
+    .ic.analogy,.ic.bugs{grid-column:auto;}
+    .main{padding:18px 16px 50px;}
+    .gc{width:36px;height:36px;font-size:13px;}
+  }
+
+  /* ---- 3D + glass upgrade ---- */
+  #bg3d{position:fixed;inset:0;width:100vw;height:100vh;z-index:-2;opacity:.5;pointer-events:none;}
+  body{background:radial-gradient(1200px 820px at 72% -12%, #15243c 0%, #0d0f14 56%) fixed;}
+  .top{backdrop-filter:blur(10px);background:rgba(12,16,22,.72)!important;}
+  .side{backdrop-filter:blur(10px);background:rgba(9,11,16,.66)!important;}
+  h1{background:linear-gradient(90deg,#00e5ff,#7c93ff 55%,#f78fb3);-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .ic{background:rgba(10,12,17,.62)!important;backdrop-filter:blur(6px);}
+  .cb,.trace{background:rgba(7,10,14,.78)!important;backdrop-filter:blur(6px);}
+  .probs,.demo{background:rgba(10,12,17,.6)!important;backdrop-filter:blur(6px);}
+  .ic,.cb,.probs,.demo,.trace{box-shadow:0 8px 30px rgba(0,0,0,.28);}
+  .demowrap3d{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start;}
+  .g3dcol{flex:2;min-width:300px;}
+  .g3dside{flex:1;min-width:200px;}
+  .g3dcol canvas{width:100%;height:300px;display:block;border-radius:12px;border:1px solid var(--border);
+    background:radial-gradient(420px 260px at 50% 35%, rgba(0,229,255,.07), rgba(10,12,17,.4));}
+  .g3dhint{font-size:10.5px;color:var(--faint);margin-top:7px;}
+
+  .qrow{display:flex;align-items:center;gap:9px;margin-top:11px;flex-wrap:wrap;min-height:26px;}
+  .qlabel{font-size:10px;color:var(--muted);letter-spacing:1.5px;font-weight:700;}
+  .qpills{display:flex;gap:5px;flex-wrap:wrap;}
+  .qp{background:#a87400;border:1px solid #f0a500;color:#fff4dd;font-size:11.5px;font-weight:700;padding:3px 10px;border-radius:13px;animation:qin .28s ease;}
+  .qp.empty{background:transparent;border:1px dashed #2a3340;color:var(--faint);font-weight:400;font-style:italic;}
+  @keyframes qin{from{opacity:0;transform:translateY(5px) scale(.8);}to{opacity:1;transform:none;}}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+  <canvas id="bg3d"></canvas>
+  <div class="top">
+    <div class="row">
+      <span class="badge">BFS</span>
+      <h1>Graph &amp; Grid BFS — Pattern Revision Hub</h1>
+      <span class="meta">17 patterns · C++ · Anshu</span>
+      <button class="copy menuToggle" id="menuToggle" style="margin-left:auto">☰ patterns</button>
+    </div>
+    <p>Templates + the exact bugs you hit + animated dry-runs with the <b>code line lighting up as it executes</b>. Built around how you actually learn.</p>
+  </div>
+
+  <div class="shell">
+    <div class="side" id="side"></div>
+    <div class="main" id="main"></div>
+  </div>
+
+<script>
+/* ───────────────────────── PATTERN DATA ───────────────────────── */
+const CAT = {
+  CORE:     {color:'#7c93ff', label:'CORE GRAPH BFS'},
+  GRID:     {color:'#69ff47', label:'GRID TRAVERSAL'},
+  MULTI:    {color:'#00e5ff', label:'MULTI-SOURCE · DISTANCE'},
+  LEVEL:    {color:'#ffd60a', label:'LEVEL-BY-LEVEL'},
+  BOUNDARY: {color:'#ff9f0a', label:'BOUNDARY (REVERSE)'},
+  SHORTEST: {color:'#ff6b6b', label:'SHORTEST PATH'},
+  STATE:    {color:'#bf5af2', label:'STATE-SPACE · ADVANCED'},
+  GRAPH:    {color:'#f78fb3', label:'GRAPH BFS (NEXT UP)'},
+}
+
+const P = [
+{
+  cat:'CORE', label:'Basic Graph BFS', done:true,
+  when:`Traverse ONE connected graph given as an adjacency list.`,
+  insight:`The 5-step skeleton: mark+push the start, then <b>pop → process → push unvisited neighbours</b>. Every other BFS on this page is a tweak of this.`,
+  analogy:`Identical to grid BFS — only the neighbours change. A grid <i>is</i> a graph whose edges are "up/down/left/right"; here they come from <code>adj[node]</code>.`,
+  bugs:[`Marking visited on <b>pop</b> instead of <b>push</b> → the same node enters the queue many times.`],
+  problems:[['BFS of Graph (GFG)',1],['Clone Graph (LC 133)',0]],
+  code:`vector<int> bfsOfGraph(int V, vector<vector<int>>& adj) {
+    vector<int> vis(V, 0), order;
+    queue<int> q;
+    vis[0] = 1;                 // ★ mark the start, then push it
+    q.push(0);
+
+    while (!q.empty()) {
+        int node = q.front(); q.pop();
+        order.push_back(node);  // process the node
+        for (int nb : adj[node])
+            if (!vis[nb]) {     // ★ first time we reach nb
+                vis[nb] = 1;
+                q.push(nb);
+            }
+    }
+    return order;
+}`
+},
+{
+  cat:'CORE', label:'Connected Components (Graph)', done:true,
+  when:`COUNT (or explore) the disconnected pieces of a general graph.`,
+  insight:`Outer loop over all <b>V</b> nodes — each unvisited node launches a BFS = one component. <b>Never reset vis.</b>`,
+  analogy:`This is literally Number of Islands, but on an adjacency list instead of a grid. "Island" becomes "component".`,
+  bugs:[`Resetting <code>vis</code> between launches → recounts the same component.`,
+        `If the graph is a matrix, loop <code>j over V</code> with <code>mat[node][j]</code> instead of <code>adj[node]</code>.`],
+  problems:[['Number of Provinces (LC 547)',1],['Connected Components',1]],
+  code:`void bfs(int s, vector<vector<int>>& adj, vector<int>& vis) {
+    queue<int> q; vis[s] = 1; q.push(s);
+    while (!q.empty()) {
+        int node = q.front(); q.pop();
+        for (int nb : adj[node])
+            if (!vis[nb]) { vis[nb] = 1; q.push(nb); }
+    }
+}
+
+int countComponents(int V, vector<vector<int>>& adj) {
+    vector<int> vis(V, 0);
+    int cnt = 0;
+    for (int i = 0; i < V; i++)
+        if (!vis[i]) {          // ★ a brand-new component
+            cnt++;
+            bfs(i, adj, vis);   // never reset vis
+        }
+    return cnt;
+}`
+},
+{
+  cat:'GRID', label:'Flood Fill / Plain Grid BFS', done:true,
+  when:`Visit or recolour ONE connected region from a start cell. You only care WHICH cells belong, not how far they are.`,
+  insight:`Cell (r,c) = node, its 4 neighbours = edges. Mark visited, spread with a queue. <b>No <span class="keyword">sz</span> layer loop, no distance</b> — just flood until the region is full.`,
+  analogy:`Spilling paint. It keeps spreading to same-coloured neighbours until the blob is full. You never ask "how many steps" — only "is this cell part of my blob?".`,
+  bugs:[`Forgetting <code>!vis[nr][nc]</code> in the neighbour check → you push the same cell again and again → TLE / infinite loop.`,
+        `Marking visited when you <b>pop</b> instead of when you <b>push</b> → same cell enters the queue many times.`],
+  problems:[['Flood Fill (LC 733)',1]],
+  code:`int dr[] = {-1, 1, 0, 0};
+int dc[] = {0, 0, -1, 1};
+
+void bfs(int sr, int sc, vector<vector<int>>& g, vector<vector<int>>& vis) {
+    int m = g.size(), n = g[0].size();
+    queue<pair<int,int>> q;
+    vis[sr][sc] = 1;            // ★ mark when you PUSH, not when you pop
+    q.push({sr, sc});
+
+    while (!q.empty()) {
+        auto [r, c] = q.front(); q.pop();
+        for (int i = 0; i < 4; i++) {
+            int nr = r + dr[i], nc = c + dc[i];
+            if (nr >= 0 && nr < m && nc >= 0 && nc < n
+                && g[nr][nc] == 1 && !vis[nr][nc]) {   // ★ the !vis guard
+                vis[nr][nc] = 1;
+                q.push({nr, nc});
+            }
+        }
+    }
+}`,
+  anim:{type:'components', single:true, grid:[
+    [0,1,1,0,0],
+    [0,1,1,1,0],
+    [0,0,1,0,0],
+    [0,0,1,1,0],
+    [0,0,0,0,0]]}
+},
+{
+  cat:'GRID', label:'Number of Islands / Components', done:true,
+  when:`COUNT how many disconnected regions a grid has.`,
+  insight:`Double <span class="keyword">for</span>-loop over the grid. Every time you hit an <b>unvisited</b> land cell → <code>cnt++</code> and BFS to drown that whole island. <b>Never reset vis</b> — the outer loop only fires once per island.`,
+  analogy:`Count how many separate paint-spills it takes to cover all the land. Each fresh spill = one island.`,
+  bugs:[`<code>vector&lt;vector&lt;int&gt;&gt; vis(m, vector&lt;int&gt;(m, 0))</code> — inner size must be <b>n</b>, not m. Non-square boards crash.`,
+        `Doing <code>cnt++</code> for every <code>'X'</code> without checking <code>!vis</code> → you recount cells of an island you already flooded → answer too big.`],
+  problems:[['Number of Islands (LC 200)',1],['Connected Components (matrix)',1],['Battleships in a Board',0]],
+  code:`int countIslands(vector<vector<int>>& g) {
+    int m = g.size(), n = g[0].size();          // ★ keep m & n separate
+    vector<vector<int>> vis(m, vector<int>(n, 0)); // ★ inner = n
+    int cnt = 0;
+
+    for (int i = 0; i < m; i++)
+        for (int j = 0; j < n; j++)
+            if (g[i][j] == 1 && !vis[i][j]) {   // ★ only UNVISITED land
+                cnt++;                          // ★ new island found
+                bfs(i, j, g, vis);              // drown the whole island
+            }
+    return cnt;
+}`,
+  anim:{type:'components', grid:[
+    [1,1,0,0,1],
+    [1,0,0,1,1],
+    [0,0,0,0,0],
+    [0,1,1,0,1],
+    [0,1,0,0,1]]}
+},
+{
+  cat:'GRID', label:'Max Area / Component Size', done:false,
+  when:`Need the SIZE of a component (largest island, area, sub-island match).`,
+  insight:`Same skeleton as Number of Islands, but the counter moves: <code>area = 0</code> once <b>per island</b>, <code>area++</code> when you <b>pop</b> a cell, then <code>maxArea = max(maxArea, area)</code> after the BFS finishes.`,
+  analogy:`Number of Islands counts how many times you press "spill". Max Area counts how many cells one spill painted. <b>Same movie — the counter just lives in a different place.</b>`,
+  bugs:[`Pushing ALL land into one queue up-front → islands blur together, you can't size them. Launch BFS from <b>one</b> unvisited cell at a time.`,
+        `<code>int area = 0</code> reset <b>per popped node</b> → wrong. Init it once per island.`,
+        `<code>area++</code> on neighbour-discovery misses a 1-cell island (returns 0, not 1). Count when you <b>pop</b>.`,
+        `<code>maxArea = INT_MIN</code> → empty grid returns garbage. Start at <b>0</b>.`,
+        `Missing <code>!vis</code> → same cell counted many times.`],
+  problems:[['Max Area of Island (LC 695)',0],['Count Sub Islands (LC 1905)',0]],
+  code:`int maxAreaOfIsland(vector<vector<int>>& g) {
+    int m = g.size(), n = g[0].size();
+    vector<vector<int>> vis(m, vector<int>(n, 0));
+    int maxArea = 0;                       // ★ NOT INT_MIN
+
+    for (int i = 0; i < m; i++) {
+        for (int j = 0; j < n; j++) {
+            if (g[i][j] == 1 && !vis[i][j]) {
+                queue<pair<int,int>> q;    // ★ fresh queue per island
+                q.push({i, j}); vis[i][j] = 1;
+                int area = 0;              // ★ once per island, not per node
+
+                while (!q.empty()) {
+                    auto [r, c] = q.front(); q.pop();
+                    area++;                // ★ count on POP (handles size-1)
+                    for (int k = 0; k < 4; k++) {
+                        int nr = r + dr[k], nc = c + dc[k];
+                        if (nr>=0 && nr<m && nc>=0 && nc<n
+                            && g[nr][nc]==1 && !vis[nr][nc]) {
+                            vis[nr][nc] = 1;
+                            q.push({nr, nc});
+                        }
+                    }
+                }
+                maxArea = max(maxArea, area);  // ★ after the island is done
+            }
+        }
+    }
+    return maxArea;
+}`
+},
+{
+  cat:'GRID', label:'Two-Grid BFS (Count Sub Islands)', done:true,
+  when:`TWO grids — validate each component of grid2 against grid1 (sub-islands, containment, shape matching).`,
+  insight:`BFS the component in <b>grid2</b> as usual, but carry an <code>ok</code> flag that flips to <b>false</b> the instant any cell is water (0) in <b>grid1</b>. Count the island only if <code>ok</code> survived. <b>Key:</b> keep flooding the WHOLE component even after it fails.`,
+  analogy:`Number of Islands, but an island only "counts" if grid1 fully covers it with land. You still walk the entire island to mark it visited — you just remember whether you ever stepped where grid1 has water.`,
+  bugs:[`Early <code>break</code>/<code>return</code> the moment you see <code>grid1==0</code> → leaves the rest of the component unvisited, so those cells re-trigger BFS and get miscounted. <b>Flip the flag, keep going.</b>`,
+        `Traversing <code>grid1</code> instead of <code>grid2</code> — you BFS the candidate, you CHECK the reference.`,
+        `Forgetting the SOURCE cell's grid1 value — checking on <b>pop</b> covers it cleanly.`],
+  problems:[['Count Sub Islands (LC 1905)',1],['Two-grid region validation',0]],
+  code:`// grid2 = candidate islands, grid1 = reference land.
+// A grid2 island is a SUB-island only if EVERY cell of it
+// is also land (1) in grid1.
+void bfs(int sr, int sc, vector<vector<int>>& g1,
+         vector<vector<int>>& g2, vector<vector<int>>& vis, bool& ok) {
+    int m = g1.size(), n = g1[0].size();
+    int dr[] = {-1,1,0,0}, dc[] = {0,0,-1,1};
+    queue<pair<int,int>> q;
+    q.push({sr, sc}); vis[sr][sc] = 1;
+
+    while (!q.empty()) {
+        auto [r, c] = q.front(); q.pop();
+        if (g1[r][c] == 0) ok = false;       // ★ failed - but DON'T stop
+        for (int i = 0; i < 4; i++) {
+            int nr = r+dr[i], nc = c+dc[i];
+            if (nr>=0 && nr<m && nc>=0 && nc<n
+                && g2[nr][nc]==1 && !vis[nr][nc]) {  // ★ flood grid2
+                vis[nr][nc] = 1;
+                q.push({nr, nc});
+            }
+        }
+    }
+}
+
+int countSubIslands(vector<vector<int>>& g1, vector<vector<int>>& g2) {
+    int m = g1.size(), n = g1[0].size();
+    vector<vector<int>> vis(m, vector<int>(n, 0));
+    int cnt = 0;
+    for (int i = 0; i < m; i++)
+        for (int j = 0; j < n; j++)
+            if (g2[i][j]==1 && !vis[i][j]) {
+                bool ok = true;              // ★ assume sub-island...
+                bfs(i, j, g1, g2, vis, ok);  // ...flood the WHOLE island
+                if (ok) cnt++;               // ★ count only if clean
+            }
+    return cnt;
+}`
+},
+{
+  cat:'GRID', label:'Grid BFS — 8-Directional', done:true,
+  when:`Movement allows diagonals (or knight L-shaped jumps).`,
+  insight:`<b>Only dr/dc and the loop bound change</b> (4 → 8). The BFS body is byte-for-byte the same as 4-directional.`,
+  analogy:`Same flood, more exits per cell. A king's move (8) vs a rook's move (4).`,
+  bugs:[`Changing dr/dc to 8 entries but leaving the loop as <code>d &lt; 4</code>.`,
+        `Forgetting the bounds check on diagonal cells.`],
+  problems:[['Shortest Path Binary Matrix (LC 1091)',1],['Minimum Knight Moves (LC 1197)',0]],
+  code:`// 8 directions = 4 straight + 4 diagonals
+int dr[] = {-1,-1,-1, 0, 0, 1, 1, 1};
+int dc[] = {-1, 0, 1,-1, 1,-1, 0, 1};
+// KNIGHT moves? swap in these 8 L-shapes instead:
+// int dr[] = {-2,-2,-1,-1, 1, 1, 2, 2};
+// int dc[] = {-1, 1,-2, 2,-2, 2,-1, 1};
+
+for (int d = 0; d < 8; d++) {            // ★ only the count changes
+    int nr = r + dr[d], nc = c + dc[d];
+    if (nr>=0 && nr<m && nc>=0 && nc<n
+        && grid[nr][nc]==0 && dist[nr][nc]==-1) {
+        dist[nr][nc] = dist[r][c] + 1;
+        q.push({nr, nc});
+    }
+}`
+},
+{
+  cat:'MULTI', label:'Multi-Source + Distance BFS', done:true, hero:true,
+  when:`Distance of every cell to the <b>nearest</b> of MANY sources. "Fan out from all sources at once."`,
+  insight:`Push <b>every</b> source into the queue first (all at distance 0), then run normal BFS. The first time a cell is reached is guaranteed shortest, because BFS visits in increasing-distance order — so <code>g[nr][nc] = g[r][c] + 1</code> is always correct and you never overwrite it.`,
+  analogy:`Every source is a water tap turned on at the <b>same moment</b>. Water spreads one ring per second. The first drop to touch a cell came from the nearest tap → that's its shortest distance. <b>Gates→sources, rooms→distances. Zeros→sources, ones→distances. Same movie, different story</b> (01 Matrix = Rotting Oranges = Walls&Gates).`,
+  bugs:[`<code>int sz = q.empty()</code> instead of <code>q.size()</code> — empty() returns 0/1, kills the loop.`,
+        `Bounds swap: <code>nc &lt; m && nr &lt; n</code>. <b>nr is a row → compare with m; nc is a col → compare with n.</b>`,
+        `<code>vis(m, vector(n, -1))</code> then checking <code>!vis</code> → <code>!(-1)</code> is <b>false</b>, guard never fires. vis must start at <b>0</b>.`,
+        `Seeding the wrong cells: for 01 Matrix push all <b>0</b>s, not the 1s.`,
+        `<code>#define INF=2147483647;</code> is wrong syntax. Use <code>const int INF = 2147483647;</code>.`,
+        `<code>g[nr][nc] = INF</code> (assign) vs <code>== INF</code> (compare).`],
+  problems:[['01 Matrix (LC 542)',1],['Rotting Oranges (LC 994)',1],['Walls and Gates / Islands & Treasure (LC 286)',1],['Shortest Path in Binary Matrix (LC 1091)',1],['Nearest Exit',0]],
+  code:`vector<vector<int>> updateMatrix(vector<vector<int>>& mat) {
+    int m = mat.size(), n = mat[0].size();
+    int dr[] = {-1, 1, 0, 0};
+    int dc[] = {0, 0, -1, 1};
+    queue<pair<int,int>> q;
+    vector<vector<int>> vis(m, vector<int>(n, 0));   // ★ start at 0
+
+    // ★ seed EVERY 0-cell (the sources) — they're all distance 0
+    for (int i = 0; i < m; i++)
+        for (int j = 0; j < n; j++)
+            if (mat[i][j] == 0) { vis[i][j] = 1; q.push({i, j}); }
+
+    while (!q.empty()) {
+        auto [r, c] = q.front(); q.pop();
+        for (int i = 0; i < 4; i++) {
+            int nr = dr[i] + r, nc = dc[i] + c;
+            if (nr >= 0 && nr < m && nc >= 0 && nc < n     // ★ nr→m, nc→n
+                && mat[nr][nc] == 1 && !vis[nr][nc]) {
+                vis[nr][nc] = 1;
+                mat[nr][nc] = mat[r][c] + 1;   // ★ neighbour = me + 1
+                q.push({nr, nc});
+            }
+        }
+    }
+    return mat;
+}`,
+  anim:{type:'distance', grid:[
+    [1,1,1,0,1],
+    [1,1,1,1,1],
+    [0,1,1,1,1],
+    [1,1,1,1,0],
+    [1,1,1,1,1]]},
+  link:'01-matrix-bfs-level-by-level.html'
+},
+{
+  cat:'LEVEL', label:'Level-by-Level BFS', done:true,
+  when:`The answer is a LEVEL itself — minutes, depth, number of steps — or you must process a whole ring together.`,
+  insight:`Snapshot <code>int sz = q.size()</code> at the <b>top</b> of each while-iteration; <code>while(sz--)</code> processes exactly one ring; bump <code>time++</code> <b>after</b> the inner loop. Note: when you store distance as <code>g[r][c]+1</code> you often don't even need the sz loop — the number carries the level for you.`,
+  analogy:`<b>Why does Rotting Oranges need level BFS but Number of Islands doesn't?</b> Rotting Oranges asks "how many MINUTES" = how many rings = the level number. Islands only asks "how many regions" — the order you visit cells is irrelevant. <b>Answer is a distance/time → level BFS. Answer is a count of cells/regions → plain BFS.</b>`,
+  bugs:[`Putting <code>time++</code> <b>inside</b> the <code>while(sz--)</code> loop → counts cells, not minutes.`,
+        `Off-by-one on start time. Trick: start <code>t = -1</code>, or only increment when something actually spread this ring.`],
+  problems:[['Rotting Oranges (LC 994)',1],['Binary Tree Level Order (LC 102)',0],['Shortest Path (unweighted)',1]],
+  code:`int orangesRotting(vector<vector<int>>& g) {
+    int m = g.size(), n = g[0].size(), fresh = 0;
+    queue<pair<int,int>> q;
+    for (int i = 0; i < m; i++)
+        for (int j = 0; j < n; j++) {
+            if (g[i][j] == 2) q.push({i, j});  // ★ all sources
+            else if (g[i][j] == 1) fresh++;
+        }
+    if (fresh == 0) return 0;
+    int dr[] = {-1,1,0,0}, dc[] = {0,0,-1,1}, minutes = 0;
+
+    while (!q.empty()) {
+        int sz = q.size();          // ★ freeze THIS minute's batch
+        bool spread = false;
+        while (sz--) {              // ★ exactly one ring / minute
+            auto [r, c] = q.front(); q.pop();
+            for (int d = 0; d < 4; d++) {
+                int nr = r+dr[d], nc = c+dc[d];
+                if (nr>=0 && nr<m && nc>=0 && nc<n && g[nr][nc]==1) {
+                    g[nr][nc] = 2; fresh--; spread = true;
+                    q.push({nr, nc});
+                }
+            }
+        }
+        if (spread) minutes++;      // ★ count AFTER the ring
+    }
+    return fresh == 0 ? minutes : -1;
+}`
+},
+{
+  cat:'BOUNDARY', label:'Boundary BFS (Reverse Thinking)', done:true,
+  when:`"Keep / count whatever is connected to the border, kill the rest." Surrounded Regions, Enclaves.`,
+  insight:`Don't hunt the trapped cells directly. <b>Seed BFS from the border cells</b>, mark everything reachable as SAFE, then whatever stayed unmarked is captured.`,
+  analogy:`It's far easier to find who CAN escape (touches an edge) than who is trapped. Mark all the escapers; condemn everyone left. The cell being "on the boundary" doesn't matter — being <b>connected to</b> the boundary does.`,
+  bugs:[`Seeding from interior cells instead of <b>border</b> cells.`,
+        `Traversing through <code>'X'</code> instead of through <code>'O'</code> (move through the region you're protecting).`,
+        `<code>for(int i=0;i&lt;n;i++)</code> for the 4 directions — it's always <b>4</b>, not n.`,
+        `Re-checking "is current cell on boundary" mid-BFS — that decision is already made at seeding time.`],
+  problems:[['Surrounded Regions (LC 130)',1],['Number of Enclaves (LC 1020)',1]],
+  code:`void solve(vector<vector<char>>& b) {
+    int m = b.size(), n = b[0].size();
+    int dr[] = {-1,1,0,0}, dc[] = {0,0,-1,1};
+    vector<vector<int>> vis(m, vector<int>(n, 0));
+    queue<pair<int,int>> q;
+
+    // ★ seed ONLY border O's
+    for (int i = 0; i < m; i++) {
+        if (b[i][0]   == 'O') { vis[i][0]=1;   q.push({i,0}); }
+        if (b[i][n-1] == 'O') { vis[i][n-1]=1; q.push({i,n-1}); }
+    }
+    for (int j = 0; j < n; j++) {
+        if (b[0][j]   == 'O') { vis[0][j]=1;   q.push({0,j}); }
+        if (b[m-1][j] == 'O') { vis[m-1][j]=1; q.push({m-1,j}); }
+    }
+
+    while (!q.empty()) {                  // mark everything reachable = SAFE
+        auto [r, c] = q.front(); q.pop();
+        for (int i = 0; i < 4; i++) {     // ★ 4 dirs, move through 'O'
+            int nr = r+dr[i], nc = c+dc[i];
+            if (nr>=0 && nr<m && nc>=0 && nc<n
+                && b[nr][nc]=='O' && !vis[nr][nc]) {
+                vis[nr][nc] = 1; q.push({nr, nc});
+            }
+        }
+    }
+    for (int i = 0; i < m; i++)           // unmarked O = trapped → flip
+        for (int j = 0; j < n; j++)
+            if (b[i][j]=='O' && !vis[i][j]) b[i][j] = 'X';
+}`
+},
+{
+  cat:'SHORTEST', label:'Shortest Path — Unweighted Graph', done:false,
+  when:`Fewest edges between src and dst in an UNWEIGHTED graph.`,
+  insight:`<code>dist[]</code> starts at -1. The first time you set <code>dist[nb]</code> it is already the shortest (BFS = increasing distance). Add a <code>parent[]</code> to rebuild the actual path.`,
+  analogy:`The non-grid twin of Shortest Path in Binary Matrix. <code>dist[]</code> doubles as your visited array.`,
+  bugs:[`Using a separate <code>vis</code> and losing the distance — let <code>dist==-1</code> mean unvisited.`,
+        `Not handling unreachable (<code>dist[dst]==-1</code>).`],
+  problems:[['Shortest Path Unweighted (GFG)',0],['Word Ladder (LC 127)',0]],
+  code:`int shortestPath(int V, vector<vector<int>>& adj, int src, int dst) {
+    vector<int> dist(V, -1), parent(V, -1);
+    queue<int> q;
+    dist[src] = 0; q.push(src);
+
+    while (!q.empty()) {
+        int node = q.front(); q.pop();
+        if (node == dst) break;        // ★ optional early exit
+        for (int nb : adj[node])
+            if (dist[nb] == -1) {      // ★ first visit = shortest
+                dist[nb] = dist[node] + 1;
+                parent[nb] = node;     // remember path
+                q.push(nb);
+            }
+    }
+    return dist[dst];                  // -1 if unreachable
+    // rebuild: walk parent[] from dst back to src
+}`
+},
+{
+  cat:'SHORTEST', label:'0-1 BFS — Deque', done:false,
+  when:`Edge weights are ONLY 0 or 1. Cheaper than Dijkstra for this case.`,
+  insight:`Use a <b>deque</b>. A weight-0 edge → <code>push_front</code> (stay on the same level); a weight-1 edge → <code>push_back</code> (next level). This replaces the priority queue.`,
+  analogy:`Like level BFS, but a free (0-cost) move keeps you on the CURRENT level instead of advancing one.`,
+  bugs:[`Pushing to the wrong end of the deque.`,
+        `Forgetting to relax (only push when <code>dist improves</code>).`],
+  problems:[['Min cost grid path',0],['Min edges to reverse',0]],
+  code:`// adj[u] = { {v, w}, ... }, weights are 0 or 1
+vector<int> zeroOneBFS(int V, vector<vector<pair<int,int>>>& adj, int src) {
+    vector<int> dist(V, INT_MAX);
+    deque<int> dq;                       // ★ deque, not queue
+    dist[src] = 0; dq.push_front(src);
+
+    while (!dq.empty()) {
+        int node = dq.front(); dq.pop_front();
+        for (auto [nb, w] : adj[node]) {
+            if (dist[node] + w < dist[nb]) {
+                dist[nb] = dist[node] + w;
+                if (w == 0) dq.push_front(nb);  // ★ same level -> front
+                else        dq.push_back(nb);   // ★ cost+1   -> back
+            }
+        }
+    }
+    return dist;
+}`
+},
+{
+  cat:'STATE', label:'State-Space BFS (Word Ladder)', done:false,
+  when:`A "node" is a (position + extra info) STATE — a word, a lock combo, a puzzle board.`,
+  insight:`Define the state, use a hash set for visited, and <b>generate neighbours on the fly</b> by applying one legal move. The rest is vanilla (often level) BFS for the step count.`,
+  analogy:`The graph is implicit — there's no <code>adj[]</code>. You BUILD each neighbour by mutating the state one legal step at a time.`,
+  bugs:[`Forgetting to mark a state visited (<code>dict.erase</code>) → revisits / TLE.`,
+        `Not restoring the mutated character after trying it.`],
+  problems:[['Word Ladder (LC 127)',0],['Open the Lock (LC 752)',0],['Sliding Puzzle (LC 773)',0]],
+  code:`int ladderLength(string begin, string end, vector<string>& words) {
+    unordered_set<string> dict(words.begin(), words.end());
+    if (!dict.count(end)) return 0;
+    queue<string> q; q.push(begin);
+    int steps = 1;
+
+    while (!q.empty()) {
+        int sz = q.size();
+        while (sz--) {
+            string w = q.front(); q.pop();
+            if (w == end) return steps;
+            for (int i = 0; i < (int)w.size(); i++) { // ★ build neighbours
+                char old = w[i];
+                for (char c = 'a'; c <= 'z'; c++) {
+                    w[i] = c;
+                    if (dict.count(w)) {
+                        q.push(w);
+                        dict.erase(w);   // ★ erase = mark visited
+                    }
+                }
+                w[i] = old;
+            }
+        }
+        steps++;
+    }
+    return 0;
+}`
+},
+{
+  cat:'STATE', label:'Bidirectional BFS', done:false,
+  when:`BOTH src and dst are known — search from both ends, meet in the middle.`,
+  insight:`Two frontier sets. Each step <b>expand the smaller one</b>; if a generated node is in the OTHER frontier, they met. <code>O(b^(d/2))</code> vs <code>O(b^d)</code>.`,
+  analogy:`Two people digging a tunnel from opposite sides — they meet in roughly half the time.`,
+  bugs:[`Not always expanding the smaller frontier (loses the speedup).`,
+        `Off-by-one on the step count when frontiers meet.`],
+  problems:[['Word Ladder (LC 127) — optimized',0],['Minimum Knight Moves — optimized',0]],
+  code:`int biDir(string begin, string end, vector<string>& words) {
+    unordered_set<string> dict(words.begin(), words.end());
+    if (!dict.count(end)) return 0;
+    unordered_set<string> front = {begin}, back = {end};
+    int steps = 1;
+
+    while (!front.empty() && !back.empty()) {
+        if (front.size() > back.size()) swap(front, back); // ★ smaller first
+        unordered_set<string> next;
+        for (string w : front) {
+            for (int i = 0; i < (int)w.size(); i++) {
+                char old = w[i];
+                for (char c = 'a'; c <= 'z'; c++) {
+                    w[i] = c;
+                    if (back.count(w)) return steps + 1;  // ★ frontiers met
+                    if (dict.count(w)) { next.insert(w); dict.erase(w); }
+                }
+                w[i] = old;
+            }
+        }
+        front = next; steps++;
+    }
+    return 0;
+}`
+},
+{
+  cat:'GRAPH', label:'Cycle Detection — Undirected (BFS)', done:false,
+  when:`Detect a cycle in a general (non-grid) undirected graph using BFS.`,
+  insight:`Queue holds <code>{node, parent}</code>. If you reach a <b>visited</b> neighbour that is <b>not your parent</b> → there's a cycle.`,
+  analogy:`On a grid your "parent" was implicit — <code>vis</code> already stopped you going back. In a real graph you must <b>remember who you came from</b>, because bumping into your own parent isn't a cycle, but bumping into anyone else already visited is.`,
+  bugs:[`Treating the parent as a cycle → false positive. Always exclude the parent.`],
+  problems:[['Detect Cycle Undirected — BFS',0],['Detect Cycle Undirected — DFS: dfs(node,parent)',0]],
+  code:`bool hasCycle(int V, vector<vector<int>>& adj) {
+    vector<int> vis(V, 0);
+    for (int s = 0; s < V; s++) {              // every component
+        if (vis[s]) continue;
+        queue<pair<int,int>> q;                // ★ {node, parent}
+        q.push({s, -1}); vis[s] = 1;
+        while (!q.empty()) {
+            auto [node, par] = q.front(); q.pop();
+            for (int nb : adj[node]) {
+                if (!vis[nb]) { vis[nb]=1; q.push({nb, node}); }
+                else if (nb != par) return true;  // ★ visited & not parent
+            }
+        }
+    }
+    return false;
+}`
+},
+{
+  cat:'GRAPH', label:'Bipartite Check (Coloring)', done:false,
+  when:`Can the graph be 2-coloured so no edge joins two same-coloured nodes?`,
+  insight:`BFS, colour the start 0, give each neighbour the <b>opposite</b> colour. If a neighbour already has the <b>same</b> colour as the current node → not bipartite.`,
+  analogy:`Two teams. Every edge must connect opposite teams. If you're ever forced to put two teammates on the same edge, the split is impossible.`,
+  bugs:[`Forgetting to loop over all components (disconnected graph).`],
+  problems:[['Is Graph Bipartite (LC 785)',0]],
+  code:`bool isBipartite(int V, vector<vector<int>>& adj) {
+    vector<int> color(V, -1);              // -1 = uncoloured
+    for (int s = 0; s < V; s++) {
+        if (color[s] != -1) continue;
+        queue<int> q; q.push(s); color[s] = 0;
+        while (!q.empty()) {
+            int node = q.front(); q.pop();
+            for (int nb : adj[node]) {
+                if (color[nb] == -1) {
+                    color[nb] = color[node] ^ 1;   // ★ opposite colour
+                    q.push(nb);
+                } else if (color[nb] == color[node]) {
+                    return false;                  // ★ clash → not bipartite
+                }
+            }
+        }
+    }
+    return true;
+}`
+},
+{
+  cat:'GRAPH', label:"Topological Sort — Kahn's (BFS)", done:false,
+  when:`Order a DAG by dependencies — course prerequisites, task scheduling, build order.`,
+  insight:`Compute <b>indegree</b> of every node. Push all indegree-0 nodes. Pop → append to order → decrement neighbours' indegree → push a neighbour the moment its indegree hits 0. If <code>order.size() != V</code> there was a cycle.`,
+  analogy:`Do every task that has no pending prerequisites first. Finishing one task "frees" the tasks that depended on it. If something can never be freed → a dependency cycle exists.`,
+  bugs:[`Building indegree from the wrong edge direction.`,
+        `Forgetting the <code>size != V</code> cycle check.`],
+  problems:[['Course Schedule (LC 207)',0],['Course Schedule II (LC 210)',0],['Alien Dictionary',0]],
+  code:`vector<int> topoSort(int V, vector<vector<int>>& adj) {
+    vector<int> indeg(V, 0);
+    for (int u = 0; u < V; u++)
+        for (int v : adj[u]) indeg[v]++;       // ★ count incoming edges
+
+    queue<int> q;
+    for (int i = 0; i < V; i++)
+        if (indeg[i] == 0) q.push(i);          // ★ no-dependency nodes first
+
+    vector<int> order;
+    while (!q.empty()) {
+        int node = q.front(); q.pop();
+        order.push_back(node);
+        for (int nb : adj[node])
+            if (--indeg[nb] == 0) q.push(nb);  // ★ freed → ready
+    }
+    return (int)order.size() == V ? order : vector<int>{}; // ★ cycle check
+}`
+}
+];
+
+/* ───── trace code shown beside the animation (line highlights as it runs) ───── */
+const TRACE = {
+  distance:[
+    'for (i,j)',                              //0
+    '  if (g[i][j] == 0) q.push({i,j}); // sources, dist 0', //1
+    'while (!q.empty()) {',                   //2
+    '  auto [r,c] = q.front(); q.pop();',     //3
+    '  for (d : 4 dirs) {',                   //4
+    '    if (inBounds && g[nr][nc]==1 && !vis)', //5
+    '      g[nr][nc] = g[r][c] + 1;  // me + 1', //6
+    '      q.push({nr,nc});',                 //7
+    '  }',                                    //8
+    '}'                                       //9
+  ],
+  components:[
+    'for (i,j) {',                            //0
+    '  if (g[i][j]==1 && !vis[i][j]) {',      //1
+    '    cnt++;            // new island',     //2
+    '    q.push({i,j}); vis=1;',              //3
+    '    while (!q.empty()) {',               //4
+    '      auto [r,c]=q.front(); q.pop();',   //5
+    '      for (d : 4 dirs)',                 //6
+    '        if (valid && !vis[nr][nc]) {',   //7
+    '          vis[nr][nc]=1;',               //8
+    '          q.push({nr,nc});',             //9
+    '    }',                                  //10
+    '  }',                                    //11
+    '}'                                       //12
+  ],
+  components_single:[
+    'q.push({sr,sc}); vis[sr][sc]=1;',        //0
+    'while (!q.empty()) {',                   //1
+    '  auto [r,c]=q.front(); q.pop();',       //2
+    '  for (d : 4 dirs)',                     //3
+    '    if (valid && g[nr][nc]==1 && !vis) {', //4
+    '      vis[nr][nc]=1;  // join the blob', //5
+    '      q.push({nr,nc});',                 //6
+    '  }',                                    //7
+    '}'                                       //8
+  ]
+};
+
+/* ───────────────────────── SYNTAX HIGHLIGHT ───────────────────────── */
+function hl(code){
+  const esc = t => t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return code.split('\n').map(line=>{
+    const ci = line.indexOf('//');
+    const codePart = ci>=0 ? line.slice(0,ci) : line;
+    const comPart  = ci>=0 ? line.slice(ci)  : '';
+    let h = esc(codePart)
+      .replace(/\b(int|void|bool|auto|vector|queue|deque|string|pair|return|while|for|if|else|true|false|const|char|max|min)\b/g,'<span class="kw">$1</span>')
+      .replace(/\b(\d+)\b/g,'<span class="nm">$1</span>');
+    if(comPart){
+      h += '<span class="cm">'+esc(comPart).replace(/(★[^<]*)/g,'<span class="star">$1</span>')+'</span>';
+    }
+    return h;
+  }).join('\n');
+}
+
+/* ───────────────────────── RENDER ───────────────────────── */
+const side=document.getElementById('side');
+const main=document.getElementById('main');
+let active=0;
+
+function buildSidebar(){
+  let html='', lastCat='';
+  P.forEach((p,i)=>{
+    if(p.cat!==lastCat){ html+=`<div class="catlabel" style="color:${CAT[p.cat].color}">${CAT[p.cat].label}</div>`; lastCat=p.cat; }
+    html+=`<div class="navitem ${i===active?'on':''}" data-i="${i}" style="${i===active?'border-left-color:'+CAT[p.cat].color:''}">
+      <div class="tag" style="color:${CAT[p.cat].color}">${p.cat}${p.done?'':' · TODO'}</div>
+      <div class="nm">${p.label}</div></div>`;
+  });
+  side.innerHTML=html;
+  side.querySelectorAll('.navitem').forEach(el=>el.onclick=()=>{active=+el.dataset.i;render();if(window.innerWidth<=860)side.classList.remove('open');});
+}
+
+function render(){
+  dispose3D();
+  const p=P[active], col=CAT[p.cat].color;
+  const methods = p.code ? [{title:p.label.toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'')+'.cpp', code:p.code}] : (p.methods||[]);
+
+  let html=`<div class="fade">
+    <div class="phead">
+      <div>
+        <span class="ptag" style="background:${col}22;border:1px solid ${col}55;color:${col}">${p.cat}</span>
+        <span class="pcount">Pattern ${active+1} / ${P.length}${p.hero?' · ⭐ your hero pattern':''}</span>
+        <h2>${p.label}</h2>
+      </div>
+      <button class="copy" id="copyBtn">copy code</button>
+    </div>
+
+    <div class="cards">
+      <div class="ic"><div class="h">WHEN TO USE</div><p>${p.when}</p></div>
+      <div class="ic" style="border-color:${col}33"><div class="h" style="color:${col}">★ KEY INSIGHT</div><p>${p.insight}</p></div>
+      <div class="ic analogy"><div class="h">◈ ANALOGY / MENTAL MODEL</div><p>${p.analogy}</p></div>`;
+  if(p.bugs&&p.bugs.length){
+    html+=`<div class="ic bugs"><div class="h">⚠ BUGS YOU ACTUALLY HIT</div><ul>${p.bugs.map(b=>`<li>${b}</li>`).join('')}</ul></div>`;
+  }
+  html+=`</div>`;
+
+  html+=`<div class="probs"><div class="h">EXAMPLE PROBLEMS</div>${
+    p.problems.map(([name,done])=>`<span class="chip">${done?'<span class="done">✓ </span>':''}${name}</span>`).join('')
+  }</div>`;
+
+  html+=`<div class="demo" id="demoHost"></div>`;
+
+  methods.forEach((mth,mi)=>{
+    html+=`<div class="cb">
+      <div class="cbbar">
+        <span class="dots"><i style="background:#ff5f56"></i><i style="background:#ffbd2e"></i><i style="background:#27c93f"></i></span>
+        ${methods.length>1?`<span class="method" style="background:${col}22;border:1px solid ${col}55;color:${col}">METHOD ${mi+1}</span>`:''}
+        <span class="cbtitle">${mth.title}</span>
+      </div>
+      <pre>${hl(mth.code)}</pre>
+    </div>`;
+  });
+
+  if(p.link){ html+=`<div class="hint">▶ Full step-through animation for this pattern: open <b>${p.link}</b> in this same folder.</div>`; }
+
+  html+=`<div class="pnav">
+    <button id="prevBtn" ${active===0?'disabled':''}>← prev</button>
+    <span class="pos">${active+1} of ${P.length}</span>
+    <button id="nextBtn" ${active===P.length-1?'disabled':''}>next →</button>
+  </div></div>`;
+
+  main.innerHTML=html;
+  main.scrollTop=0;
+
+  document.getElementById('copyBtn').onclick=e=>{
+    navigator.clipboard.writeText(methods.map(m=>m.code).join('\n\n'));
+    e.target.textContent='✓ copied'; e.target.classList.add('done');
+    setTimeout(()=>{e.target.textContent='copy code';e.target.classList.remove('done');},1600);
+  };
+  const pv=document.getElementById('prevBtn'), nx=document.getElementById('nextBtn');
+  if(pv)pv.onclick=()=>{if(active>0){active--;render();}};
+  if(nx)nx.onclick=()=>{if(active<P.length-1){active++;render();}};
+
+  { const A=animFor(p); const host=document.getElementById('demoHost');
+    if(A){ A.kind==='graph' ? mount3DGraph(host,A,col) : mountGrid(host,A,col); }
+    else host.style.display='none'; }
+  buildSidebar();
+}
+
+/* ───────────────────────── GRID ANIMATION ENGINE + CODE TRACE ───────────────────────── */
+const DR=[-1,1,0,0], DC=[0,0,-1,1];
+const DR8=[-1,-1,-1,0,0,1,1,1], DC8=[-1,0,1,-1,1,-1,0,1];
+const ISLAND_COLORS=['#00e5ff','#69ff47','#ffd60a','#ff9f0a','#bf5af2','#ff6b6b'];
+function distColor(t){const s=['#00e5ff','#39c0f0','#4aa0e8','#4f7fdb','#4a5fc8','#3f47b0'];return s[Math.min(t,s.length-1)];}
+
+/* ---------- sample data ---------- */
+const DIST_G=[[1,1,1,0,1],[1,1,1,1,1],[0,1,1,1,1],[1,1,1,1,0],[1,1,1,1,1]];
+const FLOOD_G=[[0,1,1,0,0],[0,1,1,1,0],[0,0,1,0,0],[0,0,1,1,0],[0,0,0,0,0]];
+const ISL_G=[[1,1,0,0,1],[1,0,0,1,1],[0,0,0,0,0],[0,1,1,0,1],[0,1,0,0,1]];
+const DIR8_G=[[0,1,1,1,1],[1,1,1,1,1],[1,1,1,1,1],[1,1,1,1,1],[1,1,1,1,1]];
+const ROT_G=[[2,1,1,0,1],[1,1,0,1,1],[1,1,1,1,1],[0,1,1,1,2],[1,1,0,1,1]];
+const BND_G=[[0,0,0,0,0,0],[0,1,1,0,0,0],[0,1,0,0,1,0],[0,0,0,1,1,0],[1,1,0,0,0,0],[0,0,0,0,0,0]];
+const SUB_G1=[[1,1,1,0,0],[1,1,1,0,1],[0,0,0,0,1],[1,0,1,1,1],[1,0,1,1,1]];
+const SUB_G2=[[1,1,0,0,0],[0,1,1,0,1],[0,1,0,0,1],[1,0,1,1,0],[1,0,1,0,0]];
+
+const G_GEN={nodes:[{pos:[-2.2,1.0,0.2]},{pos:[-1.0,1.7,1.0]},{pos:[0.2,0.5,-1.3]},{pos:[1.4,1.3,0.6]},{pos:[2.2,0.0,-0.4]},{pos:[0.7,-1.3,1.0]},{pos:[-1.3,-1.1,-0.8]},{pos:[-0.3,-0.5,1.7]}],
+  edges:[[0,1],[1,2],[2,3],[3,4],[2,5],[5,6],[6,0],[5,7],[1,3]], start:0};
+const G_COMP={nodes:[{pos:[-2.1,0.9,0]},{pos:[-1.4,-0.5,0.8]},{pos:[-2.3,-0.9,-0.6]},{pos:[1.6,0.9,0.4]},{pos:[2.3,-0.3,-0.6]},{pos:[1.3,-1.1,0.9]}],
+  edges:[[0,1],[1,2],[0,2],[3,4],[4,5]]};
+const G_BIP={nodes:[{pos:[-1.7,1.4,0]},{pos:[-1.7,0,0.5]},{pos:[-1.7,-1.4,-0.4]},{pos:[1.7,1.2,0.3]},{pos:[1.7,-0.2,-0.5]},{pos:[1.7,-1.5,0.4]}],
+  edges:[[0,3],[0,4],[1,4],[2,5],[1,5]], start:0};
+const G_DAG={nodes:[{pos:[-2,0.9,0.2]},{pos:[-2,-0.9,-0.3]},{pos:[-0.7,0,0.5]},{pos:[0.7,0.9,-0.4]},{pos:[0.7,-0.9,0.4]},{pos:[2,0,0]}],
+  edges:[[0,2],[1,2],[2,3],[2,4],[3,5],[4,5]]};
+
+/* ---------- traces ---------- */
+const T_DIST=["for (i,j) if (g==0) q.push({i,j});  // seed all sources","while (!q.empty()) {","  auto [r,c]=q.front(); q.pop();","  for (d : dirs) if (g[nr][nc]==1 && !vis)","    g[nr][nc]=g[r][c]+1;   // neighbour = me + 1","    q.push({nr,nc});","}"];
+const H_DIST={seed:[0],step:[2,3,4,5],done:[6]};
+const T_ROT=["for (i,j) if (g==2) q.push({i,j});  // rotten = sources","while (!q.empty()) {","  int sz=q.size();          // one MINUTE","  while(sz--){ auto [r,c]=q.front();q.pop();","    for(d:4) if(g[nr][nc]==1){","      g[nr][nc]=2; q.push({nr,nc}); } }","  minutes++;   // AFTER the whole ring","}"];
+const H_ROT={seed:[0],step:[3,4,5],done:[6]};
+const T_ISL=["for (i,j)","  if (g[i][j]==1 && !vis) {","    cnt++;             // new island","    bfs flood the whole island;","  }"];
+const H_ISL={scan:[0,1],new:[2,3],step:[3],done:[]};
+const T_FLOOD=["q.push(start); vis=1;","while(!q.empty()){","  auto [r,c]=q.front();q.pop();","  for(d:4) if(valid && !vis){","    vis=1; q.push({nr,nc}); }","}"];
+const H_FLOOD={scan:[0],new:[0],step:[2,3,4],done:[]};
+const T_AREA=["if (g==1 && !vis) {","  area=0;                 // per island","  while(!q.empty()){ pop; area++;   // count on POP","    for(d:4) if(valid&&!vis) push; }","  maxArea=max(maxArea,area);","}"];
+const H_AREA={scan:[0],new:[0,1],step:[2,3],done:[4]};
+const T_BND=["// seed BORDER land only","for border cells: if(g==1) q.push;","while(!q.empty()){ pop;","  for(d:4) if(g==1 && !vis) mark SAFE, push; }","// leftover land = trapped","for(i,j) if(g==1 && !vis) trapped++;"];
+const H_BND={seed:[0,1],step:[2,3],trap:[4,5],done:[]};
+const T_SUB=["for grid2 island (g2==1 && !vis) {","  ok=true;","  flood it; if any g1==0 -> ok=false;  // keep going!","  if(ok) sub++;","}"];
+const H_SUB={scan:[0],new:[0,1],step:[2],judge:[3],done:[]};
+const T_GBFS=["q.push(src); vis[src]=1;","while(!q.empty()){","  node=q.front(); q.pop();","  for(nb : adj[node])","    if(!vis[nb]){ vis[nb]=1;","      dist[nb]=dist[node]+1; q.push(nb); }","}"];
+const H_GBFS={seed:[0],pop:[2],push:[3,4,5],done:[6]};
+const T_CYC=["q.push({src,-1}); vis[src]=1;     // {node, parent}","while(!q.empty()){","  auto [node,par]=q.front(); q.pop();   // POP","  for(nb : adj[node])","    if(!vis[nb]){ vis[nb]=1; q.push({nb,node}); }  // PUSH","    else if(nb != par) return true;     // CYCLE!","}"];
+const H_CYC={seed:[0],pop:[2],push:[3,4],cycle:[5],done:[6]};
+const WL={start:0,end:6,nodes:[{pos:[-3,0,0],label:'hit'},{pos:[-1.7,0,0.4],label:'hot'},{pos:[-0.4,1.1,0],label:'dot'},{pos:[-0.4,-1.1,0.5],label:'lot'},{pos:[0.9,1.1,-0.4],label:'dog'},{pos:[0.9,-1.1,0.3],label:'log'},{pos:[2.2,0,0],label:'cog'}],edges:[[0,1],[1,2],[1,3],[2,4],[2,3],[3,5],[4,6],[4,5],[5,6]]};
+const T_WL=["q.push(begin); vis={begin};","while(!q.empty()){","  string w=q.front(); q.pop();   // POP","  if(w==end) return steps;","  for pos i, char c in a..z:","    nw = w with w[i]=c;","    if(dict.has(nw) && !vis){","      vis.add(nw); q.push(nw); }   // PUSH","}"];
+const H_WL={seed:[0],pop:[2,3],push:[4,5,6,7],done:[8]};
+const T_GCMP=["for(s=0;s<V;s++)","  if(!vis[s]){ cnt++;   // new component","    bfs(s); }","// never reset vis"];
+const H_GCMP={seed:[0,1],step:[2],done:[3]};
+const T_GBIP=["color[s]=0; q.push(s);","while(!q.empty()){ node=q.front();q.pop();","  for(nb:adj[node])","    if(color[nb]==-1) color[nb]=color[node]^1;","    else if(color[nb]==color[node]) return false; }"];
+const H_GBIP={seed:[0],step:[2,3,4],done:[]};
+const T_GTOPO=["compute indeg[]; push all indeg==0;","while(!q.empty()){ node=q.front();q.pop();","  order.push(node);","  for(nb:adj[node]) if(--indeg[nb]==0) q.push(nb); }","// order.size()!=V -> cycle"];
+const H_GTOPO={seed:[0],step:[1,2,3],done:[4]};
+
+/* ---------- which demo for each pattern ---------- */
+function gcfg(mode,base,extra){return Object.assign({kind:'graph',mode},base,extra||{});}
+function animFor(p){
+  const L=p.label;
+  if(L.indexOf('Flood Fill')===0) return {kind:'grid',mode:'flood',single:true,grid:FLOOD_G,trace:T_FLOOD,hot:H_FLOOD,title:'flood one region'};
+  if(L.indexOf('Number of Islands')===0) return {kind:'grid',mode:'flood',grid:ISL_G,trace:T_ISL,hot:H_ISL,title:'count islands'};
+  if(L.indexOf('Max Area')===0) return {kind:'grid',mode:'area',grid:ISL_G,trace:T_AREA,hot:H_AREA,title:'largest island'};
+  if(L.indexOf('Two-Grid')===0) return {kind:'grid',mode:'twogrid',grid:SUB_G2,g1:SUB_G1,trace:T_SUB,hot:H_SUB,title:'sub-islands'};
+  if(L.indexOf('8-Directional')>=0) return {kind:'grid',mode:'distance',dirs:8,grid:DIR8_G,label:'rings (king moves)',trace:T_DIST,hot:H_DIST,title:'8-dir spread'};
+  if(p.cat==='MULTI') return {kind:'grid',mode:'distance',grid:DIST_G,label:'max distance',trace:T_DIST,hot:H_DIST,title:'distance waves'};
+  if(p.cat==='LEVEL') return {kind:'grid',mode:'distance',srcVal:2,wallVal:0,grid:ROT_G,label:'minute',trace:T_ROT,hot:H_ROT,title:'rot, minute by minute'};
+  if(p.cat==='BOUNDARY') return {kind:'grid',mode:'boundary',grid:BND_G,trace:T_BND,hot:H_BND,title:'escape from the border'};
+  if(L.indexOf('Basic Graph')===0) return gcfg('bfs',G_GEN,{trace:T_GBFS,hot:H_GBFS,caption:'BFS layers spreading from the start node'});
+  if(L.indexOf('Connected Components')===0) return gcfg('components',G_COMP,{trace:T_GCMP,hot:H_GCMP,caption:'each cluster = one connected component'});
+  if(L.indexOf('Shortest Path')===0) return gcfg('bfs',G_GEN,{trace:T_GBFS,hot:H_GBFS,caption:'layer index = shortest #edges from start'});
+  if(L.indexOf('0-1 BFS')===0) return gcfg('bfs',G_GEN,{trace:T_GBFS,hot:H_GBFS,caption:'0-weight edge -> deque front, 1 -> back'});
+  if(L.indexOf('State-Space')===0) return gcfg('wordladder',WL,{trace:T_WL,hot:H_WL,caption:'words = nodes; change one letter to reach dictionary neighbours (hit → cog)'});
+  if(L.indexOf('Bidirectional')===0) return gcfg('bidir',G_GEN,{start:0,end:4,trace:T_GBFS,hot:H_GBFS,caption:'two frontiers grow and meet in the middle'});
+  if(L.indexOf('Cycle Detection')===0) return gcfg('cycle',G_GEN,{trace:T_CYC,hot:H_CYC,caption:'queue holds {node, parent}; a visited NON-parent neighbour = cycle'});
+  if(L.indexOf('Bipartite')===0) return gcfg('bipartite',G_BIP,{trace:T_GBIP,hot:H_GBIP,caption:'2-colour; a same-colour edge breaks it'});
+  if(L.indexOf('Topological')>=0) return gcfg('topo',G_DAG,{directed:true,trace:T_GTOPO,hot:H_GTOPO,caption:'peel indegree-0 nodes, layer by layer'});
+  return null;
+}
+
+/* ====================== 2D GRID ENGINE ====================== */
+function mountGrid(host, cfg, col){
+  const g=cfg.grid, m=g.length, n=g[0].length;
+  const g1=cfg.g1||null;
+  const rdir=cfg.dirs===8?DR8:DR, cdir=cfg.dirs===8?DC8:DC;
+  const srcVal=cfg.srcVal===undefined?0:cfg.srcVal;
+  const wallVal=cfg.wallVal===undefined?null:cfg.wallVal;
+  const inb=(r,c)=>r>=0&&r<m&&c>=0&&c<n;
+  const frames=[];
+  const mk=()=>g.map((row,i)=>row.map((v,j)=>{
+    if(wallVal!==null && v===wallVal) return {cls:'wall'};
+    if(g1 && g1[i][j]===1) return {cls:'idle',g1:1};
+    return {cls:'idle'};
+  }));
+  const clone=s=>s.map(r=>r.map(c=>({...c})));
+
+  if(cfg.mode==='distance'){
+    const dist=g.map(r=>r.map(_=>-1)); const seeds=[];
+    for(let i=0;i<m;i++)for(let j=0;j<n;j++)if(g[i][j]===srcVal){dist[i][j]=0;seeds.push([i,j]);}
+    let q=seeds.slice(),h=0;
+    while(h<q.length){const a=q[h++],r=a[0],c=a[1];for(let d=0;d<rdir.length;d++){const nr=r+rdir[d],nc=c+cdir[d];if(inb(nr,nc)&&dist[nr][nc]===-1&&g[nr][nc]!==srcVal&&(wallVal===null||g[nr][nc]!==wallVal)){dist[nr][nc]=dist[r][c]+1;q.push([nr,nc]);}}}
+    let mx=0;for(let i=0;i<m;i++)for(let j=0;j<n;j++)if(dist[i][j]>mx)mx=dist[i][j];
+    for(let lvl=0;lvl<=mx;lvl++){
+      const st=mk();
+      for(let i=0;i<m;i++)for(let j=0;j<n;j++) if(dist[i][j]>=0&&dist[i][j]<=lvl){const t=dist[i][j];st[i][j]={cls:t===0?'src':'fill',txt:String(t),tone:t};}
+      frames.push({state:st,info: lvl===0?`Seed every source at distance <b>0</b> — they spread together.`:`Ring <b>${lvl}</b>: each new cell = neighbour + 1.`,count:`${cfg.label||'max distance'}: ${lvl}`,phase:lvl===0?'seed':'step'});
+    }
+    frames.push({state:frames[frames.length-1].state,info:`Done — each cell holds its shortest distance to the nearest source.`,count:`${cfg.label||'max distance'}: ${mx}`,phase:'done'});
+  }
+  else if(cfg.mode==='flood'||cfg.mode==='area'){
+    const vis=g.map(r=>r.map(_=>0));let cnt=0,maxA=0;const st=mk();
+    frames.push({state:clone(st),info:`Scan the grid; each unvisited land cell starts a fresh BFS.`,count:cfg.single?'':'islands: 0',phase:'scan'});
+    for(let i=0;i<m;i++)for(let j=0;j<n;j++) if(g[i][j]===1&&!vis[i][j]){
+      cnt++; const colr=ISLAND_COLORS[(cnt-1)%ISLAND_COLORS.length];
+      let ring=[[i,j]];vis[i][j]=1;let area=0,first=true;
+      while(ring.length){
+        ring.forEach(a=>{st[a[0]][a[1]]={cls:'comp',color:colr};area++;});
+        const ct=cfg.mode==='area'?`max area: ${Math.max(maxA,area)} (cur ${area})`:(cfg.single?'':`islands: ${cnt}`);
+        frames.push({state:clone(st),info:first?`New land (${i},${j}) → ${cfg.mode==='area'?'measure its size':(cfg.single?'flood it':'cnt++ and flood')}.`:`Spreading…`,count:ct,phase:first?'new':'step'});
+        first=false;const nx=[];
+        ring.forEach(a=>{const r=a[0],c=a[1];for(let d=0;d<4;d++){const nr=r+DR[d],nc=c+DC[d];if(inb(nr,nc)&&g[nr][nc]===1&&!vis[nr][nc]){vis[nr][nc]=1;nx.push([nr,nc]);}}});
+        ring=nx;
+      }
+      maxA=Math.max(maxA,area);
+    }
+    frames.push({state:clone(st),info: cfg.mode==='area'?`Done — largest island has <b>${maxA}</b> cells.`:(cfg.single?`Region flooded.`:`Done — <b>${cnt}</b> islands.`),count:cfg.mode==='area'?`max area: ${maxA}`:(cfg.single?'':`islands: ${cnt}`),phase:'done'});
+  }
+  else if(cfg.mode==='boundary'){
+    const vis=g.map(r=>r.map(_=>0));const st=mk();const seeds=[];
+    for(let i=0;i<m;i++)for(let j=0;j<n;j++) if((i===0||i===m-1||j===0||j===n-1)&&g[i][j]===1&&!vis[i][j]){vis[i][j]=1;seeds.push([i,j]);}
+    seeds.forEach(a=>st[a[0]][a[1]]={cls:'safe'});
+    frames.push({state:clone(st),info:`Seed every <b>border</b> land cell — these can reach the edge.`,count:`safe: ${seeds.length}`,phase:'seed'});
+    let ring=seeds.slice(),safe=seeds.length;
+    while(ring.length){
+      const nx=[];
+      ring.forEach(a=>{const r=a[0],c=a[1];for(let d=0;d<4;d++){const nr=r+DR[d],nc=c+DC[d];if(inb(nr,nc)&&g[nr][nc]===1&&!vis[nr][nc]){vis[nr][nc]=1;st[nr][nc]={cls:'safe'};nx.push([nr,nc]);safe++;}}});
+      if(nx.length) frames.push({state:clone(st),info:`Flood inward through connected land — mark it SAFE.`,count:`safe: ${safe}`,phase:'step'});
+      ring=nx;
+    }
+    let trapped=0;
+    for(let i=0;i<m;i++)for(let j=0;j<n;j++) if(g[i][j]===1&&!vis[i][j]){st[i][j]={cls:'trapped'};trapped++;}
+    frames.push({state:clone(st),info:`Unmarked land can't reach the border → <b>trapped</b> (enclaves / captured).`,count:`trapped: ${trapped}`,phase:'trap'});
+  }
+  else if(cfg.mode==='twogrid'){
+    const g2=g;const vis=g2.map(r=>r.map(_=>0));const st=mk();let sub=0;
+    frames.push({state:clone(st),info:`Faint-green cells = land in <b>grid1</b> (reference). We flood islands of <b>grid2</b>.`,count:`sub-islands: 0`,phase:'scan'});
+    for(let i=0;i<m;i++)for(let j=0;j<n;j++) if(g2[i][j]===1&&!vis[i][j]){
+      let ring=[[i,j]];vis[i][j]=1;let ok=true,cellsList=[],first=true;
+      while(ring.length){
+        ring.forEach(a=>{const r=a[0],c=a[1];st[r][c]={cls:'comp',color:'#00e5ff'};cellsList.push([r,c]);if(g1[r][c]===0)ok=false;});
+        frames.push({state:clone(st),info:first?`New grid2 island (${i},${j}) — assume sub-island, flood it.`:`Spreading; checking each cell against grid1…`,count:`sub-islands: ${sub}`,phase:first?'new':'step'});
+        first=false;const nx=[];
+        ring.forEach(a=>{const r=a[0],c=a[1];for(let d=0;d<4;d++){const nr=r+DR[d],nc=c+DC[d];if(inb(nr,nc)&&g2[nr][nc]===1&&!vis[nr][nc]){vis[nr][nc]=1;nx.push([nr,nc]);}}});
+        ring=nx;
+      }
+      if(ok)sub++;
+      cellsList.forEach(a=>st[a[0]][a[1]]={cls:ok?'accept':'reject'});
+      frames.push({state:clone(st),info: ok?`Every cell sits on grid1 land → <b>sub-island ✓</b>`:`A cell was water in grid1 → <b>rejected ✗</b>`,count:`sub-islands: ${sub}`,phase:'judge'});
+    }
+    frames.push({state:clone(st),info:`Done — <b>${sub}</b> sub-islands.`,count:`sub-islands: ${sub}`,phase:'done'});
+  }
+
+  const wrap=document.createElement('div');
+  wrap.innerHTML=`<div class="h">◈ LIVE DRY-RUN — ${cfg.title||'BFS'} + the line running</div>
+    <div class="demowrap">
+      <div class="gd" id="gdGrid"></div>
+      <div class="demoside">
+        <div class="counter" id="gdCount"></div>
+        <div class="demoinfo" id="gdInfo"></div>
+        <div class="dctrl"><button class="play" id="gdPlay">▶ play</button><button id="gdStep">step ›</button><button id="gdReset">⟲ reset</button></div>
+        <div class="hint">play, or step one ring at a time</div>
+      </div>
+    </div>
+    <div class="trace"><div class="th">CODE BEING TRAVERSED — <b>active line highlights live</b></div><pre id="gdTrace"></pre></div>`;
+  host.appendChild(wrap);
+  const cells=[],gridEl=wrap.querySelector('#gdGrid');
+  for(let r=0;r<m;r++){const row=document.createElement('div');row.className='gdrow';cells[r]=[];for(let c=0;c<n;c++){const el=document.createElement('div');el.className='gc';row.appendChild(el);cells[r][c]=el;}gridEl.appendChild(row);}
+  const infoEl=wrap.querySelector('#gdInfo'),countEl=wrap.querySelector('#gdCount');
+  const traceLines=cfg.trace||[],traceEl=wrap.querySelector('#gdTrace'),tEls=[];
+  traceLines.forEach(ln=>{const x=document.createElement('span');x.className='tln';x.innerHTML=hl(ln)||'&nbsp;';traceEl.appendChild(x);tEls.push(x);});
+  let idx=0,timer=null;
+  function draw(){const f=frames[idx];
+    for(let r=0;r<m;r++)for(let c=0;c<n;c++){const s=f.state[r][c],el=cells[r][c];el.textContent=s.txt||'';el.style.borderColor='transparent';el.style.transform='';
+      if(s.cls==='wall'){el.style.background='#11161d';el.style.color='#2a323d';}
+      else if(s.cls==='src'){el.style.background='#0e7d72';el.style.color='#eafffb';el.style.borderColor='#1aab9c';}
+      else if(s.cls==='fill'){el.style.background=distColor(s.tone);el.style.color='#eaf6ff';el.style.transform='scale(1.04)';}
+      else if(s.cls==='comp'){el.style.background=s.color+'cc';el.style.color='#06121a';el.style.borderColor=s.color;}
+      else if(s.cls==='safe'){el.style.background='#1f8f5f';el.style.color='#eafff3';el.style.borderColor='#3ecf8e';}
+      else if(s.cls==='trapped'){el.style.background='#3a1f27';el.style.color='#ff8aa0';el.style.borderColor='#ff6b6b';}
+      else if(s.cls==='accept'){el.style.background='#1f8f5f';el.style.color='#eafff3';el.style.borderColor='#3ecf8e';}
+      else if(s.cls==='reject'){el.style.background='#3a1f27';el.style.color='#ff8aa0';el.style.borderColor='#ff6b6b';}
+      else {el.style.background=s.g1?'#16241c':'#1a212b';el.style.color='#3a4452';}
+    }
+    infoEl.innerHTML=f.info;countEl.textContent=f.count||'';
+    const hot=(cfg.hot&&cfg.hot[f.phase])||[];tEls.forEach((e,i)=>e.classList.toggle('hot',hot.indexOf(i)>=0));
+  }
+  function stop(){if(timer){clearInterval(timer);timer=null;}wrap.querySelector('#gdPlay').textContent='▶ play';}
+  function play(){if(timer){stop();return;}if(idx>=frames.length-1)idx=0;wrap.querySelector('#gdPlay').textContent='❚❚ pause';timer=setInterval(()=>{if(idx>=frames.length-1){stop();return;}idx++;draw();},680);}
+  wrap.querySelector('#gdPlay').onclick=play;
+  wrap.querySelector('#gdStep').onclick=()=>{stop();if(idx<frames.length-1){idx++;draw();}};
+  wrap.querySelector('#gdReset').onclick=()=>{stop();idx=0;draw();};
+  draw();
+}
+
+/* ====================== 3D GRAPH ENGINE (three.js) ====================== */
+let active3D=null;
+function dispose3D(){ if(active3D){ try{active3D.cancel();}catch(e){} active3D=null; } }
+
+function genGraph(cfg){
+  const N=cfg.nodes.length, E=cfg.edges, mode=cfg.mode;
+  const directed=!!cfg.directed;
+  const adj=Array.from({length:N},()=>[]);
+  E.forEach(e=>{adj[e[0]].push(e[1]); if(!directed) adj[e[1]].push(e[0]);});
+  const LP=['#00e5ff','#39c0f0','#7c93ff','#bf5af2','#f78fb3','#ff9f0a','#69ff47'];
+  const IDLE={c:'#2a3340',ei:0.08};
+  const labels=cfg.nodes.map((nd,i)=>nd.label!=null?String(nd.label):String(i));
+  const frames=[];
+  const eVis=vis=>E.map(e=>vis[e[0]]&&vis[e[1]]);
+
+  if(mode==='components'){
+    const comp=Array(N).fill(-1),cc=Array(N).fill(null);let c=0;
+    frames.push({node:Array(N).fill(IDLE),edge:E.map(()=>false),info:`Scan all nodes; each unvisited one starts a new component.`,count:`components: 0`,phase:'seed'});
+    for(let s=0;s<N;s++) if(comp[s]<0){
+      c++; const colr=LP[(c-1)%LP.length]; let ring=[s];comp[s]=c;cc[s]=colr;let first=true;
+      while(ring.length){
+        const fs=ring.slice();
+        const node=comp.map((q,i)=> q<0?IDLE:{c:cc[i],ei: fs.indexOf(i)>=0?0.9:0.4});
+        frames.push({node,edge:eVis(comp.map(q=>q>=0)),info:first?`New component #${c} — flood it.`:`Spreading component #${c}…`,count:`components: ${c}`,phase:first?'seed':'step'});
+        first=false;const nx=[];
+        ring.forEach(nd=>adj[nd].forEach(nb=>{if(comp[nb]<0){comp[nb]=c;cc[nb]=colr;nx.push(nb);}}));
+        ring=nx;
+      }
+    }
+    frames.push({node:comp.map((q,i)=>q<0?IDLE:{c:cc[i],ei:0.45}),edge:eVis(comp.map(q=>q>=0)),info:`Done — <b>${c}</b> connected components.`,count:`components: ${c}`,phase:'done'});
+    return frames;
+  }
+  if(mode==='bipartite'){
+    const color=Array(N).fill(-1),start=cfg.start||0;color[start]=0;const q=[start];let h=0,bad=-1;const COL=['#00e5ff','#ff9f0a'];
+    const fr=(info,phase,red)=>{const node=color.map(cl=> cl<0?IDLE:{c:COL[cl],ei:0.5});frames.push({node,edge:eVis(color.map(cl=>cl>=0)),info,count:bad>=0?'bipartite: NO':'bipartite: ok so far',phase,edgeRed:red});};
+    fr(`Colour the start node 0 (cyan).`,'seed');
+    while(h<q.length){const nd=q[h++];for(const nb of adj[nd]){ if(color[nb]===-1){color[nb]=color[nd]^1;q.push(nb);fr(`Neighbour gets the OPPOSITE colour.`,'step');} else if(color[nb]===color[nd]){let ke=E.findIndex(e=>(e[0]===nd&&e[1]===nb)||(e[0]===nb&&e[1]===nd));bad=ke;fr(`Two same-coloured nodes share an edge → <b>NOT bipartite</b>.`,'step',ke);} } }
+    fr(bad>=0?`Not bipartite.`:`Every edge joins opposite colours → <b>bipartite ✓</b>.`,'done',bad>=0?bad:undefined);
+    return frames;
+  }
+  if(mode==='topo'){
+    const indeg=Array(N).fill(0);E.forEach(e=>indeg[e[1]]++);const placed=Array(N).fill(-1);let lvl=0;
+    let layer=[];for(let i=0;i<N;i++) if(indeg[i]===0)layer.push(i);
+    const id2=indeg.slice();
+    const fr=(info,phase)=>{frames.push({node:placed.map(pp=> pp<0?IDLE:{c:LP[pp%LP.length],ei:0.5}),edge:eVis(placed.map(pp=>pp>=0)),info,count:`placed: ${placed.filter(pp=>pp>=0).length}/${N}`,phase});};
+    fr(`indegree-0 nodes have no prerequisites — they go first.`,'seed');
+    while(layer.length){
+      layer.forEach(nd=>placed[nd]=lvl);
+      fr(`Layer ${lvl}: place these, then free their dependents.`,'step');
+      const nxt=[];layer.forEach(nd=>adj[nd].forEach(nb=>{if(--id2[nb]===0)nxt.push(nb);}));
+      lvl++;layer=nxt;
+    }
+    fr(`Done — a valid topological order, layer by layer.`,'done');
+    return frames;
+  }
+  if(mode==='bidir'){
+    const owner=Array(N).fill(-1),start=cfg.start||0,end=cfg.end!=null?cfg.end:N-1;owner[start]=0;owner[end]=1;const COL=['#00e5ff','#f78fb3'];let met=-1;
+    let rA=[start],rB=[end];
+    const fr=(info,phase)=>{frames.push({node:owner.map(o=> o<0?IDLE:{c:COL[o],ei:0.55}),edge:eVis(owner.map(o=>o>=0)),info,count:met>=0?'frontiers met!':'searching…',phase});};
+    fr(`Start from BOTH ends at once.`,'seed');
+    let guard=0;
+    while((rA.length||rB.length)&&met<0&&guard++<20){
+      const exp=(ring,o,other)=>{const nx=[];for(const nd of ring)for(const nb of adj[nd]){if(owner[nb]===other)met=1;if(owner[nb]<0){owner[nb]=o;nx.push(nb);}}return nx;};
+      rA=exp(rA,0,1); fr(`Cyan frontier expands one ring.`,'step'); if(met>=0)break;
+      rB=exp(rB,1,0); fr(`Pink frontier expands one ring.`,'step');
+    }
+    fr(met>=0?`The two frontiers <b>met</b> — path found in ~half the work.`:`Search complete.`,'done');
+    return frames;
+  }
+
+  /* ---- detailed per-pop BFS with a live queue (bfs / cycle / wordladder) ---- */
+  const isCycle=mode==='cycle', isWL=mode==='wordladder';
+  const start=cfg.start||0, end=cfg.end;
+  const vis=Array(N).fill(0),par=Array(N).fill(-1),dist=Array(N).fill(-1),done=Array(N).fill(false);
+  const q=[]; vis[start]=1; dist[start]=0; q.push(start);
+  const QAM={c:'#f0a500',ei:0.55}, CUR={c:'#ffffff',ei:1.0}, RED={c:'#ff4d5e',ei:0.95};
+  function snap(info,phase,cur,redPair){
+    const node=[];
+    for(let i=0;i<N;i++){
+      if(redPair&&(i===redPair[0]||i===redPair[1])) node.push(RED);
+      else if(i===cur) node.push(CUR);
+      else if(done[i]) node.push({c:LP[dist[i]%LP.length],ei:0.45});
+      else if(vis[i]) node.push(QAM);
+      else node.push(IDLE);
+    }
+    const qd=q.map(id=> isCycle?(labels[id]+'←'+(par[id]<0?'·':labels[par[id]])):labels[id]);
+    const er=redPair?E.findIndex(e=>(e[0]===redPair[0]&&e[1]===redPair[1])||(e[0]===redPair[1]&&e[1]===redPair[0])):undefined;
+    frames.push({node,edge:eVis(vis.map(x=>x>0)),queue:qd,info,count:isWL?`words reached: ${vis.filter(x=>x).length}`:(isCycle?'':`visited: ${vis.filter(x=>x).length}/${N}`),phase,edgeRed:er});
+  }
+  snap(isWL?`Push the start word <b>"${labels[start]}"</b> into the queue.`:`Push the start node <b>${labels[start]}</b> into the queue (distance 0).`,'seed',-1);
+  let cyc=false, cycPair;
+  while(q.length && !cyc){
+    const node=q.shift();
+    if(isWL && node===end){ snap(`Pop <b>"${labels[node]}"</b> = target → shortest transformation found in <b>${dist[node]+1}</b> words!`,'done',node); return frames; }
+    snap(isWL?`<b>Pop "${labels[node]}"</b> — try changing each letter a..z.`:`<b>Pop ${labels[node]}</b> — scan its neighbours.`,'pop',node);
+    const pushed=[];
+    for(const nb of adj[node]){
+      if(!vis[nb]){ vis[nb]=1; par[nb]=node; dist[nb]=dist[node]+1; q.push(nb); pushed.push(nb); }
+      else if(isCycle && nb!==par[node]){ cyc=true; cycPair=[node,nb]; break; }
+    }
+    done[node]=true;
+    if(cyc){ snap(`${labels[node]} reaches <b>${labels[cycPair[1]]}</b> — already visited &amp; <b>not its parent</b> → <b>CYCLE FOUND</b>.`,'cycle',node,cycPair); break; }
+    const names=pushed.map(x=>labels[x]);
+    snap(pushed.length? (isWL?`In-dictionary neighbours <b>${names.join(', ')}</b> → push.`:`${labels[node]} pushes <b>${names.join(', ')}</b> into the queue.`) : `${labels[node]} has no new neighbours.`,'push',-1);
+  }
+  if(!cyc) snap(isCycle?`Queue drained, never hit a back-edge → <b>no cycle</b>.`:(isWL?`Queue empty — target not reachable.`:`Queue empty — BFS complete.`),'done',-1);
+  return frames;
+}
+
+function mount3DGraph(host, cfg, col){
+  if(typeof THREE==='undefined'){ host.innerHTML=`<div class="h">◈ 3D graph demo needs internet (three.js failed to load) — code &amp; notes below still work.</div>`; return; }
+  const frames=genGraph(cfg), nodes=cfg.nodes, edges=cfg.edges, N=nodes.length;
+  const hasQ=frames.some(f=>f.queue);
+  const wrap=document.createElement('div');
+  wrap.innerHTML=`<div class="h">◈ 3D GRAPH + LIVE QUEUE — ${cfg.caption||''}</div>
+    <div class="demowrap3d">
+      <div class="g3dcol">
+        <canvas id="g3d"></canvas>
+        <div class="qrow" id="gdQrow"><span class="qlabel">QUEUE&nbsp;→</span><span id="gdQ" class="qpills"></span></div>
+        <div class="g3dhint">${cfg.caption||''}</div>
+      </div>
+      <div class="g3dside">
+        <div class="counter" id="gdCount"></div>
+        <div class="demoinfo" id="gdInfo"></div>
+        <div class="dctrl"><button class="play" id="gdPlay">▶ play</button><button id="gdStep">step ›</button><button id="gdReset">⟲ reset</button></div>
+        <div class="hint">queue, graph &amp; code all move together — step through it slowly</div>
+      </div>
+    </div>
+    <div class="trace"><div class="th">CODE BEING TRAVERSED — <b>active line highlights live</b></div><pre id="gdTrace"></pre></div>`;
+  host.appendChild(wrap);
+  if(!hasQ) wrap.querySelector('#gdQrow').style.display='none';
+  const infoEl=wrap.querySelector('#gdInfo'),countEl=wrap.querySelector('#gdCount'),Qel=wrap.querySelector('#gdQ');
+  const traceLines=cfg.trace||[],traceEl=wrap.querySelector('#gdTrace'),tEls=[];
+  traceLines.forEach(ln=>{const x=document.createElement('span');x.className='tln';x.innerHTML=hl(ln)||'&nbsp;';traceEl.appendChild(x);tEls.push(x);});
+
+  const canvas=wrap.querySelector('#g3d');
+  const renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+  const scene=new THREE.Scene();
+  const camera=new THREE.PerspectiveCamera(50,1.5,0.1,100);camera.position.set(0,0,7.0);
+  const grp=new THREE.Group();scene.add(grp);
+  scene.add(new THREE.AmbientLight(0xffffff,0.7));
+  const pl=new THREE.PointLight(0x99bbff,1.0);pl.position.set(4,5,6);scene.add(pl);
+  const v3=p=>new THREE.Vector3(p[0],p[1],p[2]);
+  function makeLabel(text){
+    const c=document.createElement('canvas');const ctx=c.getContext('2d');
+    ctx.font='bold 44px ui-monospace,monospace';
+    c.width=Math.max(64,Math.ceil(ctx.measureText(text).width)+26);c.height=64;
+    ctx.font='bold 44px ui-monospace,monospace';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.lineWidth=8;ctx.strokeStyle='#04121c';ctx.strokeText(text,c.width/2,34);
+    ctx.fillStyle='#eaf6ff';ctx.fillText(text,c.width/2,34);
+    const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),depthTest:false,transparent:true}));
+    sp.scale.set(c.width/115,0.56,1);return sp;
+  }
+  const edgeObjs=edges.map(e=>{const geo=new THREE.BufferGeometry().setFromPoints([v3(nodes[e[0]].pos),v3(nodes[e[1]].pos)]);const mat=new THREE.LineBasicMaterial({color:0x33405a,transparent:true,opacity:0.45});grp.add(new THREE.Line(geo,mat));return mat;});
+  const nodeObjs=nodes.map(nd=>{const geo=new THREE.SphereGeometry(0.3,30,30);const mat=new THREE.MeshStandardMaterial({color:0x2a3340,emissive:0x000000,roughness:0.45,metalness:0.05});const me=new THREE.Mesh(geo,mat);me.position.copy(v3(nd.pos));grp.add(me);return mat;});
+  nodes.forEach((nd,i)=>{const t=nd.label!=null?String(nd.label):String(i);const sp=makeLabel(t);sp.position.copy(v3(nd.pos));sp.position.y+=0.55;grp.add(sp);});
+  function resize(){const w=canvas.clientWidth||400,h=300;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();}
+  window.addEventListener('resize',resize);resize();
+
+  let idx=0,timer=null,raf;
+  function draw(){const f=frames[idx];
+    nodeObjs.forEach((mat,i)=>{const s=f.node[i];mat.color.set(s.c);mat.emissive.set(s.c);mat.emissiveIntensity=s.ei;});
+    edgeObjs.forEach((mat,k)=>{ if(f.edgeRed===k){mat.color.set('#ff4d5e');mat.opacity=1;} else if(f.edge[k]){mat.color.set('#5a86b8');mat.opacity=0.95;} else {mat.color.set('#33405a');mat.opacity=0.4;} });
+    infoEl.innerHTML=f.info;countEl.textContent=f.count||'';
+    if(hasQ){ Qel.innerHTML=''; const arr=f.queue||[]; if(!arr.length){const s=document.createElement('span');s.className='qp empty';s.textContent='empty';Qel.appendChild(s);} else arr.forEach(t=>{const s=document.createElement('span');s.className='qp';s.textContent=t;Qel.appendChild(s);}); }
+    const hot=(cfg.hot&&cfg.hot[f.phase])||[];tEls.forEach((e,i)=>e.classList.toggle('hot',hot.indexOf(i)>=0));
+  }
+  function stop(){if(timer){clearInterval(timer);timer=null;}wrap.querySelector('#gdPlay').textContent='▶ play';}
+  function play(){if(timer){stop();return;}if(idx>=frames.length-1)idx=0;wrap.querySelector('#gdPlay').textContent='❚❚ pause';timer=setInterval(()=>{if(idx>=frames.length-1){stop();return;}idx++;draw();},900);}
+  wrap.querySelector('#gdPlay').onclick=play;
+  wrap.querySelector('#gdStep').onclick=()=>{stop();if(idx<frames.length-1){idx++;draw();}};
+  wrap.querySelector('#gdReset').onclick=()=>{stop();idx=0;draw();};
+  draw();
+  (function loop(){grp.rotation.y+=0.0032;renderer.render(scene,camera);raf=requestAnimationFrame(loop);})();
+  active3D={cancel:()=>{cancelAnimationFrame(raf);if(timer)clearInterval(timer);window.removeEventListener('resize',resize);try{renderer.dispose();}catch(e){}}};
+}
+
+function initBG(){
+  if(typeof THREE==='undefined')return;
+  const canvas=document.getElementById('bg3d');if(!canvas)return;
+  const renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+  const scene=new THREE.Scene();
+  const camera=new THREE.PerspectiveCamera(60,window.innerWidth/window.innerHeight,0.1,100);camera.position.z=14;
+  const N=150,pos=new Float32Array(N*3);
+  for(let i=0;i<N;i++){const r=8*Math.cbrt(Math.random()),th=Math.random()*6.283,ph=Math.acos(2*Math.random()-1);pos[i*3]=r*Math.sin(ph)*Math.cos(th);pos[i*3+1]=r*Math.sin(ph)*Math.sin(th);pos[i*3+2]=r*Math.cos(ph);}
+  const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.BufferAttribute(pos,3));
+  const pts=new THREE.Points(geo,new THREE.PointsMaterial({color:0x00e5ff,size:0.09,transparent:true,opacity:0.75}));scene.add(pts);
+  const lp=[];for(let i=0;i<N;i++)for(let j=i+1;j<N;j++){const dx=pos[i*3]-pos[j*3],dy=pos[i*3+1]-pos[j*3+1],dz=pos[i*3+2]-pos[j*3+2];if(dx*dx+dy*dy+dz*dz<2.3){lp.push(pos[i*3],pos[i*3+1],pos[i*3+2],pos[j*3],pos[j*3+1],pos[j*3+2]);}}
+  const lg=new THREE.BufferGeometry();lg.setAttribute('position',new THREE.BufferAttribute(new Float32Array(lp),3));
+  const lines=new THREE.LineSegments(lg,new THREE.LineBasicMaterial({color:0x2766aa,transparent:true,opacity:0.25}));scene.add(lines);
+  function resize(){renderer.setSize(window.innerWidth,window.innerHeight,false);camera.aspect=window.innerWidth/window.innerHeight;camera.updateProjectionMatrix();}
+  window.addEventListener('resize',resize);resize();
+  (function loop(){pts.rotation.y+=0.0009;pts.rotation.x+=0.0004;lines.rotation.copy(pts.rotation);renderer.render(scene,camera);requestAnimationFrame(loop);})();
+}
+
+/* ───────────────────────── INIT ───────────────────────── */
+document.getElementById('menuToggle').onclick=()=>side.classList.toggle('open');
+buildSidebar();
+render();
+initBG();
+</script>
+</body>
+</html>
