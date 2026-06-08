@@ -1,5 +1,9 @@
 # DFS Patterns
 
+Main visual hub:
+
+- [dfs-patterns-hub.html](dfs-patterns-hub.html)
+
 DFS pattern assets:
 
 - [__dfsdata.js](__dfsdata.js)

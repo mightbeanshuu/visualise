@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Visualise Graph Patterns</title>
+  <style>
+    :root {
+      --bg: #0b0f14;
+      --panel: #101720;
+      --line: #203040;
+      --text: #e6edf3;
+      --muted: #8b949e;
+      --bfs: #00e5ff;
+      --dfs: #f78fb3;
+      --green: #69ff47;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(circle at 70% 0%, #17263a 0, #0b0f14 48%);
+      color: var(--text);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+    main {
+      width: min(1080px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 44px 0;
+    }
+    header {
+      display: grid;
+      gap: 12px;
+      padding: 18px 0 28px;
+      border-bottom: 1px solid var(--line);
+    }
+    .eyebrow {
+      color: var(--green);
+      font-size: 12px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+    h1 {
+      margin: 0;
+      font-size: clamp(32px, 6vw, 64px);
+      line-height: 1;
+      letter-spacing: 0;
+    }
+    p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.65;
+      max-width: 760px;
+      font-size: 15px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      margin-top: 28px;
+    }
+    a.panel {
+      min-height: 260px;
+      color: inherit;
+      text-decoration: none;
+      border: 1px solid var(--line);
+      background: rgba(16, 23, 32, 0.76);
+      border-radius: 8px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
+      position: relative;
+    }
+    a.panel:before {
+      content: "";
+      position: absolute;
+      inset: auto -80px -90px auto;
+      width: 240px;
+      height: 240px;
+      border: 1px solid currentColor;
+      border-radius: 50%;
+      opacity: 0.16;
+    }
+    a.panel:hover { border-color: currentColor; }
+    .bfs { color: var(--bfs); }
+    .dfs { color: var(--dfs); }
+    h2 {
+      margin: 0 0 10px;
+      color: var(--text);
+      font-size: 26px;
+      letter-spacing: 0;
+    }
+    .meta {
+      color: currentColor;
+      font-size: 12px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+    .list {
+      margin-top: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .chip {
+      border: 1px solid #2a3a4c;
+      color: #a8b3bf;
+      padding: 5px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      background: #0b1118;
+    }
+    .go {
+      color: currentColor;
+      font-weight: 700;
+      font-size: 13px;
+    }
+    @media (max-width: 760px) {
+      .grid { grid-template-columns: 1fr; }
+      a.panel { min-height: 220px; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div class="eyebrow">Graph Pattern Visuals</div>
+      <h1>Visualise BFS and DFS</h1>
+      <p>Two separate interactive hubs for graph and grid traversal patterns. Use BFS for levels, distances, queues, and shortest paths. Use DFS for recursion, call stacks, components, cycles, topo order, and backtracking.</p>
+    </header>
+
+    <section class="grid" aria-label="Pattern hubs">
+      <a class="panel bfs" href="/graphs/bfs-patterns/">
+        <div>
+          <div class="meta">BFS Patterns</div>
+          <h2>Queue, levels, distance</h2>
+          <p>Graph BFS, islands, multi-source BFS, level BFS, boundary BFS, shortest path, 0-1 BFS, state-space BFS, bipartite, and Kahn topo sort.</p>
+          <div class="list">
+            <span class="chip">multi-source</span>
+            <span class="chip">boundary</span>
+            <span class="chip">shortest path</span>
+            <span class="chip">0-1 BFS</span>
+          </div>
+        </div>
+        <div class="go">Open BFS hub</div>
+      </a>
+
+      <a class="panel dfs" href="/graphs/dfs-patterns/">
+        <div>
+          <div class="meta">DFS Algorithms</div>
+          <h2>Call stack, cycles, paths</h2>
+          <p>Recursive DFS, iterative DFS, flood fill, island area, boundary DFS, undirected and directed cycle detection, bipartite coloring, topo sort, and backtracking.</p>
+          <div class="list">
+            <span class="chip">call stack</span>
+            <span class="chip">cycle detection</span>
+            <span class="chip">toposort</span>
+            <span class="chip">backtracking</span>
+          </div>
+        </div>
+        <div class="go">Open DFS hub</div>
+      </a>
+    </section>
+  </main>
+</body>
+</html>
