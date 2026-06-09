@@ -7,7 +7,7 @@
   <meta name="description" content="Interactive BFS and DFS graph & grid traversal pattern hubs — live animations, call-stack dry-runs, and full LeetCode-style code with click-to-reveal comments.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Fraunces:ital,wght@0,400..700;1,400..700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
   <style>
     :root{
       --bg:#07090d; --bg2:#0b0f15; --line:#1b2533; --line2:#243244;
@@ -116,6 +116,11 @@
       .hero{padding:56px 0 40px;}
     }
   </style>
+<style>
+h1,h2{font-family:Fraunces,Georgia,serif !important;font-style:italic;font-weight:600;letter-spacing:-.5px;}
+@keyframes rise{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:none;}}
+main>*:first-child h1,header+* h1{animation:rise .7s cubic-bezier(.2,.7,.3,1) both;}
+</style>
 </head>
 <body>
   <header class="nav">

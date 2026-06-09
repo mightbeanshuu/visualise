@@ -1,7 +1,7 @@
 const P_DFS = [
 {
   cat:'CORE', label:'Basic Graph DFS (recursive)', done:true,
-  sim:{kind:'graph', n:6, edges:[[0,1],[0,2],[1,3],[2,3],[2,4],[4,5]], start:0, algo:'dfs', caption:'DFS traversal from source 0'},
+  sim:{lc:'GFG · DFS of Graph', kind:'graph', n:6, edges:[[0,1],[0,2],[1,3],[2,3],[2,4],[4,5]], start:0, algo:'dfs', caption:'DFS traversal from source 0'},
   when:`Traverse one connected graph by going as DEEP as possible before backing up.`,
   insight:`<code>dfs(u)</code>: mark <code>u</code> on entry, recurse into each unvisited neighbour. <b>Returning from a call = backtracking.</b> The call stack remembers where to resume.`,
   analogy:`A maze where you always take the first unexplored door; when you hit a dead end you walk back to the last junction and try its next door. Recursion's call stack <i>is</i> that trail of junctions.`,
@@ -27,7 +27,7 @@ public:
 },
 {
   cat:'CORE', label:'Iterative DFS (explicit stack)', done:true,
-  sim:{kind:'graph', n:6, edges:[[0,1],[0,2],[1,3],[2,3],[2,4],[4,5]], start:0, algo:'dfsiter', caption:'Explicit stack — mark when POPPED, duplicates are fine'},
+  sim:{lc:'LC 200 · iterative variant', kind:'graph', n:6, edges:[[0,1],[0,2],[1,3],[2,3],[2,4],[4,5]], start:0, algo:'dfsiter', caption:'Explicit stack — mark when POPPED, duplicates are fine'},
   when:`Same as recursive DFS but you control the stack yourself — avoids recursion-depth limits.`,
   insight:`Replace the call stack with a real <code>stack</code>. Pop a node, push its unvisited neighbours. Order differs slightly from recursion but it's still depth-first.`,
   analogy:`The recursion was hiding a stack the whole time — here you just hold it in your hand.`,
@@ -52,7 +52,7 @@ public:
 },
 {
   cat:'CORE', label:'Connected Components (DFS)', done:true,
-  sim:{kind:'graph', n:8, edges:[[0,1],[1,2],[3,4],[5,6],[6,7],[5,7]], algo:'comp', caption:'One DFS per unvisited node — count the launches'},
+  sim:{lc:'LC 547 · Number of Provinces', kind:'graph', n:8, edges:[[0,1],[1,2],[3,4],[5,6],[6,7],[5,7]], algo:'comp', caption:'One DFS per unvisited node — count the launches'},
   when:`Count disconnected pieces of a graph.`,
   insight:`Outer loop over all V nodes; each unvisited node launches one DFS = one component. Never reset vis.`,
   analogy:`Number of Islands on an adjacency list — each fresh DFS drowns one whole component.`,
@@ -76,7 +76,7 @@ public:
 },
 {
   cat:'GRID', label:'Flood Fill (DFS)', done:true,
-  sim:{kind:'grid', algo:'flood', startCell:[1,1], newC:2, cntLabel:'CELLS RECOLOURED', caption:'Recolour everything connected to the start cell', grid:[[1,1,1],[1,1,0],[1,0,1]]},
+  sim:{lc:'LC 733 · Flood Fill', kind:'grid', algo:'flood', startCell:[1,1], newC:2, cntLabel:'CELLS RECOLOURED', caption:'Recolour everything connected to the start cell', grid:[[1,1,1],[1,1,0],[1,0,1]]},
   when:`Recolour / visit one connected region from a start cell.`,
   insight:`Cell = node, 4 neighbours = edges. Recurse into each valid same-region neighbour. No queue — the recursion dives a tendril deep, then backtracks.`,
   analogy:`Paint spilling, but it runs all the way down one channel first, then comes back to fill the side channels.`,
@@ -105,7 +105,7 @@ public:
 },
 {
   cat:'GRID', label:'Number of Islands (DFS)', done:true,
-  sim:{kind:'grid', algo:'islands', caption:'Sink each island with DFS', grid:[[1,1,0,0,1],[1,0,0,1,1],[0,0,0,0,0],[0,1,1,0,1]]},
+  sim:{lc:'LC 200 · Number of Islands', kind:'grid', algo:'islands', caption:'Sink each island with DFS', grid:[[1,1,0,0,1],[1,0,0,1,1],[0,0,0,0,0],[0,1,1,0,1]]},
   when:`Count connected regions in a grid.`,
   insight:`Double loop; each unvisited land cell → <code>cnt++</code> and a DFS that sinks the whole island.`,
   analogy:`Exactly your BFS Number of Islands — swap the queue-flood for a recursive sink. Same answer, different traversal order.`,
@@ -140,7 +140,7 @@ public:
 },
 {
   cat:'GRID', label:'Max Area / Component Size (DFS)', done:true,
-  sim:{kind:'grid', algo:'maxarea', cntLabel:'MAX AREA', caption:'Measure every island — keep the best', grid:[[1,1,0,0],[1,0,0,1],[0,0,1,1],[0,0,0,1]]},
+  sim:{lc:'LC 695 · Max Area of Island', kind:'grid', algo:'maxarea', cntLabel:'MAX AREA', caption:'Measure every island — keep the best', grid:[[1,1,0,0],[1,0,0,1],[0,0,1,1],[0,0,0,1]]},
   when:`Size of a component (largest island, area).`,
   insight:`DFS <b>returns</b> the size: <code>1 + sum of children's areas</code>. Much cleaner than BFS here — recursion adds up naturally.`,
   analogy:`Each cell reports "me (1) plus everything my neighbours reported". The root gets the whole island's size.`,
@@ -175,7 +175,7 @@ public:
 },
 {
   cat:'GRID', label:'Two-Grid Sub Islands (DFS)', done:true,
-  sim:{kind:'grid', algo:'subisl', cntLabel:'SUB-ISLANDS', caption:'Every cell of the B island must be land in A too (✗ = water in A)', grid:[[1,1,0,1],[0,1,1,0],[0,0,0,1]], grid1:[[1,1,0,0],[0,1,1,0],[0,0,0,1]]},
+  sim:{lc:'LC 1905 · Count Sub Islands', kind:'grid', algo:'subisl', cntLabel:'SUB-ISLANDS', caption:'Every cell of the B island must be land in A too (✗ = water in A)', grid:[[1,1,0,1],[0,1,1,0],[0,0,0,1]], grid1:[[1,1,0,0],[0,1,1,0],[0,0,0,1]]},
   when:`Validate each grid2 island against grid1.`,
   insight:`DFS returns <code>true</code> only if EVERY cell of the island is land in grid1. Combine children with <code>&amp;&amp;</code> — but DFS all of them, don't short-circuit.`,
   analogy:`Same as your BFS sub-islands: flood the whole island, remember if you ever stepped on grid1-water.`,
@@ -210,7 +210,7 @@ public:
 },
 {
   cat:'GRID', label:'Grid DFS — 8-Directional', done:true,
-  sim:{kind:'grid', algo:'islands8', caption:'Diagonals count — 8 neighbours per cell', grid:[[1,0,0,1],[0,1,0,0],[0,0,1,0],[1,0,0,1]]},
+  sim:{lc:'GFG · Islands (8-dir)', kind:'grid', algo:'islands8', caption:'Diagonals count — 8 neighbours per cell', grid:[[1,0,0,1],[0,1,0,0],[0,0,1,0],[1,0,0,1]]},
   when:`Diagonal connectivity (king / X-shaped regions).`,
   insight:`Only dr/dc and the loop bound change (4 → 8). DFS body identical.`,
   analogy:`Same dive-and-backtrack, just more doors out of every room.`,
@@ -242,7 +242,7 @@ public:
 },
 {
   cat:'BOUNDARY', label:'Boundary DFS (Surrounded / Enclaves)', done:true,
-  sim:{kind:'grid', algo:'boundary', cntLabel:'SAFE CELLS', caption:'Start from the border — unmarked land gets captured', grid:[[1,0,0,0],[0,1,1,0],[0,1,0,0],[0,0,0,1]]},
+  sim:{lc:'LC 130 · Surrounded Regions', kind:'grid', algo:'boundary', cntLabel:'SAFE CELLS', caption:'Start from the border — unmarked land gets captured', grid:[[1,0,0,0],[0,1,1,0],[0,1,0,0],[0,0,0,1]]},
   when:`Keep / count whatever connects to the border; kill the rest.`,
   insight:`DFS from every border land/'O' cell → mark SAFE. Anything left unmarked is captured. Reverse thinking, same as the BFS version.`,
   analogy:`Find who can escape (touches an edge), not who's trapped. DFS dives along the escape route.`,
@@ -273,7 +273,7 @@ public:
 },
 {
   cat:'GRAPH', label:'Cycle Detection — Undirected (DFS)', done:true,
-  sim:{kind:'graph', n:6, edges:[[0,1],[1,2],[2,3],[3,1],[0,4],[4,5]], start:0, algo:'ucycle', caption:'Visited neighbour that is NOT my parent ⇒ cycle'},
+  sim:{lc:'GFG · Detect Cycle (Undirected)', kind:'graph', n:6, edges:[[0,1],[1,2],[2,3],[3,1],[0,4],[4,5]], start:0, algo:'ucycle', caption:'Visited neighbour that is NOT my parent ⇒ cycle'},
   when:`Detect a cycle in an undirected graph using recursion + parent.`,
   insight:`<code>dfs(u, parent)</code>. If a neighbour is visited AND is <b>not</b> your parent → back-edge → cycle.`,
   analogy:`The grid never needed a parent (vis stopped backtracking). A real graph can loop, so you must remember who you came from — bumping into anyone else already visited means a loop.`,
@@ -302,7 +302,7 @@ public:
 },
 {
   cat:'GRAPH', label:'Cycle Detection — Directed (DFS, 3-colour)', done:true,
-  sim:{kind:'graph', n:5, directed:true, edges:[[0,1],[1,2],[2,0],[2,3],[3,4]], start:0, algo:'dfs3', caption:'3-colour DFS — edge to a GRAY node = cycle'},
+  sim:{lc:'LC 207 · Course Schedule intuition', kind:'graph', n:5, directed:true, edges:[[0,1],[1,2],[2,0],[2,3],[3,4]], start:0, algo:'dfs3', caption:'3-colour DFS — edge to a GRAY node = cycle'},
   when:`Detect a cycle in a DIRECTED graph.`,
   insight:`Colour nodes white (unseen) → gray (on the recursion stack) → black (done). An edge to a <b>gray</b> node is a back-edge → cycle. Visited (black) alone is NOT a cycle.`,
   analogy:`Gray = "still in the room I'm exploring". If I find a door back into a room I'm currently inside, I've gone in a circle.`,
@@ -333,7 +333,7 @@ public:
 },
 {
   cat:'GRAPH', label:'Bipartite Check (DFS colouring)', done:true,
-  sim:{kind:'graph', n:5, edges:[[0,1],[0,2],[1,3],[2,3],[3,4],[4,2]], algo:'bipartite', caption:'Alternate colours — the odd cycle 2-3-4 forces a clash'},
+  sim:{lc:'LC 785 · Is Graph Bipartite?', kind:'graph', n:5, edges:[[0,1],[0,2],[1,3],[2,3],[3,4],[4,2]], algo:'bipartite', caption:'Alternate colours — the odd cycle 2-3-4 forces a clash'},
   when:`Can the graph be 2-coloured so no edge joins same colours?`,
   insight:`DFS, give each neighbour the opposite colour. If a neighbour already has the SAME colour → not bipartite.`,
   analogy:`Two teams; every edge must cross teams. Forced to put teammates on one edge → impossible.`,
@@ -362,7 +362,7 @@ public:
 },
 {
   cat:'GRAPH', label:'Topological Sort (DFS post-order)', done:true,
-  sim:{kind:'graph', n:6, directed:true, edges:[[5,0],[5,2],[4,0],[4,1],[2,3],[3,1]], algo:'topo', caption:'Push a node only AFTER its children finish — reverse the stack'},
+  sim:{lc:'GFG · Topological Sort', kind:'graph', n:6, directed:true, edges:[[5,0],[5,2],[4,0],[4,1],[2,3],[3,1]], algo:'topo', caption:'Push a node only AFTER its children finish — reverse the stack'},
   when:`Order a DAG by dependencies.`,
   insight:`DFS, and push a node to the order <b>after</b> all its children finish (post-order). Reverse that list = a valid topological order.`,
   analogy:`You can only "finish" a task once everything it points to is finished — so finished-order, reversed, respects every dependency.`,
@@ -388,7 +388,7 @@ public:
 },
 {
   cat:'PATHS', label:'All Paths source→target (Backtracking)', done:true,
-  sim:{kind:'graph', n:4, directed:true, edges:[[0,1],[0,2],[1,3],[2,3]], start:0, target:3, algo:'allpaths', caption:'Backtracking — pop and un-mark after exploring'},
+  sim:{lc:'LC 797 · All Paths From Source to Target', kind:'graph', n:4, directed:true, edges:[[0,1],[0,2],[1,3],[2,3]], start:0, target:3, algo:'allpaths', caption:'Backtracking — pop and un-mark after exploring'},
   when:`Enumerate every path from a source to a target (DAG / small graph).`,
   insight:`DFS that <b>adds the node to the path, recurses, then removes it</b> (backtracks). On reaching the target, record a copy of the current path.`,
   analogy:`Try a branch fully, snapshot it if it reaches the goal, then undo your last step and try the next branch.`,

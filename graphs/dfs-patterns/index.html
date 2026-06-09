@@ -6,7 +6,7 @@
 <title>Graph & Grid DFS — Pattern Revision Hub</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Fraunces:ital,wght@0,400..700;1,400..700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
   :root{
     --bg:#0d0f14; --bg2:#0a0c11; --panel:#141920; --border:#1e2a38;
@@ -149,6 +149,29 @@
   .vstack{display:flex;gap:5px;flex-wrap:wrap;align-items:center;}
   .vstack .b{background:#3a2e0a;border:1px solid #f0a500;color:#ffd479;font-size:11px;font-weight:700;padding:3px 9px;border-radius:6px;font-family:'JetBrains Mono',monospace;}
   .vstack .e{color:var(--faint);font-style:italic;font-size:11px;}
+  /* ── manim-style scene ── */
+  .vstage svg.scene{max-width:780px;}
+  .scene text{font-family:'JetBrains Mono',monospace;font-weight:700;}
+  .scene .slbl{font-family:'Fraunces',Georgia,serif;font-style:italic;font-weight:500;font-size:19px;fill:#dbe4ee;letter-spacing:.3px;}
+  .scene .nd .ring{fill:#131a22;stroke:#7e5151;stroke-width:2;transition:stroke .4s,fill .4s,stroke-width .3s;}
+  .scene .nd text{fill:#e6edf3;}
+  .scene .nd.front .ring{stroke:#f0a500;fill:#241c06;}
+  .scene .nd.done .ring{stroke:#69ff47;fill:#0c2417;}
+  .scene .nd.cur .ring{stroke:#ffd60a;fill:#241d04;stroke-width:3.5;}
+  .scene .halo{fill:none;stroke:#ffd60a;stroke-width:2;opacity:0;transition:opacity .3s;}
+  .scene .nd.cur .halo{opacity:.85;animation:halo 1.15s ease-in-out infinite;}
+  @keyframes halo{50%{opacity:.15;}}
+  .scene .qbx{fill:#0b1118;stroke:#27313d;stroke-width:1.6;transition:stroke .35s,fill .35s;}
+  .scene .qbx.full{stroke:#f0a500;fill:#1c1505;}
+  .scene .qbx.head{stroke:#fff;stroke-width:2;}
+  .scene .qtx{fill:#ffd479;font-size:15px;}
+  .scene .vbx{fill:#0b1118;stroke:#27313d;stroke-width:1.6;transition:stroke .35s,fill .35s;}
+  .scene .vbx.full{stroke:#1f7a3a;fill:#0c2417;}
+  .scene .vtx{fill:#69ff47;font-size:14px;}
+  .scene .curB{fill:#0b1118;stroke:#3a4452;stroke-width:1.8;transition:stroke .35s,fill .35s;}
+  .scene .curB.live{stroke:#ffd60a;fill:#171304;}
+  .scene .curT{fill:#ffd60a;font-size:22px;}
+  .lcchip{margin-left:10px;font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:1px;font-weight:700;color:#ffb86b;background:#241604;border:1px solid #5a3a14;border-radius:20px;padding:2px 10px;vertical-align:1px;}
   .vcode{margin:0 0 12px;background:#070a0e;border:1px solid var(--border);border-radius:10px;padding:10px 8px;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11.5px;line-height:1.75;overflow-x:auto;}
   .rl{display:block;padding:1px 12px;border-left:3px solid transparent;white-space:pre;color:#7d8895;transition:background .2s,color .2s,border-color .2s;}
   .rl.active{background:#0f2a33;border-left-color:var(--multi);color:#dff6ff;font-weight:700;}
@@ -224,6 +247,10 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="__dfsdata.js"></script>
 <script src="__dfseng.js"></script>
+<style>
+.phead h2{font-family:Fraunces,Georgia,serif;font-style:italic;font-weight:600;letter-spacing:0;}
+header h1, .htitle{font-family:Fraunces,Georgia,serif;font-style:italic;font-weight:600;}
+</style>
 </head>
 <body>
   <canvas id="bg3d"></canvas>
@@ -747,29 +774,76 @@ function simulate(spec){
   return F;
 }
 
-function vizSVG(spec,frames,f){
-  const pos=frames.layout, directed=!!spec.directed, r=18;
+/* ── manim-style composite scene: graph + Call-stack column + Visited row + Current box.
+      Built ONCE per pattern (vizSVG), then mutated per frame (vizUpd) so CSS
+      transitions make every state change glide instead of flicker. ── */
+const QSLOTS=7, VSLOTS=12;
+function vizSVG(spec,frames){
+  const pos=frames.layout, directed=!!spec.directed, r=18, n=spec.n;
   const mk=(id,c)=>`<marker id="${id}" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L9,3 L0,6 Z" fill="${c}"/></marker>`;
-  let s=`<svg viewBox="0 0 420 320">`;
-  if(directed) s+=`<defs>${mk('ah','#3a4a5c')}${mk('aht','#69ff47')}${mk('ahr','#ff5f56')}${mk('ahg','#8b949e')}</defs>`;
-  spec.edges.forEach(([a,b])=>{
+  let s=`<svg viewBox="0 0 780 412" class="scene">`;
+  s+=`<defs>${mk('ah','#3a4a5c')}${mk('aht','#69ff47')}${mk('ahr','#ff5f56')}${mk('ahg','#8b949e')}</defs>`;
+  s+=`<g transform="translate(15,4)">`;
+  spec.edges.forEach(([a,b],ei)=>{
+    const [x1,y1]=pos[a],[x2,y2]=pos[b], dx=x2-x1,dy=y2-y1,L=Math.hypot(dx,dy)||1, ux=dx/L,uy=dy/L;
+    const X1=x1+ux*r, Y1=y1+uy*r, X2=x2-ux*(r+(directed?6:0)), Y2=y2-uy*(r+(directed?6:0));
+    s+=`<line id="ed${ei}" x1="${X1}" y1="${Y1}" x2="${X2}" y2="${Y2}" stroke="#2a3a4c" stroke-width="2" ${directed?`marker-end="url(#ah)"`:''}/>`;
+  });
+  pos.forEach((p,i)=>{
+    s+=`<g id="nd${i}" class="nd">
+      <circle class="halo" cx="${p[0]}" cy="${p[1]}" r="${r+6}"/>
+      <circle class="ring" cx="${p[0]}" cy="${p[1]}" r="${r}"/>
+      <text x="${p[0]}" y="${p[1]+5}" font-size="15" text-anchor="middle">${i}</text></g>`;
+    if(i===(spec.start||0)) s+=`<text x="${p[0]}" y="${p[1]-r-8}" fill="#ff6b6b" font-size="10" text-anchor="middle" font-style="italic">source</text>`;
+    if(spec.target!=null&&i===spec.target) s+=`<text x="${p[0]}" y="${p[1]-r-8}" fill="#69ff47" font-size="10" text-anchor="middle" font-style="italic">target</text>`;
+  });
+  s+=`</g>`;
+  // ── Call-stack column (top of stack at the top) ──
+  const qx=500, qw=120, qh=40;
+  s+=`<text x="${qx+qw/2}" y="30" class="slbl" text-anchor="middle">${spec.qlabel||'Call stack'}</text>`;
+  for(let k=0;k<QSLOTS;k++) s+=`<g><rect id="qs${k}" class="qbx" x="${qx}" y="${42+k*(qh+6)}" width="${qw}" height="${qh}" rx="8"/><text id="qt${k}" class="qtx" x="${qx+qw/2}" y="${42+k*(qh+6)+qh/2+5}" text-anchor="middle"></text></g>`;
+  // ── Current node box ──
+  const cx=668;
+  s+=`<text x="${cx+46}" y="30" class="slbl" text-anchor="middle">Current</text>`;
+  s+=`<rect id="curB" class="curB" x="${cx}" y="42" width="92" height="66" rx="10"/><text id="curT" class="curT" x="${cx+46}" y="${42+33+8}" text-anchor="middle">—</text>`;
+  // ── Visited row ──
+  const vn=Math.min(n,VSLOTS), vw=40, vy=368;
+  s+=`<text x="15" y="${vy-10}" class="slbl">Visited nodes</text>`;
+  for(let k=0;k<vn;k++) s+=`<g><rect id="vs${k}" class="vbx" x="${15+k*(vw+6)}" y="${vy}" width="${vw}" height="${vw}" rx="8"/><text id="vt${k}" class="vtx" x="${15+k*(vw+6)+vw/2}" y="${vy+vw/2+5}" text-anchor="middle"></text></g>`;
+  return s+`</svg>`;
+}
+function vizUpd(svg,spec,frames,f){
+  const Q=sel=>svg.querySelector(sel), directed=!!spec.directed;
+  spec.edges.forEach(([a,b],ei)=>{
+    const L=Q('#ed'+ei); if(!L) return;
     const hot=f.edge && (f.edge[0]===a&&f.edge[1]===b || (!directed&&f.edge[0]===b&&f.edge[1]===a));
     let col='#2a3a4c',wd=2,dash='',mk2='ah';
     if(hot){ if(f.edgeType==='tree'){col='#69ff47';wd=3.5;mk2='aht';} else if(f.edgeType==='back'){col='#ff5f56';wd=3.5;mk2='ahr';} else {col='#8b949e';dash='5 3';mk2='ahg';} }
-    const [x1,y1]=pos[a],[x2,y2]=pos[b], dx=x2-x1,dy=y2-y1,L=Math.hypot(dx,dy)||1, ux=dx/L,uy=dy/L;
-    const X1=x1+ux*r, Y1=y1+uy*r, X2=x2-ux*(r+(directed?6:0)), Y2=y2-uy*(r+(directed?6:0));
-    s+=`<line x1="${X1}" y1="${Y1}" x2="${X2}" y2="${Y2}" stroke="${col}" stroke-width="${wd}" ${dash?`stroke-dasharray="${dash}"`:''} ${directed?`marker-end="url(#${mk2})"`:''}/>`;
+    L.setAttribute('stroke',col); L.setAttribute('stroke-width',wd);
+    dash?L.setAttribute('stroke-dasharray',dash):L.removeAttribute('stroke-dasharray');
+    if(directed) L.setAttribute('marker-end',`url(#${mk2})`);
   });
-  pos.forEach((p,i)=>{
-    const st=f.nodeState?f.nodeState[i]:0; let fill='#141b24',stroke='#3a4452';
-    if(st===1){fill='#3a2e0a';stroke='#f0a500';} if(st===2){fill='#0c2417';stroke='#1f7a3a';}
-    const cur=f.cur===i;
-    if(cur) s+=`<circle cx="${p[0]}" cy="${p[1]}" r="${r+5}" fill="none" stroke="#fff" stroke-width="1.6" opacity=".7"/>`;
-    s+=`<circle cx="${p[0]}" cy="${p[1]}" r="${r}" fill="${fill}" stroke="${stroke}" stroke-width="${cur?3.5:2}"/>`;
-    s+=`<text x="${p[0]}" y="${p[1]+5}" fill="#e6edf3" font-size="15" text-anchor="middle">${i}</text>`;
-    if(i===(spec.start||0)) s+=`<text x="${p[0]}" y="${p[1]-r-7}" fill="#ff6b6b" font-size="10" text-anchor="middle">source</text>`;
-  });
-  return s+`</svg>`;
+  for(let i=0;i<spec.n;i++){
+    const st=f.nodeState?f.nodeState[i]:0;
+    const nd=Q('#nd'+i); if(!nd) continue;
+    nd.setAttribute('class','nd'+(st===1?' front':st===2?' done':'')+(f.cur===i?' cur':''));
+  }
+  const items=[...(f.stack||[])].reverse().map(String);   // top of stack first
+  for(let k=0;k<QSLOTS;k++){
+    const t=Q('#qt'+k), b=Q('#qs'+k); if(!t) continue;
+    const v=(k===QSLOTS-1&&items.length>QSLOTS)?('+'+(items.length-QSLOTS+1)):(k<items.length?items[k]:'');
+    t.textContent=v; b.setAttribute('class','qbx'+(v?' full':'')+(k===0&&v?' head':''));
+  }
+  const vis=(f.order&&f.order.length)?f.order:(f.nodeState||[]).map((s,i)=>s===2?i:-1).filter(x=>x>=0);
+  for(let k=0;k<Math.min(spec.n,VSLOTS);k++){
+    const t=Q('#vt'+k), b=Q('#vs'+k); if(!t) continue;
+    const v=k<vis.length?String(vis[k]):'';
+    t.textContent=v; b.setAttribute('class','vbx'+(v?' full':''));
+  }
+  const ct=Q('#curT'), cb=Q('#curB');
+  const has=f.cur!=null&&f.cur>=0;
+  if(ct){ ct.textContent=has?String(f.cur):'—'; }
+  if(cb){ cb.setAttribute('class','curB'+(has?' live':'')); }
 }
 
 function vizGrid(spec,f){
@@ -824,7 +898,7 @@ function mountViz(host, p, col){
   const spec=p.sim, frames=simulate(spec);
   let idx=0, mode='play', playing=false;
   host.style.display='';
-  host.innerHTML=`<div class="vh">◈ ANIMATION — <span>${spec.caption||''}</span></div>
+  host.innerHTML=`<div class="vh">◈ ANIMATION — <span>${spec.caption||''}</span>${spec.lc?`<span class="lcchip">${spec.lc}</span>`:''}</div>
     <div class="vmode">
       <button data-m="play" class="on">▶ Play</button>
       <button data-m="frames">▦ Frames + state</button>
@@ -850,7 +924,11 @@ function mountViz(host, p, col){
 
   function paint(){
     const f=frames[idx];
-    stage.innerHTML = spec.kind==='graph' ? vizSVG(spec,frames,f) : vizGrid(spec,f);
+    if(spec.kind==='graph'){           // persistent scene → CSS transitions glide between states
+      let sv=stage.querySelector('svg.scene');
+      if(!sv){ stage.innerHTML=vizSVG(spec,frames); sv=stage.querySelector('svg.scene'); }
+      vizUpd(sv,spec,frames,f);
+    } else stage.innerHTML=vizGrid(spec,f);
     msg.innerHTML=`<span class="stepchip">STEP ${idx+1}</span>${f.msg||''}`;
     msg.classList.remove('flash'); void msg.offsetWidth; msg.classList.add('flash');   // re-trigger pop-in
     posEl.textContent=`step ${idx+1} / ${frames.length}`;
