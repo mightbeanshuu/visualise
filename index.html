@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Visualise · BFS & DFS Pattern Hubs</title>
-  <meta name="description" content="Interactive BFS and DFS graph & grid traversal pattern hubs — live animations, call-stack dry-runs, and full LeetCode-style code with click-to-reveal comments.">
+  <title>Visualise · Interactive DSA Topics</title>
+  <meta name="description" content="An interactive roadmap of Data Structures & Algorithms — visual pattern hubs, live animations, and full LeetCode-style code. Starting with Graphs.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
   <style>
     :root{
-      --bg:#07090d; --bg2:#0b0f15; --line:#1b2533; --line2:#243244;
+      --bg:#07090d; --line:#1b2533; --line2:#243244;
       --text:#e9eef5; --muted:#93a0b1; --faint:#5b6675;
       --bfs:#00e5ff; --dfs:#f78fb3; --green:#69ff47; --accent:#7c93ff;
     }
@@ -28,93 +28,57 @@
     }
     .mono{font-family:'JetBrains Mono',ui-monospace,Menlo,monospace;}
     .wrap{width:min(1140px,calc(100% - 40px));margin:0 auto;}
-    a{color:inherit;}
 
     /* nav */
     .nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(12px);background:rgba(7,9,13,.72);border-bottom:1px solid var(--line);}
     .nav .wrap{display:flex;align-items:center;justify-content:space-between;padding:14px 0;}
-    .logo{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:-.3px;font-size:17px;text-decoration:none;}
+    .logo{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:-.3px;font-size:17px;text-decoration:none;color:inherit;}
     .logo .dot{width:13px;height:13px;border-radius:50%;background:conic-gradient(from 0deg,var(--bfs),var(--dfs),var(--green),var(--bfs));box-shadow:0 0 16px rgba(0,229,255,.55);animation:spin 6s linear infinite;}
     @keyframes spin{to{transform:rotate(360deg);}}
     .nav .links{display:flex;align-items:center;gap:26px;}
     .nav .links a{color:var(--muted);text-decoration:none;font-size:14px;transition:color .2s;}
     .nav .links a:hover{color:var(--text);}
-    .btn{display:inline-flex;align-items:center;gap:8px;font-family:inherit;font-weight:600;font-size:14px;border-radius:30px;padding:10px 20px;text-decoration:none;cursor:pointer;transition:transform .2s,box-shadow .2s,background .2s,border-color .2s;border:1px solid transparent;}
-    .btn-primary{background:linear-gradient(100deg,var(--bfs),var(--accent));color:#06121f;box-shadow:0 8px 24px rgba(0,229,255,.22);}
-    .btn-primary:hover{transform:translateY(-2px);box-shadow:0 14px 34px rgba(0,229,255,.34);}
-    .btn-ghost{background:transparent;border-color:var(--line2);color:var(--text);}
-    .btn-ghost:hover{border-color:var(--muted);background:rgba(255,255,255,.03);}
-    .btn .arr{transition:transform .25s;}
-    .btn:hover .arr{transform:translateX(4px);}
 
     /* hero */
-    .hero{padding:84px 0 60px;display:grid;gap:22px;justify-items:start;}
+    .hero{padding:80px 0 38px;display:grid;gap:20px;justify-items:start;}
     .eyebrow{display:inline-flex;align-items:center;gap:8px;color:var(--green);font-size:12px;letter-spacing:2px;text-transform:uppercase;font-weight:700;font-family:'JetBrains Mono',monospace;border:1px solid #1f3a2a;background:rgba(105,255,71,.06);padding:6px 13px;border-radius:30px;}
     .eyebrow .pulse{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green);animation:blink 1.6s ease-in-out infinite;}
     @keyframes blink{50%{opacity:.25;}}
-    h1{margin:0;font-size:clamp(42px,8vw,86px);line-height:.98;letter-spacing:-2px;font-weight:700;background:linear-gradient(100deg,#fff 6%,var(--bfs) 40%,var(--accent) 60%,var(--dfs) 90%);-webkit-background-clip:text;background-clip:text;color:transparent;background-size:200% auto;animation:shimmer 9s ease-in-out infinite;}
+    h1{margin:0;font-size:clamp(42px,8vw,82px);line-height:.98;letter-spacing:-2px;font-weight:700;background:linear-gradient(100deg,#fff 6%,var(--bfs) 42%,var(--accent) 62%,var(--dfs) 92%);-webkit-background-clip:text;background-clip:text;color:transparent;background-size:200% auto;animation:shimmer 9s ease-in-out infinite;}
     @keyframes shimmer{50%{background-position:100% center;}}
-    .sub{margin:0;color:var(--muted);line-height:1.7;max-width:680px;font-size:17px;}
-    .cta{display:flex;gap:14px;flex-wrap:wrap;margin-top:6px;}
-    .stats{display:flex;gap:34px;flex-wrap:wrap;margin-top:24px;padding-top:24px;border-top:1px solid var(--line);width:100%;}
-    .stat .n{font-size:30px;font-weight:700;font-family:'JetBrains Mono',monospace;}
-    .stat .l{font-size:11px;color:var(--faint);letter-spacing:1px;text-transform:uppercase;margin-top:2px;}
-    .stat.bfs .n{color:var(--bfs);} .stat.dfs .n{color:var(--dfs);} .stat.gn .n{color:var(--green);} .stat.ac .n{color:var(--accent);}
+    .sub{margin:0;color:var(--muted);line-height:1.7;max-width:660px;font-size:17px;}
 
-    /* section */
-    section{padding:54px 0;}
-    .shead{display:grid;gap:10px;margin-bottom:34px;max-width:620px;}
-    .stag{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);font-weight:700;}
-    .shead h2{margin:0;font-size:clamp(28px,4.4vw,40px);letter-spacing:-1px;line-height:1.08;}
-    .shead p{margin:0;color:var(--muted);font-size:15.5px;line-height:1.65;}
+    /* topics */
+    .sectionhead{display:flex;align-items:baseline;justify-content:space-between;gap:14px;margin:26px 0 18px;flex-wrap:wrap;}
+    .sectionhead h2{margin:0;font-size:20px;letter-spacing:-.4px;}
+    .sectionhead .note{font-size:12.5px;color:var(--faint);font-family:'JetBrains Mono',monospace;}
+    .topics{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;padding-bottom:70px;}
+    .topic{position:relative;border:1px solid var(--line);border-radius:15px;background:linear-gradient(180deg,rgba(16,22,31,.6),rgba(10,13,18,.8));padding:20px;min-height:150px;display:flex;flex-direction:column;gap:8px;text-decoration:none;color:inherit;transition:transform .24s,border-color .24s,box-shadow .24s,opacity .24s;}
+    .ticon{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px;border:1px solid var(--line2);background:rgba(124,147,255,.07);}
+    .topic h3{margin:6px 0 0;font-size:16px;letter-spacing:-.3px;}
+    .topic p{margin:0;color:var(--muted);font-size:12.5px;line-height:1.5;}
+    .pill{position:absolute;top:14px;right:14px;font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:1px;text-transform:uppercase;font-weight:700;padding:3px 8px;border-radius:20px;border:1px solid var(--line2);color:var(--faint);background:rgba(11,17,24,.6);}
 
-    /* feature grid */
-    .feats{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
-    .fcard{border:1px solid var(--line);border-radius:16px;background:linear-gradient(180deg,rgba(16,22,31,.7),rgba(10,13,18,.85));padding:24px;transition:transform .26s,border-color .26s,box-shadow .26s;}
-    .fcard:hover{transform:translateY(-5px);border-color:var(--line2);box-shadow:0 18px 44px rgba(0,0,0,.4);}
-    .ficon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:16px;border:1px solid var(--line2);background:rgba(124,147,255,.08);}
-    .fcard h3{margin:0 0 8px;font-size:18px;letter-spacing:-.3px;}
-    .fcard p{margin:0;color:var(--muted);font-size:14px;line-height:1.6;}
-    .fcard .codeline{margin-top:14px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--faint);background:#070a0e;border:1px solid var(--line);border-radius:8px;padding:8px 11px;}
-    .fcard .codeline b{color:var(--green);} .fcard .codeline .c{color:var(--bfs);}
+    /* live (graphs) */
+    .topic.live{border-color:#1f7a5a;background:linear-gradient(180deg,rgba(0,229,255,.06),rgba(10,13,18,.85));cursor:pointer;}
+    .topic.live .ticon{border-color:#1f7a5a;background:rgba(0,229,255,.1);}
+    .topic.live .pill{color:var(--green);border-color:#1f7a3a;background:rgba(105,255,71,.07);}
+    .topic.live:hover{transform:translateY(-6px);border-color:var(--bfs);box-shadow:0 20px 50px rgba(0,0,0,.45);}
+    .topic.live .open{margin-top:auto;display:inline-flex;align-items:center;gap:7px;color:var(--bfs);font-weight:700;font-size:13px;}
+    .topic.live .open .arr{transition:transform .25s;}
+    .topic.live:hover .open .arr{transform:translateX(5px);}
 
-    /* product hubs */
-    .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
-    a.panel{position:relative;overflow:hidden;min-height:280px;text-decoration:none;border:1px solid var(--line);border-radius:18px;background:linear-gradient(180deg,rgba(16,23,32,.86),rgba(10,13,18,.92));padding:28px;display:flex;flex-direction:column;justify-content:space-between;backdrop-filter:blur(8px);transition:transform .28s cubic-bezier(.2,.7,.3,1),border-color .28s,box-shadow .28s;}
-    a.panel:after{content:"";position:absolute;inset:auto -90px -110px auto;width:280px;height:280px;background:radial-gradient(circle,currentColor,transparent 68%);opacity:.1;transition:opacity .28s,transform .4s;}
-    a.panel:hover{transform:translateY(-6px);border-color:currentColor;box-shadow:0 24px 60px rgba(0,0,0,.5);}
-    a.panel:hover:after{opacity:.2;transform:scale(1.15);}
-    .bfs{color:var(--bfs);} .dfs{color:var(--dfs);}
-    .meta{color:currentColor;font-size:11px;letter-spacing:2px;text-transform:uppercase;font-weight:700;font-family:'JetBrains Mono',monospace;}
-    .panel h3{margin:12px 0 8px;color:var(--text);font-size:26px;letter-spacing:-.5px;}
-    a.panel p{margin:0;color:var(--muted);line-height:1.6;font-size:14px;}
-    .list{margin-top:18px;display:flex;flex-wrap:wrap;gap:8px;}
-    .chip{border:1px solid var(--line2);color:#aab6c4;padding:5px 10px;border-radius:6px;font-size:12px;background:rgba(11,17,24,.7);font-family:'JetBrains Mono',monospace;}
-    .go{display:inline-flex;align-items:center;gap:8px;color:currentColor;font-weight:700;font-size:14px;margin-top:22px;}
-    a.panel:hover .go .arr{transform:translateX(6px);} .go .arr{transition:transform .25s;}
-
-    /* steps */
-    .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;counter-reset:s;}
-    .step{border:1px solid var(--line);border-radius:14px;background:rgba(11,17,24,.55);padding:22px;position:relative;}
-    .step:before{counter-increment:s;content:"0" counter(s);font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--accent);}
-    .step h4{margin:10px 0 6px;font-size:16px;}
-    .step p{margin:0;color:var(--muted);font-size:13.5px;line-height:1.6;}
-
-    /* cta band */
-    .band{border:1px solid var(--line);border-radius:20px;background:linear-gradient(120deg,rgba(0,229,255,.08),rgba(124,147,255,.06) 50%,rgba(247,143,179,.08));padding:44px;text-align:center;display:grid;gap:16px;justify-items:center;}
-    .band h2{margin:0;font-size:clamp(26px,4vw,38px);letter-spacing:-1px;}
-    .band p{margin:0;color:var(--muted);max-width:520px;font-size:15px;line-height:1.6;}
+    /* coming soon */
+    .topic.soon{opacity:.6;cursor:not-allowed;}
+    .topic.soon:hover{opacity:.78;border-color:var(--line2);}
 
     footer{border-top:1px solid var(--line);}
-    footer .wrap{padding:26px 0 40px;color:var(--faint);font-size:13px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+    footer .wrap{padding:24px 0 40px;color:var(--faint);font-size:13px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;}
     footer a{color:var(--muted);text-decoration:none;} footer a:hover{color:var(--text);}
 
-    @media(max-width:820px){
-      .feats,.steps{grid-template-columns:1fr;}
-      .grid{grid-template-columns:1fr;}
-      .nav .links a:not(.btn){display:none;}
-      .hero{padding:56px 0 40px;}
-    }
+    @media(max-width:980px){.topics{grid-template-columns:repeat(3,1fr);}}
+    @media(max-width:720px){.topics{grid-template-columns:repeat(2,1fr);}.hero{padding:52px 0 30px;}}
+    @media(max-width:440px){.topics{grid-template-columns:1fr;}}
   </style>
 </head>
 <body>
@@ -122,118 +86,61 @@
     <div class="wrap">
       <a class="logo" href="/"><span class="dot"></span> visualise</a>
       <nav class="links">
-        <a href="#features">Features</a>
-        <a href="#hubs">Hubs</a>
-        <a href="#how">How it works</a>
-        <a class="btn btn-primary" href="/graphs/dfs-patterns/">Launch hub <span class="arr">→</span></a>
+        <a href="/graphs/">Graphs</a>
+        <a href="https://github.com/mightbeanshuu" target="_blank" rel="noopener">GitHub</a>
       </nav>
     </div>
   </header>
 
   <main>
-    <!-- HERO -->
     <section class="wrap hero">
-      <span class="eyebrow"><span class="pulse"></span> Graph &amp; Grid Traversal · Revision Hubs</span>
-      <h1>See BFS &amp; DFS<br>actually run.</h1>
-      <p class="sub">Two interactive hubs for every graph and grid traversal pattern — live animations, call-stack dry-runs, and full <b style="color:var(--text)">LeetCode-style code</b> (driver + helper) with click-to-reveal comments. Built around how you actually learn.</p>
-      <div class="cta">
-        <a class="btn btn-primary" href="/graphs/dfs-patterns/">Explore DFS hub <span class="arr">→</span></a>
-        <a class="btn btn-ghost" href="/graphs/bfs-patterns/">Explore BFS hub</a>
-      </div>
-      <div class="stats">
-        <div class="stat bfs"><div class="n">10</div><div class="l">BFS patterns</div></div>
-        <div class="stat dfs"><div class="n">14</div><div class="l">DFS patterns</div></div>
-        <div class="stat gn"><div class="n">24</div><div class="l">full solutions</div></div>
-        <div class="stat ac"><div class="n">3D</div><div class="l">graph demos</div></div>
-      </div>
+      <span class="eyebrow"><span class="pulse"></span> Interactive DSA Roadmap</span>
+      <h1>DSA,<br>visualised.</h1>
+      <p class="sub">Pick a topic. Get the intuition, watch it run, and read full <b style="color:var(--text)">LeetCode-style code</b> with click-to-reveal comments. More topics are on the way — <b style="color:var(--text)">Graphs</b> is live now.</p>
     </section>
 
-    <!-- FEATURES -->
-    <section class="wrap" id="features">
-      <div class="shead">
-        <span class="stag">Why it works</span>
-        <h2>Not flashcards. A pattern playground.</h2>
-        <p>Every pattern pairs the intuition, the bugs you actually hit, and runnable code — so the idea sticks instead of the syntax.</p>
-      </div>
-      <div class="feats">
-        <div class="fcard">
-          <div class="ficon">⚙️</div>
-          <h3>Full LeetCode-style code</h3>
-          <p>Each snippet is a complete <span class="mono">class Solution</span> — the driver method <i>and</i> its helper, with authentic LC/GFG signatures you can paste and submit.</p>
-          <div class="codeline">int <span class="c">numIslands</span>(...) { ... <b>dfs</b>(i,j,g,vis); }</div>
-        </div>
-        <div class="fcard">
-          <div class="ficon">💬</div>
-          <h3>Click-to-reveal comments</h3>
-          <p>Read the code clean first. A <span class="mono" style="color:var(--green)">●</span> marks lines that hide a note — click to reveal the “why”, click again to hide. Quiz yourself line by line.</p>
-          <div class="codeline"><b>●</b> cnt++;&nbsp;&nbsp;<span class="c">// ★ new island</span></div>
-        </div>
-        <div class="fcard">
-          <div class="ficon">▶️</div>
-          <h3>Live animations &amp; 3D</h3>
-          <p>Watch the queue fill, the recursion stack grow, the grid flood — synced to the code line lighting up as it executes. Real graphs render in 3D.</p>
-          <div class="codeline">queue → level → dist&nbsp;&nbsp;<span class="c">// step through</span></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- PRODUCT HUBS -->
-    <section class="wrap" id="hubs">
-      <div class="shead">
-        <span class="stag">The hubs</span>
-        <h2>Pick a traversal. Dive in.</h2>
-        <p>Separate, focused hubs — BFS for levels, distances and shortest paths; DFS for recursion, components, cycles and backtracking.</p>
-      </div>
-      <div class="grid">
-        <a class="panel bfs" href="/graphs/bfs-patterns/">
-          <div>
-            <div class="meta">BFS Patterns</div>
-            <h3>Queue · levels · distance</h3>
-            <p>Graph BFS, islands, multi-source BFS, level BFS, boundary BFS, shortest path, 0-1 BFS, state-space BFS, bipartite, and Kahn topo sort.</p>
-            <div class="list"><span class="chip">multi-source</span><span class="chip">boundary</span><span class="chip">shortest path</span><span class="chip">0-1 BFS</span></div>
-          </div>
-          <span class="go">Open BFS hub <span class="arr">→</span></span>
-        </a>
-        <a class="panel dfs" href="/graphs/dfs-patterns/">
-          <div>
-            <div class="meta">DFS Algorithms</div>
-            <h3>Call stack · cycles · paths</h3>
-            <p>Recursive &amp; iterative DFS, flood fill, island area, boundary DFS, undirected &amp; directed cycle detection, bipartite coloring, topo sort, backtracking.</p>
-            <div class="list"><span class="chip">call stack</span><span class="chip">cycle detection</span><span class="chip">toposort</span><span class="chip">backtracking</span></div>
-          </div>
-          <span class="go">Open DFS hub <span class="arr">→</span></span>
-        </a>
-      </div>
-    </section>
-
-    <!-- HOW IT WORKS -->
-    <section class="wrap" id="how">
-      <div class="shead">
-        <span class="stag">How it works</span>
-        <h2>Three passes per pattern.</h2>
-      </div>
-      <div class="steps">
-        <div class="step"><h4>Get the intuition</h4><p>Read “when to use”, the key insight, and a plain-language analogy — plus the bugs you’ll actually hit.</p></div>
-        <div class="step"><h4>Watch it run</h4><p>Step through the animation while the matching code line highlights, so the mechanism — not the syntax — lands.</p></div>
-        <div class="step"><h4>Own the code</h4><p>Read the full driver + helper clean, then click lines to reveal comments and test whether you really know why each step is there.</p></div>
-      </div>
-    </section>
-
-    <!-- CTA -->
     <section class="wrap">
-      <div class="band">
-        <span class="stag">Ready?</span>
-        <h2>Start with the DFS hub.</h2>
-        <p>14 patterns, full solutions, click-to-reveal comments and call-stack dry-runs — all in one page.</p>
-        <a class="btn btn-primary" href="/graphs/dfs-patterns/">Launch the DFS hub <span class="arr">→</span></a>
+      <div class="sectionhead">
+        <h2>Topics</h2>
+        <span class="note">1 live · more coming soon</span>
+      </div>
+      <div class="topics">
+
+        <a class="topic live" href="/graphs/">
+          <div class="ticon">🕸️</div>
+          <span class="pill">Live</span>
+          <h3>Graphs</h3>
+          <p>BFS &amp; DFS hubs — traversals, islands, cycles, shortest paths, topo sort, backtracking.</p>
+          <span class="open">Open <span class="arr">→</span></span>
+        </a>
+
+        <div class="topic soon"><div class="ticon">🗃️</div><span class="pill">Soon</span><h3>Arrays &amp; Hashing</h3><p>Prefix sums, hashing, frequency maps, two-sum family.</p></div>
+        <div class="topic soon"><div class="ticon">↔️</div><span class="pill">Soon</span><h3>Two Pointers</h3><p>Opposite ends, fast/slow, partitioning.</p></div>
+        <div class="topic soon"><div class="ticon">🪟</div><span class="pill">Soon</span><h3>Sliding Window</h3><p>Fixed &amp; variable windows, longest/shortest.</p></div>
+
+        <div class="topic soon"><div class="ticon">🥞</div><span class="pill">Soon</span><h3>Stack &amp; Queue</h3><p>Monotonic stack, next-greater, deque tricks.</p></div>
+        <div class="topic soon"><div class="ticon">🔍</div><span class="pill">Soon</span><h3>Binary Search</h3><p>On answer, on arrays, boundary conditions.</p></div>
+        <div class="topic soon"><div class="ticon">🔗</div><span class="pill">Soon</span><h3>Linked List</h3><p>Reversal, cycle detection, merging.</p></div>
+        <div class="topic soon"><div class="ticon">🌳</div><span class="pill">Soon</span><h3>Trees</h3><p>Traversals, BST, LCA, recursion patterns.</p></div>
+
+        <div class="topic soon"><div class="ticon">🔤</div><span class="pill">Soon</span><h3>Tries</h3><p>Prefix trees, word search, autocomplete.</p></div>
+        <div class="topic soon"><div class="ticon">⛰️</div><span class="pill">Soon</span><h3>Heap / PQ</h3><p>Top-K, merge K, scheduling, median.</p></div>
+        <div class="topic soon"><div class="ticon">↩️</div><span class="pill">Soon</span><h3>Backtracking</h3><p>Subsets, permutations, combinations, N-Queens.</p></div>
+        <div class="topic soon"><div class="ticon">🧩</div><span class="pill">Soon</span><h3>Dynamic Programming</h3><p>1D/2D DP, knapsack, LIS, intervals.</p></div>
+
+        <div class="topic soon"><div class="ticon">💰</div><span class="pill">Soon</span><h3>Greedy</h3><p>Exchange argument, intervals, scheduling.</p></div>
+        <div class="topic soon"><div class="ticon">📊</div><span class="pill">Soon</span><h3>Intervals</h3><p>Merge, insert, overlap counting.</p></div>
+        <div class="topic soon"><div class="ticon">🔢</div><span class="pill">Soon</span><h3>Bit Manipulation</h3><p>Masks, XOR tricks, subsets via bits.</p></div>
+        <div class="topic soon"><div class="ticon">📐</div><span class="pill">Soon</span><h3>Math &amp; Geometry</h3><p>Number theory, matrices, sweep lines.</p></div>
+
       </div>
     </section>
   </main>
 
   <footer>
     <div class="wrap">
-      <span>Built for graph-pattern revision · hand-coded, deployed on Vercel</span>
-      <span><a href="/graphs/bfs-patterns/">BFS hub</a> · <a href="/graphs/dfs-patterns/">DFS hub</a> · <a href="https://github.com/mightbeanshuu" target="_blank" rel="noopener">GitHub</a></span>
+      <span>Interactive DSA roadmap · hand-coded, deployed on Vercel</span>
+      <span><a href="/graphs/">Graphs hub</a> · <a href="https://github.com/mightbeanshuu" target="_blank" rel="noopener">GitHub</a></span>
     </div>
   </footer>
 </body>
