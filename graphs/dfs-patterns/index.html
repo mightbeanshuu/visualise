@@ -29,6 +29,8 @@
   .top{background:linear-gradient(135deg,#0d0f14,#141920);border-bottom:1px solid var(--border);padding:18px 26px 14px;}
   .top .row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
   .badge{background:#00e5ff22;border:1px solid #00e5ff55;color:var(--multi);font-size:10px;font-weight:700;letter-spacing:2px;padding:3px 10px;border-radius:3px;}
+  .backbtn{text-decoration:none;color:var(--txt2);border:1px solid var(--border);background:rgba(255,255,255,.02);font-size:12px;font-weight:600;padding:5px 12px;border-radius:7px;transition:.15s;white-space:nowrap;}
+  .backbtn:hover{border-color:#475569;color:var(--head);background:rgba(255,255,255,.05);}
   h1{margin:0;font-size:19px;font-weight:700;color:var(--head);letter-spacing:-.3px;}
   .top .meta{color:var(--faint);font-size:12px;}
   .top p{margin:6px 0 0;font-size:11px;color:var(--muted);letter-spacing:.3px;}
@@ -56,6 +58,15 @@
   .copy{background:var(--panel);border:1px solid #30363d;color:var(--txt2);padding:8px 15px;border-radius:6px;cursor:pointer;font-size:11px;font-family:inherit;letter-spacing:.5px;white-space:nowrap;transition:.2s;}
   .copy:hover{border-color:#475569;color:var(--head);}
   .copy.done{background:#1a3a1a;border-color:#69ff47;color:#69ff47;}
+
+  .pheadbtns{display:flex;gap:8px;flex-wrap:wrap;}
+  /* side-by-side animation + code, collapsible notes */
+  .split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:start;margin-bottom:14px;}
+  .split .demo{margin-bottom:0;}
+  .codeCol{display:flex;flex-direction:column;gap:14px;min-width:0;}
+  .codeCol .cb{margin-bottom:0;}
+  .notesWrap{margin-bottom:16px;animation:fade .3s ease;}
+  @media(max-width:1080px){ .split{grid-template-columns:1fr;} }
 
   .cards{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;}
   .ic{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px 18px;transition:border-color .2s,transform .2s,box-shadow .2s;}
@@ -206,6 +217,7 @@
   <canvas id="bg3d"></canvas>
   <div class="top">
     <div class="row">
+      <a class="backbtn" href="/graphs/" title="Back to Graphs">← Back</a>
       <span class="badge">DFS</span>
       <h1>Graph &amp; Grid DFS — Pattern Revision Hub</h1>
       <span class="meta">14 patterns · C++ · Anshu</span>
@@ -315,33 +327,23 @@ function render(){
   const p=P[active], col=CAT[p.cat].color;
   const methods = p.code ? [{title:p.label.toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'')+'.cpp', code:p.code}] : (p.methods||[]);
 
-  let html=`<div class="fade">
-    <div class="phead">
-      <div>
-        <span class="ptag" style="background:${col}22;border:1px solid ${col}55;color:${col}">${p.cat}</span>
-        <span class="pcount">Pattern ${active+1} / ${P.length}${p.hero?' · ⭐ your hero pattern':''}</span>
-        <h2>${p.label}</h2>
-      </div>
-      <button class="copy" id="copyBtn">copy code</button>
-    </div>
-
-    <div class="cards">
+  // ── collapsible notes (when / insight / analogy / bugs / problems) ──
+  let notesHtml=`<div class="cards">
       <div class="ic"><div class="h">WHEN TO USE</div><p>${p.when}</p></div>
       <div class="ic" style="border-color:${col}33"><div class="h" style="color:${col}">★ KEY INSIGHT</div><p>${p.insight}</p></div>
       <div class="ic analogy"><div class="h">◈ ANALOGY / MENTAL MODEL</div><p>${p.analogy}</p></div>`;
   if(p.bugs&&p.bugs.length){
-    html+=`<div class="ic bugs"><div class="h">⚠ BUGS YOU ACTUALLY HIT</div><ul>${p.bugs.map(b=>`<li>${b}</li>`).join('')}</ul></div>`;
+    notesHtml+=`<div class="ic bugs"><div class="h">⚠ BUGS YOU ACTUALLY HIT</div><ul>${p.bugs.map(b=>`<li>${b}</li>`).join('')}</ul></div>`;
   }
-  html+=`</div>`;
+  notesHtml+=`</div>
+    <div class="probs"><div class="h">EXAMPLE PROBLEMS</div>${
+      p.problems.map(([name,done])=>`<span class="chip">${done?'<span class="done">✓ </span>':''}${name}</span>`).join('')
+    }</div>`;
 
-  html+=`<div class="probs"><div class="h">EXAMPLE PROBLEMS</div>${
-    p.problems.map(([name,done])=>`<span class="chip">${done?'<span class="done">✓ </span>':''}${name}</span>`).join('')
-  }</div>`;
-
-  html+=`<div class="demo" id="demoHost"></div>`;
-
+  // ── code column ──
+  let codeHtml='';
   methods.forEach((mth,mi)=>{
-    html+=`<div class="cb">
+    codeHtml+=`<div class="cb">
       <div class="cbbar">
         <span class="dots"><i style="background:#ff5f56"></i><i style="background:#ffbd2e"></i><i style="background:#27c93f"></i></span>
         ${methods.length>1?`<span class="method" style="background:${col}22;border:1px solid ${col}55;color:${col}">METHOD ${mi+1}</span>`:''}
@@ -349,20 +351,43 @@ function render(){
         <button class="cbtoggle" data-mi="${mi}">💬 reveal all</button>
       </div>
       <pre>${hl(mth.code)}</pre>
-      <div class="cbnote">● = this line hides a comment — click the line to reveal it, click again to hide.</div>
+      <div class="cbnote">● = this line hides a comment — click to reveal, click again to hide.</div>
     </div>`;
   });
+  if(p.link){ codeHtml+=`<div class="hint">▶ Full step-through animation: open <b>${p.link}</b> in this same folder.</div>`; }
 
-  if(p.link){ html+=`<div class="hint">▶ Full step-through animation for this pattern: open <b>${p.link}</b> in this same folder.</div>`; }
+  let html=`<div class="fade">
+    <div class="phead">
+      <div>
+        <span class="ptag" style="background:${col}22;border:1px solid ${col}55;color:${col}">${p.cat}</span>
+        <span class="pcount">Pattern ${active+1} / ${P.length}${p.hero?' · ⭐ your hero pattern':''}</span>
+        <h2>${p.label}</h2>
+      </div>
+      <div class="pheadbtns">
+        <button class="copy" id="notesBtn">📝 show notes</button>
+        <button class="copy" id="copyBtn">copy code</button>
+      </div>
+    </div>
 
-  html+=`<div class="pnav">
-    <button id="prevBtn" ${active===0?'disabled':''}>← prev</button>
-    <span class="pos">${active+1} of ${P.length}</span>
-    <button id="nextBtn" ${active===P.length-1?'disabled':''}>next →</button>
-  </div></div>`;
+    <div class="notesWrap" id="notesWrap" style="display:none">${notesHtml}</div>
+
+    <div class="split">
+      <div class="splitcol"><div class="demo" id="demoHost"></div></div>
+      <div class="splitcol codeCol">${codeHtml}</div>
+    </div>
+
+    <div class="pnav">
+      <button id="prevBtn" ${active===0?'disabled':''}>← prev</button>
+      <span class="pos">${active+1} of ${P.length}</span>
+      <button id="nextBtn" ${active===P.length-1?'disabled':''}>next →</button>
+    </div></div>`;
 
   main.innerHTML=html;
   main.scrollTop=0;
+
+  { const nb=document.getElementById('notesBtn'), nw=document.getElementById('notesWrap');
+    nb.onclick=()=>{ const show=nw.style.display==='none'; nw.style.display=show?'':'none';
+      nb.textContent=show?'📝 hide notes':'📝 show notes'; nb.classList.toggle('done',show); }; }
 
   document.getElementById('copyBtn').onclick=e=>{
     navigator.clipboard.writeText(methods.map(m=>m.code).join('\n\n'));
@@ -489,6 +514,23 @@ function initBG(){
 let vizTimer=null;
 function vizStop(){ if(vizTimer){clearInterval(vizTimer);vizTimer=null;} }
 
+// Nested-tree layout from traversal parent[] — root(s) on top, children below.
+function treeLayout(n, parent){
+  const children=Array.from({length:n},()=>[]), roots=[];
+  for(let v=0;v<n;v++){ if(parent[v]>=0) children[parent[v]].push(v); else roots.push(v); }
+  const pos=new Array(n); let nextX=0;
+  const place=(u,depth)=>{
+    if(!children[u].length){ pos[u]=[nextX++,depth]; return pos[u][0]; }
+    const xs=children[u].map(c=>place(c,depth+1));
+    const x=(Math.min(...xs)+Math.max(...xs))/2; pos[u]=[x,depth]; return x;
+  };
+  let maxD=0; roots.forEach(r=>{ place(r,0); });
+  pos.forEach(p=>{ if(p&&p[1]>maxD) maxD=p[1]; });
+  const cols=Math.max(1,nextX-1), W=400,H=290,padX=44,padY=46;
+  return pos.map(p=>{ const [x,d]=p||[0,0];
+    return [ cols? padX+(x/cols)*(W-2*padX) : W/2 , padY+(maxD? d/maxD:0)*(H-2*padY) ]; });
+}
+
 function simulate(spec){
   const F=[];
   if(spec.kind==='graph'){
@@ -496,6 +538,7 @@ function simulate(spec){
     const adj=Array.from({length:n},()=>[]);
     spec.edges.forEach(([a,b])=>{ adj[a].push(b); if(!directed) adj[b].push(a); });
     const ns=new Array(n).fill(0);   // 0 unvisited · 1 active/gray · 2 done/black
+    const parent=new Array(n).fill(-1);  // DFS-tree parent (for nested-tree layout)
     const stack=[], order=[]; let cycle=false;
     const snap=ex=>F.push(Object.assign({nodeState:ns.slice(),stack:stack.slice(),order:order.slice(),cur:-1,edge:null,edgeType:null,cycle},ex));
     if(spec.algo==='dfs3'){
@@ -503,7 +546,7 @@ function simulate(spec){
         ns[u]=1; stack.push(u); snap({cur:u,msg:`Enter <b>${u}</b> → mark <b>GRAY</b> (on recursion stack).`});
         for(const v of adj[u]){
           if(ns[v]===1){ cycle=true; snap({cur:u,edge:[u,v],edgeType:'back',msg:`Edge <b>${u}→${v}</b> hits a <b>GRAY</b> node ⇒ <span class="bad">cycle!</span>`}); return true; }
-          if(ns[v]===0){ snap({cur:u,edge:[u,v],edgeType:'tree',msg:`Tree edge <b>${u}→${v}</b> — recurse.`}); if(dfs(v)) return true; }
+          if(ns[v]===0){ parent[v]=u; snap({cur:u,edge:[u,v],edgeType:'tree',msg:`Tree edge <b>${u}→${v}</b> — recurse.`}); if(dfs(v)) return true; }
           else { snap({cur:u,edge:[u,v],edgeType:'cross',msg:`Edge <b>${u}→${v}</b> to a <b>BLACK</b> node — ignore (finished, not a cycle).`}); }
         }
         ns[u]=2; stack.pop(); snap({cur:u,msg:`Finish <b>${u}</b> → mark <b>BLACK</b> (done).`});
@@ -515,7 +558,7 @@ function simulate(spec){
       const dfs=u=>{
         ns[u]=1; stack.push(u); order.push(u); snap({cur:u,msg:`Visit <b>${u}</b> — mark on entry, push to call stack.`});
         for(const v of adj[u]){
-          if(ns[v]===0){ snap({cur:u,edge:[u,v],edgeType:'tree',msg:`<b>${u}→${v}</b> unvisited — go deeper.`}); dfs(v); snap({cur:u,msg:`Back at <b>${u}</b> after ${v} finished.`}); }
+          if(ns[v]===0){ parent[v]=u; snap({cur:u,edge:[u,v],edgeType:'tree',msg:`<b>${u}→${v}</b> unvisited — go deeper.`}); dfs(v); snap({cur:u,msg:`Back at <b>${u}</b> after ${v} finished.`}); }
           else { snap({cur:u,edge:[u,v],edgeType:'back',msg:`<b>${u}→${v}</b> already visited — skip.`}); }
         }
         ns[u]=2; stack.pop(); snap({cur:u,msg:`Done <b>${u}</b> — pop, backtrack.`});
@@ -523,7 +566,7 @@ function simulate(spec){
       dfs(spec.start||0);
       snap({cur:-1,msg:`DFS order: <b>${order.join(' → ')}</b>.`});
     }
-    F.layout=(()=>{ const cx=200,cy=145,R=110,p=[]; for(let i=0;i<n;i++){const a=-Math.PI/2+i*2*Math.PI/n; p.push([cx+R*Math.cos(a),cy+R*Math.sin(a)]);} return p; })();
+    F.layout=treeLayout(n,parent);   // nested-tree positions (root = source)
     return F;
   }
   // ── grid islands ──
