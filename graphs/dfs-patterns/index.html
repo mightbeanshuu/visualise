@@ -146,6 +146,9 @@
   .vstack{display:flex;gap:5px;flex-wrap:wrap;align-items:center;}
   .vstack .b{background:#3a2e0a;border:1px solid #f0a500;color:#ffd479;font-size:11px;font-weight:700;padding:3px 9px;border-radius:6px;font-family:'JetBrains Mono',monospace;}
   .vstack .e{color:var(--faint);font-style:italic;font-size:11px;}
+  .vcode{margin:0 0 12px;background:#070a0e;border:1px solid var(--border);border-radius:10px;padding:10px 8px;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11.5px;line-height:1.75;overflow-x:auto;}
+  .rl{display:block;padding:1px 12px;border-left:3px solid transparent;white-space:pre;color:#7d8895;transition:background .2s,color .2s,border-color .2s;}
+  .rl.active{background:#0f2a33;border-left-color:var(--multi);color:#dff6ff;font-weight:700;}
 
   .demo{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:14px;}
   .demo .h{font-size:9px;letter-spacing:1.5px;color:var(--multi);margin-bottom:12px;font-weight:700;}
@@ -557,29 +560,31 @@ function simulate(spec){
     const stack=[], order=[]; let cycle=false;
     const snap=ex=>F.push(Object.assign({nodeState:ns.slice(),stack:stack.slice(),order:order.slice(),cur:-1,edge:null,edgeType:null,cycle},ex));
     if(spec.algo==='dfs3'){
+      F.code=['dfs(u):','  color[u] = GRAY        // on the stack','  for v in adj[u]:','    if color[v]==GRAY: return CYCLE','    elif color[v]==WHITE: dfs(v)','  color[u] = BLACK       // finished'];
       const dfs=u=>{
-        ns[u]=1; stack.push(u); snap({cur:u,msg:`Enter <b>${u}</b> → mark <b>GRAY</b> (on recursion stack).`});
+        ns[u]=1; stack.push(u); snap({cur:u,line:1,msg:`Enter <b>${u}</b> → mark <b>GRAY</b> (on recursion stack).`});
         for(const v of adj[u]){
-          if(ns[v]===1){ cycle=true; snap({cur:u,edge:[u,v],edgeType:'back',msg:`Edge <b>${u}→${v}</b> hits a <b>GRAY</b> node ⇒ <span class="bad">cycle!</span>`}); return true; }
-          if(ns[v]===0){ parent[v]=u; snap({cur:u,edge:[u,v],edgeType:'tree',msg:`Tree edge <b>${u}→${v}</b> — recurse.`}); if(dfs(v)) return true; }
-          else { snap({cur:u,edge:[u,v],edgeType:'cross',msg:`Edge <b>${u}→${v}</b> to a <b>BLACK</b> node — ignore (finished, not a cycle).`}); }
+          if(ns[v]===1){ cycle=true; snap({cur:u,line:3,edge:[u,v],edgeType:'back',msg:`Edge <b>${u}→${v}</b> hits a <b>GRAY</b> node ⇒ <span class="bad">cycle!</span>`}); return true; }
+          if(ns[v]===0){ parent[v]=u; snap({cur:u,line:4,edge:[u,v],edgeType:'tree',msg:`Tree edge <b>${u}→${v}</b> — recurse.`}); if(dfs(v)) return true; }
+          else { snap({cur:u,line:2,edge:[u,v],edgeType:'cross',msg:`Edge <b>${u}→${v}</b> to a <b>BLACK</b> node — ignore (finished, not a cycle).`}); }
         }
-        ns[u]=2; stack.pop(); snap({cur:u,msg:`Finish <b>${u}</b> → mark <b>BLACK</b> (done).`});
+        ns[u]=2; stack.pop(); snap({cur:u,line:5,msg:`Finish <b>${u}</b> → mark <b>BLACK</b> (done).`});
         return false;
       };
       for(let s=0;s<n && !cycle;s++) if(ns[s]===0) dfs(s);
-      snap({cur:-1,msg: cycle?`<span class="bad">Cycle detected</span> — a back-edge reached a node still on the stack.`:`<span class="ok">No cycle</span> — every edge led to a finished node.`});
+      snap({cur:-1,line:-1,msg: cycle?`<span class="bad">Cycle detected</span> — a back-edge reached a node still on the stack.`:`<span class="ok">No cycle</span> — every edge led to a finished node.`});
     } else {
+      F.code=['dfs(u):','  vis[u] = 1             // mark on entry','  for v in adj[u]:','    if !vis[v]: dfs(v)   // tree edge','  return                 // backtrack'];
       const dfs=u=>{
-        ns[u]=1; stack.push(u); order.push(u); snap({cur:u,msg:`Visit <b>${u}</b> — mark on entry, push to call stack.`});
+        ns[u]=1; stack.push(u); order.push(u); snap({cur:u,line:1,msg:`Visit <b>${u}</b> — mark on entry, push to call stack.`});
         for(const v of adj[u]){
-          if(ns[v]===0){ parent[v]=u; snap({cur:u,edge:[u,v],edgeType:'tree',msg:`<b>${u}→${v}</b> unvisited — go deeper.`}); dfs(v); snap({cur:u,msg:`Back at <b>${u}</b> after ${v} finished.`}); }
-          else { snap({cur:u,edge:[u,v],edgeType:'back',msg:`<b>${u}→${v}</b> already visited — skip.`}); }
+          if(ns[v]===0){ parent[v]=u; snap({cur:u,line:3,edge:[u,v],edgeType:'tree',msg:`<b>${u}→${v}</b> unvisited — go deeper.`}); dfs(v); snap({cur:u,line:2,msg:`Back at <b>${u}</b> after ${v} finished.`}); }
+          else { snap({cur:u,line:3,edge:[u,v],edgeType:'back',msg:`<b>${u}→${v}</b> already visited — skip.`}); }
         }
-        ns[u]=2; stack.pop(); snap({cur:u,msg:`Done <b>${u}</b> — pop, backtrack.`});
+        ns[u]=2; stack.pop(); snap({cur:u,line:4,msg:`Done <b>${u}</b> — pop, backtrack.`});
       };
       dfs(spec.start||0);
-      snap({cur:-1,msg:`DFS order: <b>${order.join(' → ')}</b>.`});
+      snap({cur:-1,line:-1,msg:`DFS order: <b>${order.join(' → ')}</b>.`});
     }
     F.layout=treeLayout(n,parent,spec.start||0);   // layered tree (root = source)
     return F;
@@ -588,14 +593,15 @@ function simulate(spec){
   const g=spec.grid.map(r=>r.slice()), m=g.length, w=g[0].length;
   const vis=Array.from({length:m},()=>new Array(w).fill(0));
   const dr=[-1,1,0,0], dc=[0,0,-1,1], stack=[]; let cnt=0;
+  F.code=['for each cell (i,j):','  if land & !vis:','    islands++; dfs(i,j)','dfs(r,c):','  vis[r][c] = 1','  for 4 neighbours (nr,nc):','    if land & !vis: dfs(nr,nc)'];
   const snap=ex=>F.push(Object.assign({grid:g.map(r=>r.slice()),vis:vis.map(r=>r.slice()),stack:stack.slice(),cnt,cur:null,to:null},ex));
-  const dfs=(r,c)=>{ vis[r][c]=1; stack.push(r+','+c); snap({cur:[r,c],msg:`Sink land at (<b>${r},${c}</b>).`});
+  const dfs=(r,c)=>{ vis[r][c]=1; stack.push(r+','+c); snap({cur:[r,c],line:4,msg:`Sink land at (<b>${r},${c}</b>).`});
     for(let d=0;d<4;d++){ const nr=r+dr[d],nc=c+dc[d];
-      if(nr>=0&&nr<m&&nc>=0&&nc<w&&g[nr][nc]===1&&!vis[nr][nc]){ snap({cur:[r,c],to:[nr,nc],msg:`Neighbour (<b>${nr},${nc}</b>) is land — recurse.`}); dfs(nr,nc); } }
+      if(nr>=0&&nr<m&&nc>=0&&nc<w&&g[nr][nc]===1&&!vis[nr][nc]){ snap({cur:[r,c],to:[nr,nc],line:6,msg:`Neighbour (<b>${nr},${nc}</b>) is land — recurse.`}); dfs(nr,nc); } }
     stack.pop();
   };
-  for(let i=0;i<m;i++)for(let j=0;j<w;j++) if(g[i][j]===1&&!vis[i][j]){ cnt++; snap({cur:[i,j],msg:`New land at (<b>${i},${j}</b>) → island <b>#${cnt}</b>.`}); dfs(i,j); }
-  snap({cur:null,msg:`Done — total islands: <b>${cnt}</b>.`});
+  for(let i=0;i<m;i++)for(let j=0;j<w;j++) if(g[i][j]===1&&!vis[i][j]){ cnt++; snap({cur:[i,j],line:2,msg:`New land at (<b>${i},${j}</b>) → island <b>#${cnt}</b>.`}); dfs(i,j); }
+  snap({cur:null,line:-1,msg:`Done — total islands: <b>${cnt}</b>.`});
   return F;
 }
 
@@ -664,6 +670,7 @@ function mountViz(host, p, col){
       <button data-m="frames">▦ Frames + state</button>
       <button data-m="demo">◈ 3D / grid demo</button>
     </div>
+    <pre class="vcode" id="vcode"></pre>
     <div class="vstage" id="vstage"></div>
     <div class="vtables" id="vtables"></div>
     <div class="vmsg" id="vmsg"></div>
@@ -676,8 +683,10 @@ function mountViz(host, p, col){
     </div>`;
   const stage=host.querySelector('#vstage'), msg=host.querySelector('#vmsg'),
         tables=host.querySelector('#vtables'), ctrl=host.querySelector('#vctrl'),
+        vcode=host.querySelector('#vcode'),
         posEl=host.querySelector('#vpos'), playBtn=host.querySelector('#vPlay'),
         prevBtn=host.querySelector('#vPrev'), nextBtn=host.querySelector('#vNext');
+  const esc=t=>t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 
   function paint(){
     const f=frames[idx];
@@ -685,6 +694,8 @@ function mountViz(host, p, col){
     msg.innerHTML=f.msg||'';
     posEl.textContent=`step ${idx+1} / ${frames.length}`;
     tables.style.display=''; tables.innerHTML=vizTables(spec,f);   // queue/stack + arrays always on
+    if(frames.code){ vcode.style.display=''; vcode.innerHTML=frames.code.map((ln,i)=>`<span class="rl${i===f.line?' active':''}">${esc(ln)||'&nbsp;'}</span>`).join(''); }
+    else vcode.style.display='none';
     prevBtn.disabled=idx===0; nextBtn.disabled=idx===frames.length-1;
   }
   function stop(){ playing=false; vizStop(); playBtn.textContent='▶'; }
@@ -701,7 +712,7 @@ function mountViz(host, p, col){
     b.classList.add('on'); mode=b.dataset.m; stop();
     if(typeof dispose3D==='function') dispose3D();
     if(mode==='demo'){
-      ctrl.style.display='none'; msg.style.display='none'; tables.style.display='none'; stage.style.display='block';
+      ctrl.style.display='none'; msg.style.display='none'; tables.style.display='none'; vcode.style.display='none'; stage.style.display='block';
       const A=(typeof animForDFS==='function')?animForDFS(p):null;
       stage.innerHTML='';
       if(A){ A.kind==='graph' ? mount3DGraph(stage,A,col) : mountGridDFS(stage,A,col); }
