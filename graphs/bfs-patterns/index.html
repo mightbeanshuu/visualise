@@ -129,8 +129,11 @@
   .vstage{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px;min-height:300px;display:flex;align-items:center;justify-content:center;overflow:auto;}
   .vstage svg{width:100%;height:auto;max-width:520px;}
   .vstage svg text{font-family:'JetBrains Mono',monospace;font-weight:700;}
-  .vmsg{margin-top:11px;font-size:12.5px;line-height:1.6;color:var(--text);background:var(--panel);border:1px solid var(--border);border-radius:7px;padding:9px 13px;min-height:20px;}
+  .vmsg{margin-top:11px;font-size:13.5px;line-height:1.65;color:var(--text);background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--multi);border-radius:7px;padding:11px 14px;min-height:22px;}
   .vmsg b{color:var(--head);} .vmsg .ok{color:#69ff47;} .vmsg .bad{color:#ff6b6b;}
+  .vmsg.flash{animation:stepin .35s ease;}
+  @keyframes stepin{from{opacity:.25;transform:translateY(3px);}to{opacity:1;transform:none;}}
+  .stepchip{display:inline-block;margin-right:9px;font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:1.2px;font-weight:700;color:var(--multi);background:#0a1f2a;border:1px solid #14424f;border-radius:20px;padding:2px 9px;vertical-align:1px;}
   .vctrl{display:flex;gap:7px;align-items:center;margin-top:11px;flex-wrap:wrap;}
   .vctrl button{background:var(--panel);border:1px solid #30363d;color:var(--text);padding:6px 13px;border-radius:6px;cursor:pointer;font-size:13px;font-family:inherit;font-weight:600;transition:.15s;}
   .vctrl button:hover{background:#1c2530;} .vctrl button:disabled{opacity:.4;cursor:not-allowed;}
@@ -309,6 +312,7 @@ int countComponents(int V, vector<vector<int>>& adj) {
 },
 {
   cat:'GRID', label:'Flood Fill / Plain Grid BFS', done:true,
+  sim:{kind:'grid', algo:'flood', startCell:[1,1], newC:2, cntLabel:'CELLS RECOLOURED', caption:'Recolour everything connected to the start cell', grid:[[1,1,1],[1,1,0],[1,0,1]]},
   when:`Visit or recolour ONE connected region from a start cell. You only care WHICH cells belong, not how far they are.`,
   insight:`Cell (r,c) = node, its 4 neighbours = edges. Mark visited, spread with a queue. <b>No <span class="keyword">sz</span> layer loop, no distance</b> — just flood until the region is full.`,
   analogy:`Spilling paint. It keeps spreading to same-coloured neighbours until the blob is full. You never ask "how many steps" — only "is this cell part of my blob?".`,
@@ -374,6 +378,7 @@ void bfs(int sr, int sc, vector<vector<int>>& g, vector<vector<int>>& vis) {
 },
 {
   cat:'GRID', label:'Max Area / Component Size', done:false,
+  sim:{kind:'grid', algo:'maxarea', cntLabel:'MAX AREA', caption:'Flood every island — keep the best area', grid:[[1,1,0,0],[1,0,0,1],[0,0,1,1],[0,0,0,1]]},
   when:`Need the SIZE of a component (largest island, area, sub-island match).`,
   insight:`Same skeleton as Number of Islands, but the counter moves: <code>area = 0</code> once <b>per island</b>, <code>area++</code> when you <b>pop</b> a cell, then <code>maxArea = max(maxArea, area)</code> after the BFS finishes.`,
   analogy:`Number of Islands counts how many times you press "spill". Max Area counts how many cells one spill painted. <b>Same movie — the counter just lives in a different place.</b>`,
@@ -416,6 +421,7 @@ void bfs(int sr, int sc, vector<vector<int>>& g, vector<vector<int>>& vis) {
 },
 {
   cat:'GRID', label:'Two-Grid BFS (Count Sub Islands)', done:true,
+  sim:{kind:'grid', algo:'subisl', cntLabel:'SUB-ISLANDS', caption:'Every cell of the B island must be land in A too (✗ = water in A)', grid:[[1,1,0,1],[0,1,1,0],[0,0,0,1]], grid1:[[1,1,0,0],[0,1,1,0],[0,0,0,1]]},
   when:`TWO grids — validate each component of grid2 against grid1 (sub-islands, containment, shape matching).`,
   insight:`BFS the component in <b>grid2</b> as usual, but carry an <code>ok</code> flag that flips to <b>false</b> the instant any cell is water (0) in <b>grid1</b>. Count the island only if <code>ok</code> survived. <b>Key:</b> keep flooding the WHOLE component even after it fails.`,
   analogy:`Number of Islands, but an island only "counts" if grid1 fully covers it with land. You still walk the entire island to mark it visited — you just remember whether you ever stepped where grid1 has water.`,
@@ -463,6 +469,7 @@ int countSubIslands(vector<vector<int>>& g1, vector<vector<int>>& g2) {
 },
 {
   cat:'GRID', label:'Grid BFS — 8-Directional', done:true,
+  sim:{kind:'grid', algo:'islands8', caption:'Diagonals count — 8 neighbours per cell', grid:[[1,0,0,1],[0,1,0,0],[0,0,1,0],[1,0,0,1]]},
   when:`Movement allows diagonals (or knight L-shaped jumps).`,
   insight:`<b>Only dr/dc and the loop bound change</b> (4 → 8). The BFS body is byte-for-byte the same as 4-directional.`,
   analogy:`Same flood, more exits per cell. A king's move (8) vs a rook's move (4).`,
@@ -572,6 +579,7 @@ for (int d = 0; d < 8; d++) {            // ★ only the count changes
 },
 {
   cat:'BOUNDARY', label:'Boundary BFS (Reverse Thinking)', done:true,
+  sim:{kind:'grid', algo:'boundary', cntLabel:'SAFE CELLS', caption:'Flood from the border — unmarked land gets captured', grid:[[1,0,0,0],[0,1,1,0],[0,1,0,0],[0,0,0,1]]},
   when:`"Keep / count whatever is connected to the border, kill the rest." Surrounded Regions, Enclaves.`,
   insight:`Don't hunt the trapped cells directly. <b>Seed BFS from the border cells</b>, mark everything reachable as SAFE, then whatever stayed unmarked is captured.`,
   analogy:`It's far easier to find who CAN escape (touches an edge) than who is trapped. Mark all the escapers; condemn everyone left. The cell being "on the boundary" doesn't matter — being <b>connected to</b> the boundary does.`,
@@ -641,6 +649,7 @@ for (int d = 0; d < 8; d++) {            // ★ only the count changes
 },
 {
   cat:'SHORTEST', label:'0-1 BFS — Deque', done:false,
+  sim:{kind:'graph', n:6, edges:[[0,1],[0,2],[1,3],[2,3],[3,4],[2,4],[4,5]], weights:[0,1,1,0,1,0,0], start:0, algo:'zeroone', caption:'0-edges jump to the FRONT of the deque, 1-edges go to the back'},
   when:`Edge weights are ONLY 0 or 1. Cheaper than Dijkstra for this case.`,
   insight:`Use a <b>deque</b>. A weight-0 edge → <code>push_front</code> (stay on the same level); a weight-1 edge → <code>push_back</code> (next level). This replaces the priority queue.`,
   analogy:`Like level BFS, but a free (0-cost) move keeps you on the CURRENT level instead of advancing one.`,
@@ -668,6 +677,7 @@ vector<int> zeroOneBFS(int V, vector<vector<pair<int,int>>>& adj, int src) {
 },
 {
   cat:'STATE', label:'State-Space BFS (Word Ladder)', done:false,
+  sim:{kind:'graph', n:7, labels:['hit','hot','dot','lot','dog','log','cog'], edges:[[0,1],[1,2],[1,3],[2,4],[2,3],[3,5],[4,6],[4,5],[5,6]], start:0, target:6, algo:'bfs', caption:'Words are nodes, one-letter changes are edges — BFS finds the shortest ladder'},
   when:`A "node" is a (position + extra info) STATE — a word, a lock combo, a puzzle board.`,
   insight:`Define the state, use a hash set for visited, and <b>generate neighbours on the fly</b> by applying one legal move. The rest is vanilla (often level) BFS for the step count.`,
   analogy:`The graph is implicit — there's no <code>adj[]</code>. You BUILD each neighbour by mutating the state one legal step at a time.`,
@@ -704,6 +714,7 @@ vector<int> zeroOneBFS(int V, vector<vector<pair<int,int>>>& adj, int src) {
 },
 {
   cat:'STATE', label:'Bidirectional BFS', done:false,
+  sim:{kind:'graph', n:8, edges:[[0,1],[1,2],[2,3],[3,4],[4,5],[5,6],[6,7],[1,3],[4,6]], start:0, target:7, algo:'bibfs', caption:'Two waves march toward each other and MEET in the middle'},
   when:`BOTH src and dst are known — search from both ends, meet in the middle.`,
   insight:`Two frontier sets. Each step <b>expand the smaller one</b>; if a generated node is in the OTHER frontier, they met. <code>O(b^(d/2))</code> vs <code>O(b^d)</code>.`,
   analogy:`Two people digging a tunnel from opposite sides — they meet in roughly half the time.`,
@@ -737,6 +748,7 @@ vector<int> zeroOneBFS(int V, vector<vector<pair<int,int>>>& adj, int src) {
 },
 {
   cat:'GRAPH', label:'Cycle Detection — Undirected (BFS)', done:false,
+  sim:{kind:'graph', n:6, edges:[[0,1],[1,2],[2,3],[3,1],[0,4],[4,5]], start:0, algo:'ucycle', caption:'Seen neighbour that is NOT my parent ⇒ cycle'},
   when:`Detect a cycle in a general (non-grid) undirected graph using BFS.`,
   insight:`Queue holds <code>{node, parent}</code>. If you reach a <b>visited</b> neighbour that is <b>not your parent</b> → there's a cycle.`,
   analogy:`On a grid your "parent" was implicit — <code>vis</code> already stopped you going back. In a real graph you must <b>remember who you came from</b>, because bumping into your own parent isn't a cycle, but bumping into anyone else already visited is.`,
@@ -789,6 +801,7 @@ vector<int> zeroOneBFS(int V, vector<vector<pair<int,int>>>& adj, int src) {
 },
 {
   cat:'GRAPH', label:"Topological Sort — Kahn's (BFS)", done:false,
+  sim:{kind:'graph', n:6, directed:true, edges:[[5,0],[5,2],[4,0],[4,1],[2,3],[3,1]], algo:'kahn', caption:'Pop indegree-0 nodes — finishing one frees the next'},
   when:`Order a DAG by dependencies — course prerequisites, task scheduling, build order.`,
   insight:`Compute <b>indegree</b> of every node. Push all indegree-0 nodes. Pop → append to order → decrement neighbours' indegree → push a neighbour the moment its indegree hits 0. If <code>order.size() != V</code> there was a cycle.`,
   analogy:`Do every task that has no pending prerequisites first. Finishing one task "frees" the tasks that depended on it. If something can never be freed → a dependency cycle exists.`,
@@ -1467,6 +1480,100 @@ function simulate(spec){
       F.layout=treeLayout(n,parent,spec.start||0);
       return F;
     }
+    if(spec.algo==='ucycle'){
+      F.code=['bfs(s), remembering parent:','  q=[s]; vis[s]=1','  u = q.pop()','  for v in adj[u]:','    if !vis[v]: parent[v]=u; q.push(v)','    elif v != parent[u]: CYCLE'];
+      let found=false;
+      const par=new Array(n).fill(-1);
+      for(let s=0;s<n&&!found;s++) if(ns[s]===0){
+        ns[s]=1; q.push(s); snap({cur:s,line:1,msg:`Start BFS at <b>${s}</b>.`});
+        while(q.length&&!found){
+          const u=q.shift(); ns[u]=2;
+          snap({cur:u,line:2,msg:`Dequeue <b>${u}</b>${par[u]>=0?` (parent <b>${par[u]}</b>)`:''}.`});
+          for(const v of adj[u]){
+            if(ns[v]===0){ ns[v]=1; par[v]=u; parent[v]=u; q.push(v); snap({cur:u,edge:[u,v],edgeType:'tree',line:4,msg:`<b>${u}–${v}</b> unseen — enqueue, parent = ${u}.`}); }
+            else if(v!==par[u]){ found=true; snap({cur:u,edge:[u,v],edgeType:'back',line:5,msg:`<b>${u}–${v}</b> already seen and NOT my parent ⇒ <span class="bad">cycle!</span>`}); break; }
+            else snap({cur:u,edge:[u,v],edgeType:'cross',line:3,msg:`<b>${u}–${v}</b> is just the edge I came from — ignore.`});
+          }
+        }
+      }
+      snap({cur:-1,line:-1,msg: found?`<span class="bad">Cycle found</span> — two BFS waves collided away from the parent edge.`:`<span class="ok">No cycle</span>.`});
+      F.layout=treeLayout(n,parent,spec.start||0,true);
+      return F;
+    }
+    if(spec.algo==='bibfs'){
+      F.code=['qA = [src] · qB = [dst]','while both frontiers alive:','  expand the SMALLER frontier one level','  node reached by BOTH waves ⇒ MEET','answer = distA[meet] + distB[meet]'];
+      const src=spec.start||0, dst=spec.target!=null?spec.target:n-1;
+      const dA=new Array(n).fill(-1), dB=new Array(n).fill(-1);
+      let qa=[src], qb=[dst], meet=-1, guard=0;
+      dA[src]=0; dB[dst]=0; ns[src]=1; ns[dst]=2;
+      const sync=()=>{ for(let i=0;i<n;i++) dist[i]=dA[i]>=0?dA[i]:dB[i]; };
+      const qq=()=>qa.map(x=>x+'ᴬ').concat(qb.map(x=>x+'ᴮ'));
+      sync();
+      snap({cur:src,line:0,queue:qq(),msg:`Two waves — <b style="color:#00e5ff">A from ${src}</b> and <b style="color:#69ff47">B from ${dst}</b> — march toward each other.`});
+      while(qa.length&&qb.length&&meet<0&&guard++<60){
+        const expandA=qa.length<=qb.length, q0=expandA?qa:qb, D=expandA?dA:dB, O=expandA?dB:dA, mark=expandA?1:2;
+        const next=[];
+        snap({line:2,queue:qq(),msg:`Side ${expandA?'<b style="color:#00e5ff">A</b>':'<b style="color:#69ff47">B</b>'} is smaller (${q0.length}) — expand it one level.`});
+        for(const u of q0){
+          for(const v of adj[u]){
+            if(D[v]<0){ D[v]=D[u]+1; if(ns[v]===0){ns[v]=mark; parent[v]=u;} next.push(v); sync();
+              if(O[v]>=0){ meet=v; snap({cur:v,edge:[u,v],edgeType:'tree',line:3,queue:qq(),msg:`<b>${v}</b> was already reached by the other wave → <span class="ok">they MEET!</span>`}); break; }
+              snap({cur:u,edge:[u,v],edgeType:'tree',line:2,queue:qq(),msg:`Wave ${expandA?'A':'B'} reaches <b>${v}</b>.`});
+            }
+          }
+          if(meet>=0) break;
+        }
+        if(expandA) qa=next; else qb=next;
+      }
+      sync();
+      snap({cur:meet,line:4,queue:[],msg: meet>=0?`Met at <b>${meet}</b> → shortest path = <b>${dA[meet]+dB[meet]}</b> edges. Each wave explored ~half the graph.`:`The waves never met — no path.`});
+      F.layout=treeLayout(n,parent,src);
+      return F;
+    }
+    if(spec.algo==='kahn'){
+      F.code=['compute indegree of every node','push ALL indegree-0 nodes (no prereqs)','while !q.empty():','  u = q.pop() → next in topo order','  for v in adj[u]: indeg[v]--','    if indeg[v]==0: q.push(v)   // now ready'];
+      const indeg=new Array(n).fill(0);
+      spec.edges.forEach(([a,b])=>indeg[b]++);
+      const topo=[];
+      const sync=()=>{ for(let i=0;i<n;i++) dist[i]=indeg[i]; };
+      sync();
+      snap({line:0,topo:[],msg:`Count incoming edges per node — that's the <b>indegree</b> row below.`});
+      for(let i=0;i<n;i++) if(indeg[i]===0){ ns[i]=1; q.push(i); }
+      snap({line:1,topo:[],msg:`Indegree-0 nodes (<b>${q.join(', ')}</b>) have no prerequisites — enqueue them all.`});
+      while(q.length){
+        const u=q.shift(); ns[u]=2; topo.push(u);
+        snap({cur:u,line:3,topo:topo.slice(),msg:`Pop <b>${u}</b> → place it next in the topo order.`});
+        for(const v of adj[u]){ indeg[v]--; sync();
+          if(indeg[v]===0){ ns[v]=1; parent[v]=u; q.push(v); snap({cur:u,edge:[u,v],edgeType:'tree',line:5,topo:topo.slice(),msg:`<b>${u}→${v}</b> satisfied — indegree(<b>${v}</b>) hits 0 → ready, enqueue.`}); }
+          else snap({cur:u,edge:[u,v],edgeType:'cross',line:4,topo:topo.slice(),msg:`<b>${u}→${v}</b> satisfied — indegree(<b>${v}</b>) drops to ${indeg[v]}.`});
+        }
+      }
+      snap({cur:-1,line:-1,topo:topo.slice(),msg: topo.length===n?`Kahn order: <b>${topo.join(' → ')}</b> — every node placed, no cycle.`:`Only ${topo.length}/${n} placed ⇒ <span class="bad">cycle</span>.`});
+      F.layout=treeLayout(n,parent,spec.start||0,true);
+      return F;
+    }
+    if(spec.algo==='zeroone'){
+      F.code=['deque = [src]; dist[src] = 0','while !deque.empty():','  u = deque.popFront()','  for (v, w) in adj[u]:        // w is 0 or 1','    if dist[u]+w < dist[v]: dist[v] = dist[u]+w','      w==0 ? pushFront(v) : pushBack(v)'];
+      const W={}; spec.edges.forEach(([a,b],i)=>{ W[a+'-'+b]=spec.weights[i]; W[b+'-'+a]=spec.weights[i]; });
+      const src=spec.start||0;
+      dist[src]=0; ns[src]=1; q.push(src);
+      snap({cur:src,line:0,msg:`Start at <b>${src}</b> with a <b>deque</b> — 0-edges jump the queue.`});
+      while(q.length){
+        const u=q.shift(); ns[u]=2;
+        snap({cur:u,line:2,msg:`Pop <b>${u}</b> from the FRONT (dist ${dist[u]}).`});
+        for(const v of adj[u]){
+          const wgt=W[u+'-'+v];
+          if(dist[u]+wgt<(dist[v]<0?Infinity:dist[v])){
+            dist[v]=dist[u]+wgt; parent[v]=u; ns[v]=ns[v]===2?2:1;
+            if(wgt===0){ q.unshift(v); snap({cur:u,edge:[u,v],edgeType:'tree',line:5,msg:`<b>${u}→${v}</b> costs <b>0</b> → dist ${dist[v]}, push <b>FRONT</b> (free moves first!).`}); }
+            else { q.push(v); snap({cur:u,edge:[u,v],edgeType:'tree',line:5,msg:`<b>${u}→${v}</b> costs <b>1</b> → dist ${dist[v]}, push <b>BACK</b>.`}); }
+          } else snap({cur:u,edge:[u,v],edgeType:'back',line:4,msg:`<b>${u}→${v}</b> offers no improvement — skip.`});
+        }
+      }
+      snap({cur:-1,line:-1,msg:`Done — the deque kept distances sorted without a heap: <b>[${dist.join(', ')}]</b>.`});
+      F.layout=treeLayout(n,parent,src);
+      return F;
+    }
     const src=spec.start||0;
     // pseudo-code panel — each frame points at the line being executed
     F.code=['bfs(src):','  dist[src] = 0; q.push(src)','  while !q.empty():','    u = q.pop()              // dequeue','    for v in adj[u]:','      if !seen[v]: dist[v] = dist[u]+1; q.push(v)','      else: skip               // already reached'];
@@ -1488,8 +1595,71 @@ function simulate(spec){
   // ── grid sims ──
   const g=spec.grid.map(r=>r.slice()), m=g.length, w=g[0].length;
   const vis=Array.from({length:m},()=>new Array(w).fill(0));
-  const dr=[-1,1,0,0], dc=[0,0,-1,1]; let cnt=0, q=[];
+  const eight=spec.algo==='islands8';
+  const dr=eight?[-1,-1,-1,0,0,1,1,1]:[-1,1,0,0], dc=eight?[-1,0,1,-1,1,-1,0,1]:[0,0,-1,1]; let cnt=0, q=[];
   const snap=ex=>F.push(Object.assign({grid:g.map(r=>r.slice()),vis:vis.map(r=>r.slice()),queue:q.map(c=>c[0]+','+c[1]),cnt,cur:null,to:null},ex));
+  const inb=(r,c)=>r>=0&&r<m&&c>=0&&c<w;
+  if(spec.algo==='flood'){
+    F.code=['oldC = img[sr][sc]; q = [(sr,sc)]','while !q.empty():','  (r,c) = q.pop()','  img[r][c] = newC          // recolour','  for 4 neighbours still oldC:','    q.push(nr,nc)'];
+    const [sr,sc]=spec.startCell, oldC=g[sr][sc], newC=spec.newC;
+    q=[[sr,sc]]; vis[sr][sc]=1;
+    snap({cur:[sr,sc],line:0,msg:`Start at (<b>${sr},${sc}</b>) — old colour <b>${oldC}</b>, new colour <b>${newC}</b>.`});
+    while(q.length){
+      const [r,c]=q.shift(); g[r][c]=newC; cnt++;
+      snap({cur:[r,c],line:3,msg:`Recolour (<b>${r},${c}</b>): ${oldC} → <b>${newC}</b>.`});
+      for(let d=0;d<4;d++){ const nr=r+dr[d],nc=c+dc[d];
+        if(inb(nr,nc)&&g[nr][nc]===oldC&&!vis[nr][nc]){ vis[nr][nc]=1; q.push([nr,nc]); snap({cur:[r,c],to:[nr,nc],line:5,msg:`(<b>${nr},${nc}</b>) still wears the old colour — enqueue.`}); } }
+    }
+    snap({line:-1,msg:`Only the region <b>connected</b> to the start changed — <b>${cnt}</b> cells.`});
+    return F;
+  }
+  if(spec.algo==='maxarea'){
+    F.code=['best = 0','for each cell (i,j):','  if land & !vis:','    area = flood with BFS, count dequeues','    best = max(best, area)'];
+    let best=0;
+    for(let i=0;i<m;i++)for(let j=0;j<w;j++) if(g[i][j]===1&&!vis[i][j]){
+      snap({cur:[i,j],line:3,cnt:best,msg:`New island at (<b>${i},${j}</b>) — flood it and count.`});
+      q=[[i,j]]; vis[i][j]=1; let a=0;
+      while(q.length){ const [r,c]=q.shift(); a++;
+        snap({cur:[r,c],line:3,cnt:best,msg:`Dequeue (<b>${r},${c}</b>) — area so far <b>${a}</b>.`});
+        for(let d=0;d<4;d++){ const nr=r+dr[d],nc=c+dc[d];
+          if(inb(nr,nc)&&g[nr][nc]===1&&!vis[nr][nc]){ vis[nr][nc]=1; q.push([nr,nc]); } } }
+      best=Math.max(best,a); cnt=best;
+      snap({cur:[i,j],line:4,cnt:best,msg:`Island area = <b>${a}</b> → best so far = <b>${best}</b>.`});
+    }
+    snap({line:-1,cnt:best,msg:`Max area: <b>${best}</b>.`});
+    return F;
+  }
+  if(spec.algo==='boundary'){
+    F.code=['push every BORDER land cell','flood from the border (BFS):','  (r,c) = q.pop(); mark SAFE','  enqueue land neighbours','any land NOT marked safe ⇒ captured'];
+    q=[];
+    for(let i=0;i<m;i++)for(let j=0;j<w;j++) if((i===0||i===m-1||j===0||j===w-1)&&g[i][j]===1&&!vis[i][j]){ vis[i][j]=1; q.push([i,j]); }
+    snap({line:0,msg:`Reverse thinking: ALL border land enters the queue first — only it can escape.`});
+    while(q.length){
+      const [r,c]=q.shift(); cnt++;
+      snap({cur:[r,c],line:2,msg:`(<b>${r},${c}</b>) is connected to the border — mark <b>SAFE</b>.`});
+      for(let d=0;d<4;d++){ const nr=r+dr[d],nc=c+dc[d];
+        if(inb(nr,nc)&&g[nr][nc]===1&&!vis[nr][nc]){ vis[nr][nc]=1; q.push([nr,nc]); snap({cur:[r,c],to:[nr,nc],line:3,msg:`Safety spreads to (<b>${nr},${nc}</b>).`}); } }
+    }
+    let cap=0; for(let i=0;i<m;i++)for(let j=0;j<w;j++) if(g[i][j]===1&&!vis[i][j]) cap++;
+    snap({line:4,msg:`Unmarked land is surrounded → <b>${cap}</b> cell(s) captured.`});
+    return F;
+  }
+  if(spec.algo==='subisl'){
+    F.code=['for each island of grid B:','  flood it (BFS), checking EVERY cell vs grid A','  cell is water in A ⇒ island ruined','  all cells land in A ⇒ subIslands++'];
+    const g1=spec.grid1; let sub=0;
+    for(let i=0;i<m;i++)for(let j=0;j<w;j++) if(g[i][j]===1&&!vis[i][j]){
+      snap({cur:[i,j],line:0,cnt:sub,msg:`New island of B at (<b>${i},${j}</b>) — is ALL of it on A's land?`});
+      q=[[i,j]]; vis[i][j]=1; let ok=true;
+      while(q.length){ const [r,c]=q.shift(); const good=g1[r][c]===1; ok=ok&&good;
+        snap({cur:[r,c],line:good?1:2,cnt:sub,msg: good?`(<b>${r},${c}</b>) is land in A too — still a sub-island.`:`(<b>${r},${c}</b>) is <span class="bad">water in A</span> — this island is ruined.`});
+        for(let d=0;d<4;d++){ const nr=r+dr[d],nc=c+dc[d];
+          if(inb(nr,nc)&&g[nr][nc]===1&&!vis[nr][nc]){ vis[nr][nc]=1; q.push([nr,nc]); } } }
+      if(ok){ sub++; cnt=sub; snap({cur:[i,j],line:3,cnt:sub,msg:`Whole island sits on A's land → <span class="ok">sub-island #${sub}</span>.`}); }
+      else snap({cur:[i,j],line:2,cnt:sub,msg:`At least one cell missed A's land — <span class="bad">not a sub-island</span>.`});
+    }
+    snap({line:-1,cnt:sub,msg:`Sub-islands: <b>${sub}</b>.`});
+    return F;
+  }
   if(spec.algo==='oranges'){
     // 0 empty · 1 fresh 🍊 · 2 rotten 🦠 — vis marks rotten; cnt = minute
     F.code=['push ALL rotten oranges, minute = 0','while !q.empty():','  for each orange of this minute:   // level','    (r,c) = q.pop()','    rot fresh 4-neighbours; push them','  minute++        // one wave = one minute'];
@@ -1508,12 +1678,12 @@ function simulate(spec){
     snap({line:-1,msg:`All reachable oranges rotten after <b>${cnt}</b> minute(s).`});
     return F;
   }
-  F.code=['for each cell (i,j):','  if land & !vis:','    islands++; q = [(i,j)]','    while !q.empty():','      (r,c) = q.pop()        // dequeue','      for 4 neighbours (nr,nc):','        if land & !vis: q.push(nr,nc)'];
+  F.code=['for each cell (i,j):','  if land & !vis:','    islands++; q = [(i,j)]','    while !q.empty():','      (r,c) = q.pop()        // dequeue',`      for ${eight?8:4} neighbours (nr,nc):`,'        if land & !vis: q.push(nr,nc)'];
   for(let i=0;i<m;i++)for(let j=0;j<w;j++) if(g[i][j]===1&&!vis[i][j]){
     cnt++; q=[[i,j]]; vis[i][j]=1; snap({cur:[i,j],line:2,msg:`New land at (<b>${i},${j}</b>) → island <b>#${cnt}</b>, enqueue.`});
     while(q.length){ const [r,c]=q.shift(); snap({cur:[r,c],line:4,msg:`Dequeue (<b>${r},${c}</b>) — process.`});
-      for(let d=0;d<4;d++){ const nr=r+dr[d],nc=c+dc[d];
-        if(nr>=0&&nr<m&&nc>=0&&nc<w&&g[nr][nc]===1&&!vis[nr][nc]){ vis[nr][nc]=1; q.push([nr,nc]); snap({cur:[r,c],to:[nr,nc],line:6,msg:`Enqueue land (<b>${nr},${nc}</b>).`}); } }
+      for(let d=0;d<dr.length;d++){ const nr=r+dr[d],nc=c+dc[d];
+        if(inb(nr,nc)&&g[nr][nc]===1&&!vis[nr][nc]){ vis[nr][nc]=1; q.push([nr,nc]); snap({cur:[r,c],to:[nr,nc],line:6,msg:`Enqueue land (<b>${nr},${nc}</b>)${eight?' — diagonals count!':''}.`}); } }
     }
   }
   snap({cur:null,line:-1,msg:`Done — total islands: <b>${cnt}</b>.`});
@@ -1525,13 +1695,15 @@ function vizSVG(spec,frames,f){
   const mk=(id,c)=>`<marker id="${id}" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L9,3 L0,6 Z" fill="${c}"/></marker>`;
   let s=`<svg viewBox="0 0 420 320">`;
   if(directed) s+=`<defs>${mk('ah','#3a4a5c')}${mk('aht','#69ff47')}${mk('ahr','#ff5f56')}${mk('ahg','#8b949e')}</defs>`;
-  spec.edges.forEach(([a,b])=>{
+  spec.edges.forEach(([a,b],ei)=>{
     const hot=f.edge && (f.edge[0]===a&&f.edge[1]===b || (!directed&&f.edge[0]===b&&f.edge[1]===a));
     let col='#2a3a4c',wd=2,dash='',mk2='ah';
     if(hot){ if(f.edgeType==='tree'){col='#69ff47';wd=3.5;mk2='aht';} else if(f.edgeType==='back'){col='#ff5f56';wd=3.5;mk2='ahr';} else {col='#8b949e';dash='5 3';mk2='ahg';} }
     const [x1,y1]=pos[a],[x2,y2]=pos[b], dx=x2-x1,dy=y2-y1,L=Math.hypot(dx,dy)||1, ux=dx/L,uy=dy/L;
     const X1=x1+ux*r, Y1=y1+uy*r, X2=x2-ux*(r+(directed?6:0)), Y2=y2-uy*(r+(directed?6:0));
     s+=`<line x1="${X1}" y1="${Y1}" x2="${X2}" y2="${Y2}" stroke="${col}" stroke-width="${wd}" ${dash?`stroke-dasharray="${dash}"`:''} ${directed?`marker-end="url(#${mk2})"`:''}/>`;
+    if(spec.weights){ const mx=(x1+x2)/2, my=(y1+y2)/2, wgt=spec.weights[ei];   // 0-1 BFS edge cost
+      s+=`<circle cx="${mx}" cy="${my}" r="8" fill="#0b1118" stroke="${wgt===0?'#69ff47':'#f0a500'}" stroke-width="1.4"/><text x="${mx}" y="${my+3.5}" fill="${wgt===0?'#69ff47':'#f0a500'}" font-size="10" text-anchor="middle">${wgt}</text>`; }
   });
   pos.forEach((p,i)=>{
     const st=f.nodeState?f.nodeState[i]:0; let fill='#141b24',stroke='#3a4452';
@@ -1539,8 +1711,10 @@ function vizSVG(spec,frames,f){
     const cur=f.cur===i;
     if(cur) s+=`<circle cx="${p[0]}" cy="${p[1]}" r="${r+5}" fill="none" stroke="#fff" stroke-width="1.6" opacity=".7"/>`;
     s+=`<circle cx="${p[0]}" cy="${p[1]}" r="${r}" fill="${fill}" stroke="${stroke}" stroke-width="${cur?3.5:2}"/>`;
-    s+=`<text x="${p[0]}" y="${p[1]+5}" fill="#e6edf3" font-size="15" text-anchor="middle">${i}</text>`;
-    if(i===(spec.start||0)) s+=`<text x="${p[0]}" y="${p[1]-r-7}" fill="#ff6b6b" font-size="10" text-anchor="middle">source</text>`;
+    const lbl=spec.labels?spec.labels[i]:i;
+    s+=`<text x="${p[0]}" y="${p[1]+(spec.labels?3.5:5)}" fill="#e6edf3" font-size="${spec.labels?10:15}" text-anchor="middle">${lbl}</text>`;
+    if(i===(spec.start||0)) s+=`<text x="${p[0]}" y="${p[1]-r-7}" fill="#ff6b6b" font-size="10" text-anchor="middle">${spec.algo==='bibfs'?'src':'source'}</text>`;
+    if(spec.target!=null&&i===spec.target) s+=`<text x="${p[0]}" y="${p[1]-r-7}" fill="#69ff47" font-size="10" text-anchor="middle">target</text>`;
   });
   return s+`</svg>`;
 }
@@ -1554,6 +1728,16 @@ function vizGrid(spec,f){
       const bg= val===0?'#0e141b':(v?'#2a1313':'#20290e'), bd= cur?'#fff':(to?'#ff6b6b':'transparent'),
             t= val===0?'·':(v?'🦠':'🍊');
       s+=`<div class="gc" style="background:${bg};border-color:${bd};color:#39424d">${t}</div>`;
+    } else if(spec.algo==='flood'){      // cells show their colour value
+      const PAL=[['#0e141b','#39424d'],['#13283a','#7fd1ff'],['#0c2417','#69ff47'],['#241430','#d29bff']];
+      const [bg,fg]=PAL[val%PAL.length], bd2= cur?'#fff':(to?'#00e5ff':'transparent');
+      s+=`<div class="gc" style="background:${bg};border-color:${bd2};color:${fg}">${val}</div>`;
+    } else if(spec.algo==='subisl'){     // ✗ = land of B that is water in A
+      const badc=val===1&&spec.grid1[r][c]===0, bd2= cur?'#fff':(to?'#00e5ff':'transparent');
+      const bg= val===0?'#0e141b':(v?(badc?'#2a1313':'#0c2417'):'#13283a'),
+            fg= val===0?'#39424d':(v?(badc?'#ff6b6b':'#69ff47'):(badc?'#ffb38a':'#7fd1ff')),
+            t = val===0?'~':(v?(badc?'✗':'✓'):'1');
+      s+=`<div class="gc" style="background:${bg};border-color:${bd2};color:${fg}">${t}</div>`;
     } else {
       const bg= val===0?'#0e141b':(v?'#0c2417':'#13283a'), bd= cur?'#fff':(to?'#00e5ff':'transparent'),
             fg= val===0?'#39424d':(v?'#69ff47':'#7fd1ff'), t= val===0?'~':(v?'✓':'1');
@@ -1575,11 +1759,14 @@ function vizTables(spec,f){
     row=`<tr><td class="k">colour</td>`+ns.map((s,i)=>`<td class="${s===1?'g':s===2?'b':''} ${f.cur===i?'on':''}">${sym[s]}</td>`).join('')+'</tr>';
   } else if(spec.algo==='comp'){ cap='VISITED';
     row=`<tr><td class="k">vis</td>`+ns.map((s,i)=>`<td class="${s?'b':''} ${f.cur===i?'on':''}">${s?1:0}</td>`).join('')+'</tr>';
+  } else if(spec.algo==='kahn'){ cap='INDEGREE — 0 = ready to place';
+    row=`<tr><td class="k">indeg</td>`+dist.map((d,i)=>`<td class="${ns[i]===2?'b':ns[i]===1?'g':''} ${f.cur===i?'on':''}">${d}</td>`).join('')+'</tr>';
   } else { cap='DISTANCE FROM SOURCE (∞ = unreached)';
     row=`<tr><td class="k">dist</td>`+dist.map((d,i)=>`<td class="${ns[i]===2?'b':ns[i]===1?'g':''} ${f.cur===i?'on':''}">${d<0?'∞':d}</td>`).join('')+'</tr>';
   }
   const q=f.queue&&f.queue.length?f.queue.map(x=>`<span class="b">${x}</span>`).join(''):'<span class="e">empty</span>';
-  const extra=f.comps!==undefined?`<div class="vtbl"><div class="cap">COMPONENTS</div><table><tr><td class="b" style="min-width:42px;font-size:14px">${f.comps}</td></tr></table></div>`:'';
+  let extra=f.comps!==undefined?`<div class="vtbl"><div class="cap">COMPONENTS</div><table><tr><td class="b" style="min-width:42px;font-size:14px">${f.comps}</td></tr></table></div>`:'';
+  if(f.topo) extra+=`<div class="vtbl"><div class="cap">TOPO ORDER →</div><div class="vstack">${f.topo.length?f.topo.map(x=>`<span class="b">${x}</span>`).join(''):'<span class="e">empty</span>'}</div></div>`;
   return `<div class="vtbl"><div class="cap">${cap}</div><table>${head}${row}</table></div>
           <div class="vtbl"><div class="cap">QUEUE →</div><div class="vstack">${q}</div></div>${extra}`;
 }
@@ -1616,7 +1803,8 @@ function mountViz(host, p, col){
   function paint(){
     const f=frames[idx];
     stage.innerHTML = spec.kind==='graph' ? vizSVG(spec,frames,f) : vizGrid(spec,f);
-    msg.innerHTML=f.msg||'';
+    msg.innerHTML=`<span class="stepchip">STEP ${idx+1}</span>${f.msg||''}`;
+    msg.classList.remove('flash'); void msg.offsetWidth; msg.classList.add('flash');   // re-trigger pop-in
     posEl.textContent=`step ${idx+1} / ${frames.length}`;
     tables.style.display=''; tables.innerHTML=vizTables(spec,f);   // queue + arrays always on
     // animation drives the highlighted pseudo-code line

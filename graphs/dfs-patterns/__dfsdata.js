@@ -27,6 +27,7 @@ public:
 },
 {
   cat:'CORE', label:'Iterative DFS (explicit stack)', done:true,
+  sim:{kind:'graph', n:6, edges:[[0,1],[0,2],[1,3],[2,3],[2,4],[4,5]], start:0, algo:'dfsiter', caption:'Explicit stack — mark when POPPED, duplicates are fine'},
   when:`Same as recursive DFS but you control the stack yourself — avoids recursion-depth limits.`,
   insight:`Replace the call stack with a real <code>stack</code>. Pop a node, push its unvisited neighbours. Order differs slightly from recursion but it's still depth-first.`,
   analogy:`The recursion was hiding a stack the whole time — here you just hold it in your hand.`,
@@ -75,6 +76,7 @@ public:
 },
 {
   cat:'GRID', label:'Flood Fill (DFS)', done:true,
+  sim:{kind:'grid', algo:'flood', startCell:[1,1], newC:2, cntLabel:'CELLS RECOLOURED', caption:'Recolour everything connected to the start cell', grid:[[1,1,1],[1,1,0],[1,0,1]]},
   when:`Recolour / visit one connected region from a start cell.`,
   insight:`Cell = node, 4 neighbours = edges. Recurse into each valid same-region neighbour. No queue — the recursion dives a tendril deep, then backtracks.`,
   analogy:`Paint spilling, but it runs all the way down one channel first, then comes back to fill the side channels.`,
@@ -138,6 +140,7 @@ public:
 },
 {
   cat:'GRID', label:'Max Area / Component Size (DFS)', done:true,
+  sim:{kind:'grid', algo:'maxarea', cntLabel:'MAX AREA', caption:'Measure every island — keep the best', grid:[[1,1,0,0],[1,0,0,1],[0,0,1,1],[0,0,0,1]]},
   when:`Size of a component (largest island, area).`,
   insight:`DFS <b>returns</b> the size: <code>1 + sum of children's areas</code>. Much cleaner than BFS here — recursion adds up naturally.`,
   analogy:`Each cell reports "me (1) plus everything my neighbours reported". The root gets the whole island's size.`,
@@ -172,6 +175,7 @@ public:
 },
 {
   cat:'GRID', label:'Two-Grid Sub Islands (DFS)', done:true,
+  sim:{kind:'grid', algo:'subisl', cntLabel:'SUB-ISLANDS', caption:'Every cell of the B island must be land in A too (✗ = water in A)', grid:[[1,1,0,1],[0,1,1,0],[0,0,0,1]], grid1:[[1,1,0,0],[0,1,1,0],[0,0,0,1]]},
   when:`Validate each grid2 island against grid1.`,
   insight:`DFS returns <code>true</code> only if EVERY cell of the island is land in grid1. Combine children with <code>&amp;&amp;</code> — but DFS all of them, don't short-circuit.`,
   analogy:`Same as your BFS sub-islands: flood the whole island, remember if you ever stepped on grid1-water.`,
@@ -206,6 +210,7 @@ public:
 },
 {
   cat:'GRID', label:'Grid DFS — 8-Directional', done:true,
+  sim:{kind:'grid', algo:'islands8', caption:'Diagonals count — 8 neighbours per cell', grid:[[1,0,0,1],[0,1,0,0],[0,0,1,0],[1,0,0,1]]},
   when:`Diagonal connectivity (king / X-shaped regions).`,
   insight:`Only dr/dc and the loop bound change (4 → 8). DFS body identical.`,
   analogy:`Same dive-and-backtrack, just more doors out of every room.`,
@@ -237,6 +242,7 @@ public:
 },
 {
   cat:'BOUNDARY', label:'Boundary DFS (Surrounded / Enclaves)', done:true,
+  sim:{kind:'grid', algo:'boundary', cntLabel:'SAFE CELLS', caption:'Start from the border — unmarked land gets captured', grid:[[1,0,0,0],[0,1,1,0],[0,1,0,0],[0,0,0,1]]},
   when:`Keep / count whatever connects to the border; kill the rest.`,
   insight:`DFS from every border land/'O' cell → mark SAFE. Anything left unmarked is captured. Reverse thinking, same as the BFS version.`,
   analogy:`Find who can escape (touches an edge), not who's trapped. DFS dives along the escape route.`,
@@ -267,6 +273,7 @@ public:
 },
 {
   cat:'GRAPH', label:'Cycle Detection — Undirected (DFS)', done:true,
+  sim:{kind:'graph', n:6, edges:[[0,1],[1,2],[2,3],[3,1],[0,4],[4,5]], start:0, algo:'ucycle', caption:'Visited neighbour that is NOT my parent ⇒ cycle'},
   when:`Detect a cycle in an undirected graph using recursion + parent.`,
   insight:`<code>dfs(u, parent)</code>. If a neighbour is visited AND is <b>not</b> your parent → back-edge → cycle.`,
   analogy:`The grid never needed a parent (vis stopped backtracking). A real graph can loop, so you must remember who you came from — bumping into anyone else already visited means a loop.`,
@@ -381,6 +388,7 @@ public:
 },
 {
   cat:'PATHS', label:'All Paths source→target (Backtracking)', done:true,
+  sim:{kind:'graph', n:4, directed:true, edges:[[0,1],[0,2],[1,3],[2,3]], start:0, target:3, algo:'allpaths', caption:'Backtracking — pop and un-mark after exploring'},
   when:`Enumerate every path from a source to a target (DAG / small graph).`,
   insight:`DFS that <b>adds the node to the path, recurses, then removes it</b> (backtracks). On reaching the target, record a copy of the current path.`,
   analogy:`Try a branch fully, snapshot it if it reaches the goal, then undo your last step and try the next branch.`,

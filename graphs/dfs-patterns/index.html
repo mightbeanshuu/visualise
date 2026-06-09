@@ -129,8 +129,11 @@
   .vstage{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px;min-height:300px;display:flex;align-items:center;justify-content:center;overflow:auto;}
   .vstage svg{width:100%;height:auto;max-width:520px;}
   .vstage svg text{font-family:'JetBrains Mono',monospace;font-weight:700;}
-  .vmsg{margin-top:11px;font-size:12.5px;line-height:1.6;color:var(--text);background:var(--panel);border:1px solid var(--border);border-radius:7px;padding:9px 13px;min-height:20px;}
+  .vmsg{margin-top:11px;font-size:13.5px;line-height:1.65;color:var(--text);background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--multi);border-radius:7px;padding:11px 14px;min-height:22px;}
   .vmsg b{color:var(--head);} .vmsg .ok{color:#69ff47;} .vmsg .bad{color:#ff6b6b;}
+  .vmsg.flash{animation:stepin .35s ease;}
+  @keyframes stepin{from{opacity:.25;transform:translateY(3px);}to{opacity:1;transform:none;}}
+  .stepchip{display:inline-block;margin-right:9px;font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:1.2px;font-weight:700;color:var(--multi);background:#0a1f2a;border:1px solid #14424f;border-radius:20px;padding:2px 9px;vertical-align:1px;}
   .vctrl{display:flex;gap:7px;align-items:center;margin-top:11px;flex-wrap:wrap;}
   .vctrl button{background:var(--panel);border:1px solid #30363d;color:var(--text);padding:6px 13px;border-radius:6px;cursor:pointer;font-size:13px;font-family:inherit;font-weight:600;transition:.15s;}
   .vctrl button:hover{background:#1c2530;} .vctrl button:disabled{opacity:.4;cursor:not-allowed;}
@@ -613,6 +616,44 @@ function simulate(spec){
       };
       for(let s=0;s<n;s++) if(ns[s]===0) dfs(s);
       snap({cur:-1,line:5,topo:topo.slice(),msg:`Reverse the stack → topo order: <b>${topo.slice().reverse().join(' → ')}</b>.`});
+    } else if(spec.algo==='dfsiter'){
+      F.code=['st = [src]','while !st.empty():','  u = st.pop()','  if vis[u]: continue      // duplicates happen','  vis[u] = 1               // mark when POPPED','  push every unvisited neighbour'];
+      const src=spec.start||0;
+      stack.push(src); ns[src]=1; snap({cur:src,line:0,msg:`Push source <b>${src}</b> onto the explicit stack.`});
+      while(stack.length){
+        const u=stack.pop(); snap({cur:u,line:2,msg:`Pop <b>${u}</b> from the stack.`});
+        if(ns[u]===2){ snap({cur:u,line:3,msg:`<b>${u}</b> was already visited — discard the duplicate.`}); continue; }
+        ns[u]=2; order.push(u); snap({cur:u,line:4,msg:`Mark <b>${u}</b> visited — only when popped, never when pushed!`});
+        for(const v of adj[u]) if(ns[v]!==2){ if(parent[v]<0&&v!==src) parent[v]=u; ns[v]=ns[v]||1; stack.push(v); snap({cur:u,edge:[u,v],edgeType:'tree',line:5,msg:`Push neighbour <b>${v}</b> — it may sit in the stack twice, that's fine.`}); }
+      }
+      snap({cur:-1,line:-1,msg:`Iterative DFS order: <b>${order.join(' → ')}</b>.`});
+    } else if(spec.algo==='ucycle'){
+      F.code=['dfs(u, parent):','  vis[u] = 1','  for v in adj[u]:','    if !vis[v]: dfs(v, u)','    elif v != parent: CYCLE  // visited, not my parent','  return'];
+      let found=false;
+      const dfs=(u,pe)=>{
+        ns[u]=1; stack.push(u); snap({cur:u,line:1,msg:`Visit <b>${u}</b>${pe>=0?` (came from <b>${pe}</b>)`:''}.`});
+        for(const v of adj[u]){
+          if(found) return;
+          if(ns[v]===0){ parent[v]=u; snap({cur:u,edge:[u,v],edgeType:'tree',line:3,msg:`<b>${u}–${v}</b> unvisited — recurse, remembering <b>${u}</b> as parent.`}); dfs(v,u); }
+          else if(v!==pe){ found=true; snap({cur:u,edge:[u,v],edgeType:'back',line:4,msg:`<b>${u}–${v}</b> is visited and NOT my parent ⇒ <span class="bad">cycle!</span>`}); return; }
+          else snap({cur:u,edge:[u,v],edgeType:'cross',line:2,msg:`<b>${u}–${v}</b> is just the edge I came from — ignore.`});
+        }
+        ns[u]=2; stack.pop(); snap({cur:u,line:5,msg:`Done <b>${u}</b> — backtrack.`});
+      };
+      for(let s=0;s<n&&!found;s++) if(ns[s]===0) dfs(s,-1);
+      snap({cur:-1,line:-1,msg: found?`<span class="bad">Cycle found</span> — an edge reached a visited node that isn't the parent.`:`<span class="ok">No cycle</span> — every visited neighbour was the parent.`});
+    } else if(spec.algo==='allpaths'){
+      F.code=['dfs(u, path):','  path.push(u)','  if u == target: record path ✓','  for v in adj[u]: dfs(v, path)','  path.pop()               // backtrack & reuse'];
+      const target=spec.target!=null?spec.target:n-1, path=[], paths=[];
+      const dfs=u=>{
+        path.push(u); stack.push(u); ns[u]=1;
+        snap({cur:u,line:1,msg:`Push <b>${u}</b> — path so far: [${path.join(' → ')}].`});
+        if(u===target){ paths.push(path.slice()); snap({cur:u,line:2,msg:`Reached target <b>${target}</b> → record <b>[${path.join(' → ')}]</b> ✓ (${paths.length} found).`}); }
+        else for(const v of adj[u]){ if(parent[v]<0&&v!==(spec.start||0)) parent[v]=u; snap({cur:u,edge:[u,v],edgeType:'tree',line:3,msg:`Try edge <b>${u}→${v}</b>.`}); dfs(v); }
+        path.pop(); stack.pop(); ns[u]=0; snap({cur:u,line:4,msg:`Backtrack — pop <b>${u}</b> and un-mark it so other paths can reuse it.`});
+      };
+      dfs(spec.start||0);
+      snap({cur:-1,line:-1,msg:`All paths: <b>${paths.map(p=>'['+p.join('→')+']').join(' · ')}</b>.`});
     } else {
       F.code=['dfs(u):','  vis[u] = 1             // mark on entry','  for v in adj[u]:','    if !vis[v]: dfs(v)   // tree edge','  return                 // backtrack'];
       const dfs=u=>{
@@ -629,15 +670,76 @@ function simulate(spec){
     F.layout=treeLayout(n,parent,spec.start||0, spec.algo==='comp'||spec.algo==='topo');   // forest = multi-root
     return F;
   }
-  // ── grid islands ──
+  // ── grid sims ──
   const g=spec.grid.map(r=>r.slice()), m=g.length, w=g[0].length;
   const vis=Array.from({length:m},()=>new Array(w).fill(0));
-  const dr=[-1,1,0,0], dc=[0,0,-1,1], stack=[]; let cnt=0;
-  F.code=['for each cell (i,j):','  if land & !vis:','    islands++; dfs(i,j)','dfs(r,c):','  vis[r][c] = 1','  for 4 neighbours (nr,nc):','    if land & !vis: dfs(nr,nc)'];
+  const eight=spec.algo==='islands8';
+  const dr=eight?[-1,-1,-1,0,0,1,1,1]:[-1,1,0,0], dc=eight?[-1,0,1,-1,1,-1,0,1]:[0,0,-1,1], stack=[]; let cnt=0;
   const snap=ex=>F.push(Object.assign({grid:g.map(r=>r.slice()),vis:vis.map(r=>r.slice()),stack:stack.slice(),cnt,cur:null,to:null},ex));
+  const inb=(r,c)=>r>=0&&r<m&&c>=0&&c<w;
+  if(spec.algo==='flood'){
+    F.code=['oldC = img[sr][sc]','dfs(r,c):','  img[r][c] = newC          // recolour','  for 4 neighbours (nr,nc):','    if img[nr][nc]==oldC: dfs(nr,nc)'];
+    const [sr,sc]=spec.startCell, oldC=g[sr][sc], newC=spec.newC;
+    const dfs=(r,c)=>{ g[r][c]=newC; vis[r][c]=1; cnt++; stack.push(r+','+c);
+      snap({cur:[r,c],line:2,msg:`Recolour (<b>${r},${c}</b>): ${oldC} → <b>${newC}</b>.`});
+      for(let d=0;d<4;d++){ const nr=r+dr[d],nc=c+dc[d];
+        if(inb(nr,nc)&&g[nr][nc]===oldC){ snap({cur:[r,c],to:[nr,nc],line:4,msg:`(<b>${nr},${nc}</b>) still wears the old colour ${oldC} — recurse.`}); dfs(nr,nc); } }
+      stack.pop(); };
+    snap({cur:[sr,sc],line:0,msg:`Start at (<b>${sr},${sc}</b>) — old colour <b>${oldC}</b>, new colour <b>${newC}</b>.`});
+    dfs(sr,sc);
+    snap({line:-1,msg:`Only the region <b>connected</b> to the start changed — <b>${cnt}</b> cells.`});
+    return F;
+  }
+  if(spec.algo==='maxarea'){
+    F.code=['best = 0','for each cell (i,j):','  if land & !vis:','    best = max(best, dfs(i,j))','dfs(r,c):','  vis = 1','  return 1 + Σ dfs(land neighbours)'];
+    let best=0;
+    const dfs=(r,c)=>{ vis[r][c]=1; stack.push(r+','+c); let a=1;
+      snap({cur:[r,c],line:6,cnt:best,msg:`Count (<b>${r},${c}</b>) — this island keeps growing.`});
+      for(let d=0;d<4;d++){ const nr=r+dr[d],nc=c+dc[d]; if(inb(nr,nc)&&g[nr][nc]===1&&!vis[nr][nc]) a+=dfs(nr,nc); }
+      stack.pop(); return a; };
+    for(let i=0;i<m;i++)for(let j=0;j<w;j++) if(g[i][j]===1&&!vis[i][j]){
+      snap({cur:[i,j],line:3,cnt:best,msg:`New island at (<b>${i},${j}</b>) — measure it.`});
+      const a=dfs(i,j); best=Math.max(best,a); cnt=best;
+      snap({cur:[i,j],line:3,cnt:best,msg:`Island area = <b>${a}</b> → best so far = <b>${best}</b>.`});
+    }
+    snap({line:-1,cnt:best,msg:`Max area: <b>${best}</b>.`});
+    return F;
+  }
+  if(spec.algo==='boundary'){
+    F.code=['for every BORDER cell:','  if it is land: dfs — mark SAFE','dfs(r,c):','  safe[r][c] = 1','  spread to land neighbours','any land NOT marked safe ⇒ captured'];
+    const dfs=(r,c)=>{ vis[r][c]=1; cnt++; stack.push(r+','+c); snap({cur:[r,c],line:3,msg:`(<b>${r},${c}</b>) is connected to the border — mark <b>SAFE</b>.`});
+      for(let d=0;d<4;d++){ const nr=r+dr[d],nc=c+dc[d];
+        if(inb(nr,nc)&&g[nr][nc]===1&&!vis[nr][nc]){ snap({cur:[r,c],to:[nr,nc],line:4,msg:`Safety spreads to (<b>${nr},${nc}</b>).`}); dfs(nr,nc); } }
+      stack.pop(); };
+    snap({line:0,msg:`Reverse thinking: walk the <b>border</b> — only regions touching it can escape.`});
+    for(let i=0;i<m;i++)for(let j=0;j<w;j++) if((i===0||i===m-1||j===0||j===w-1)&&g[i][j]===1&&!vis[i][j]){
+      snap({cur:[i,j],line:1,msg:`Border cell (<b>${i},${j}</b>) is land — everything connected to it survives.`}); dfs(i,j); }
+    let cap=0; for(let i=0;i<m;i++)for(let j=0;j<w;j++) if(g[i][j]===1&&!vis[i][j]) cap++;
+    snap({line:5,msg:`Unmarked land is surrounded → <b>${cap}</b> cell(s) captured.`});
+    return F;
+  }
+  if(spec.algo==='subisl'){
+    F.code=['for each island of grid B:','  dfs it, checking EVERY cell against grid A','  cell is water in A ⇒ island ruined','  all cells land in A ⇒ subIslands++'];
+    const g1=spec.grid1; let sub=0;
+    const dfs=(r,c)=>{ vis[r][c]=1; stack.push(r+','+c); let ok=g1[r][c]===1;
+      snap({cur:[r,c],line:ok?1:2,msg: ok?`(<b>${r},${c}</b>) is land in A too — still a sub-island.`:`(<b>${r},${c}</b>) is <span class="bad">water in A</span> — this island is ruined.`});
+      for(let d=0;d<4;d++){ const nr=r+dr[d],nc=c+dc[d];
+        if(inb(nr,nc)&&g[nr][nc]===1&&!vis[nr][nc]){ const r2=dfs(nr,nc); ok=ok&&r2; } }
+      stack.pop(); return ok; };
+    for(let i=0;i<m;i++)for(let j=0;j<w;j++) if(g[i][j]===1&&!vis[i][j]){
+      snap({cur:[i,j],line:0,cnt:sub,msg:`New island of B at (<b>${i},${j}</b>) — is ALL of it on A's land?`});
+      const ok=dfs(i,j);
+      if(ok){ sub++; cnt=sub; snap({cur:[i,j],line:3,cnt:sub,msg:`Whole island sits on A's land → <span class="ok">sub-island #${sub}</span>.`}); }
+      else snap({cur:[i,j],line:2,cnt:sub,msg:`At least one cell missed A's land — <span class="bad">not a sub-island</span>.`});
+    }
+    snap({line:-1,cnt:sub,msg:`Sub-islands: <b>${sub}</b>.`});
+    return F;
+  }
+  // islands / islands8 (default)
+  F.code=['for each cell (i,j):','  if land & !vis:','    islands++; dfs(i,j)','dfs(r,c):','  vis[r][c] = 1',`  for ${eight?8:4} neighbours (nr,nc):`,'    if land & !vis: dfs(nr,nc)'];
   const dfs=(r,c)=>{ vis[r][c]=1; stack.push(r+','+c); snap({cur:[r,c],line:4,msg:`Sink land at (<b>${r},${c}</b>).`});
-    for(let d=0;d<4;d++){ const nr=r+dr[d],nc=c+dc[d];
-      if(nr>=0&&nr<m&&nc>=0&&nc<w&&g[nr][nc]===1&&!vis[nr][nc]){ snap({cur:[r,c],to:[nr,nc],line:6,msg:`Neighbour (<b>${nr},${nc}</b>) is land — recurse.`}); dfs(nr,nc); } }
+    for(let d=0;d<dr.length;d++){ const nr=r+dr[d],nc=c+dc[d];
+      if(inb(nr,nc)&&g[nr][nc]===1&&!vis[nr][nc]){ snap({cur:[r,c],to:[nr,nc],line:6,msg:`Neighbour (<b>${nr},${nc}</b>)${eight?' (diagonals count!)':''} is land — recurse.`}); dfs(nr,nc); } }
     stack.pop();
   };
   for(let i=0;i<m;i++)for(let j=0;j<w;j++) if(g[i][j]===1&&!vis[i][j]){ cnt++; snap({cur:[i,j],line:2,msg:`New land at (<b>${i},${j}</b>) → island <b>#${cnt}</b>.`}); dfs(i,j); }
@@ -674,16 +776,29 @@ function vizGrid(spec,f){
   let s='<div class="gd">';
   f.grid.forEach((row,r)=>{ s+='<div class="gdrow">'; row.forEach((val,c)=>{
     const v=f.vis[r][c], cur=f.cur&&f.cur[0]===r&&f.cur[1]===c, to=f.to&&f.to[0]===r&&f.to[1]===c;
-    const bg= val===0?'#0e141b':(v?'#0c2417':'#13283a'), bd= cur?'#fff':(to?'#f0a500':'transparent'),
-          fg= val===0?'#39424d':(v?'#69ff47':'#7fd1ff'), t= val===0?'~':(v?'✓':'1');
-    s+=`<div class="gc" style="background:${bg};border-color:${bd};color:${fg}">${t}</div>`;
+    const bd= cur?'#fff':(to?'#f0a500':'transparent');
+    if(spec.algo==='flood'){           // cells show their colour value
+      const PAL=[['#0e141b','#39424d'],['#13283a','#7fd1ff'],['#0c2417','#69ff47'],['#241430','#d29bff']];
+      const [bg,fg]=PAL[val%PAL.length];
+      s+=`<div class="gc" style="background:${bg};border-color:${bd};color:${fg}">${val}</div>`;
+    } else if(spec.algo==='subisl'){   // ✗ = land of B that is water in A
+      const badc=val===1&&spec.grid1[r][c]===0;
+      const bg= val===0?'#0e141b':(v?(badc?'#2a1313':'#0c2417'):'#13283a'),
+            fg= val===0?'#39424d':(v?(badc?'#ff6b6b':'#69ff47'):(badc?'#ffb38a':'#7fd1ff')),
+            t = val===0?'~':(v?(badc?'✗':'✓'):'1');
+      s+=`<div class="gc" style="background:${bg};border-color:${bd};color:${fg}">${t}</div>`;
+    } else {
+      const bg= val===0?'#0e141b':(v?'#0c2417':'#13283a'),
+            fg= val===0?'#39424d':(v?'#69ff47':'#7fd1ff'), t= val===0?'~':(v?'✓':'1');
+      s+=`<div class="gc" style="background:${bg};border-color:${bd};color:${fg}">${t}</div>`;
+    }
   }); s+='</div>'; }); return s+'</div>';
 }
 
 function vizTables(spec,f){
   if(spec.kind==='grid'){
     const stk=f.stack&&f.stack.length?f.stack.map(x=>`<span class="b">(${x})</span>`).join(''):'<span class="e">empty</span>';
-    return `<div class="vtbl"><div class="cap">ISLANDS FOUND</div><table><tr><td class="b" style="min-width:42px;font-size:14px">${f.cnt}</td></tr></table></div>
+    return `<div class="vtbl"><div class="cap">${spec.cntLabel||'ISLANDS FOUND'}</div><table><tr><td class="b" style="min-width:42px;font-size:14px">${f.cnt}</td></tr></table></div>
             <div class="vtbl"><div class="cap">DFS STACK ↓ (cells)</div><div class="vstack">${stk}</div></div>`;
   }
   const n=spec.n, ns=f.nodeState||[];
@@ -736,7 +851,8 @@ function mountViz(host, p, col){
   function paint(){
     const f=frames[idx];
     stage.innerHTML = spec.kind==='graph' ? vizSVG(spec,frames,f) : vizGrid(spec,f);
-    msg.innerHTML=f.msg||'';
+    msg.innerHTML=`<span class="stepchip">STEP ${idx+1}</span>${f.msg||''}`;
+    msg.classList.remove('flash'); void msg.offsetWidth; msg.classList.add('flash');   // re-trigger pop-in
     posEl.textContent=`step ${idx+1} / ${frames.length}`;
     tables.style.display=''; tables.innerHTML=vizTables(spec,f);   // queue/stack + arrays always on
     if(frames.code){ vcode.style.display=''; vcode.innerHTML=frames.code.map((ln,i)=>`<span class="rl${i===f.line?' active':''}">${esc(ln)||'&nbsp;'}</span>`).join(''); }
