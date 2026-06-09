@@ -38,7 +38,13 @@
   .shell{display:flex;min-height:calc(100vh - 84px);}
 
   .side{width:248px;min-width:248px;background:var(--bg2);border-right:1px solid var(--border);overflow-y:auto;padding:10px 0 30px;}
-  .catlabel{font-size:9px;letter-spacing:1.6px;color:var(--faint);padding:14px 18px 6px;font-weight:700;}
+  .catlabel{font-size:9px;letter-spacing:1.6px;color:var(--faint);padding:11px 16px 8px;font-weight:700;font-family:'JetBrains Mono',monospace;display:flex;align-items:center;gap:7px;cursor:pointer;user-select:none;transition:color .15s;}
+  .catlabel:hover{filter:brightness(1.3);}
+  .catlabel .caret{font-size:8px;transition:transform .2s;display:inline-block;}
+  .catgroup.open .catlabel .caret{transform:rotate(90deg);}
+  .catlabel .catn{margin-left:auto;font-size:9px;color:var(--faint);background:#0e151d;border:1px solid var(--border);border-radius:10px;padding:1px 7px;}
+  .catitems{overflow:hidden;max-height:0;transition:max-height .26s ease;}
+  .catgroup.open .catitems{max-height:1500px;}
   .navitem{padding:9px 16px;cursor:pointer;border-left:3px solid transparent;transition:background .15s,border-color .15s;}
   .navitem:hover{background:#10151c;}
   .navitem.on{background:var(--panel);}
@@ -120,8 +126,8 @@
   .vmode button{background:var(--panel);border:1px solid #30363d;color:var(--txt2);padding:6px 13px;border-radius:7px;cursor:pointer;font-family:inherit;font-size:11.5px;font-weight:600;transition:.15s;}
   .vmode button:hover{border-color:#475569;color:var(--head);}
   .vmode button.on{background:#0c1a14;border-color:#1f7a3a;color:#69ff47;}
-  .vstage{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px;min-height:230px;display:flex;align-items:center;justify-content:center;overflow:auto;}
-  .vstage svg{width:100%;height:auto;max-width:560px;}
+  .vstage{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px;min-height:300px;display:flex;align-items:center;justify-content:center;overflow:auto;}
+  .vstage svg{width:100%;height:auto;max-width:520px;}
   .vstage svg text{font-family:'JetBrains Mono',monospace;font-weight:700;}
   .vmsg{margin-top:11px;font-size:12.5px;line-height:1.6;color:var(--text);background:var(--panel);border:1px solid var(--border);border-radius:7px;padding:9px 13px;min-height:20px;}
   .vmsg b{color:var(--head);} .vmsg .ok{color:#69ff47;} .vmsg .bad{color:#ff6b6b;}
@@ -130,7 +136,7 @@
   .vctrl button:hover{background:#1c2530;} .vctrl button:disabled{opacity:.4;cursor:not-allowed;}
   .vctrl button.play{background:var(--multi);border-color:var(--multi);color:#06223f;}
   .vpos{font-size:11px;color:var(--faint);margin-left:auto;font-family:'JetBrains Mono',monospace;}
-  .vtables{margin-top:12px;display:flex;gap:18px;flex-wrap:wrap;}
+  .vtables{margin-top:10px;display:flex;gap:16px;flex-wrap:wrap;justify-content:center;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:13px 14px;}
   .vtbl{font-family:'JetBrains Mono',monospace;font-size:11px;}
   .vtbl .cap{color:var(--muted);margin-bottom:6px;letter-spacing:1px;font-weight:700;}
   .vtbl table{border-collapse:collapse;}
@@ -311,15 +317,24 @@ const main=document.getElementById('main');
 let active=0;
 
 function buildSidebar(){
-  let html='', lastCat='';
-  P.forEach((p,i)=>{
-    if(p.cat!==lastCat){ html+=`<div class="catlabel" style="color:${CAT[p.cat].color}">${CAT[p.cat].label}</div>`; lastCat=p.cat; }
-    html+=`<div class="navitem ${i===active?'on':''}" data-i="${i}" style="${i===active?'border-left-color:'+CAT[p.cat].color:''}">
-      <div class="tag" style="color:${CAT[p.cat].color}">${p.cat}${p.done?'':' · TODO'}</div>
-      <div class="nm">${p.label}</div></div>`;
+  // group patterns by category (folders), each collapsible
+  const groups=[]; let cur=null;
+  P.forEach((p,i)=>{ if(!cur||cur.cat!==p.cat){ cur={cat:p.cat,items:[]}; groups.push(cur); } cur.items.push({p,i}); });
+  let html='';
+  groups.forEach(g=>{
+    const open=g.items.some(it=>it.i===active);   // auto-open the active group
+    const c=CAT[g.cat].color;
+    html+=`<div class="catgroup ${open?'open':''}">
+      <div class="catlabel" style="color:${c}"><span class="caret">▸</span>${CAT[g.cat].label}<span class="catn">${g.items.length}</span></div>
+      <div class="catitems">`+
+      g.items.map(({p,i})=>`<div class="navitem ${i===active?'on':''}" data-i="${i}" style="${i===active?'border-left-color:'+c:''}">
+        <div class="tag" style="color:${c}">${p.cat}${p.done?'':' · TODO'}</div>
+        <div class="nm">${p.label}</div></div>`).join('')
+      +`</div></div>`;
   });
   side.innerHTML=html;
-  side.querySelectorAll('.navitem').forEach(el=>el.onclick=()=>{active=+el.dataset.i;render();if(window.innerWidth<=860)side.classList.remove('open');});
+  side.querySelectorAll('.catlabel').forEach(el=>el.onclick=()=>el.parentElement.classList.toggle('open'));
+  side.querySelectorAll('.navitem').forEach(el=>el.onclick=e=>{e.stopPropagation();active=+el.dataset.i;render();if(window.innerWidth<=860)side.classList.remove('open');});
 }
 
 function render(){
@@ -514,21 +529,21 @@ function initBG(){
 let vizTimer=null;
 function vizStop(){ if(vizTimer){clearInterval(vizTimer);vizTimer=null;} }
 
-// Nested-tree layout from traversal parent[] — root(s) on top, children below.
-function treeLayout(n, parent){
-  const children=Array.from({length:n},()=>[]), roots=[];
-  for(let v=0;v<n;v++){ if(parent[v]>=0) children[parent[v]].push(v); else roots.push(v); }
-  const pos=new Array(n); let nextX=0;
-  const place=(u,depth)=>{
-    if(!children[u].length){ pos[u]=[nextX++,depth]; return pos[u][0]; }
-    const xs=children[u].map(c=>place(c,depth+1));
-    const x=(Math.min(...xs)+Math.max(...xs))/2; pos[u]=[x,depth]; return x;
-  };
-  let maxD=0; roots.forEach(r=>{ place(r,0); });
-  pos.forEach(p=>{ if(p&&p[1]>maxD) maxD=p[1]; });
-  const cols=Math.max(1,nextX-1), W=400,H=290,padX=44,padY=46;
-  return pos.map(p=>{ const [x,d]=p||[0,0];
-    return [ cols? padX+(x/cols)*(W-2*padX) : W/2 , padY+(maxD? d/maxD:0)*(H-2*padY) ]; });
+// Layered tree layout from traversal parent[] — source on top, each depth a
+// centred row (reads like nested BFS/DFS levels). Unreached nodes go bottom.
+function treeLayout(n, parent, start){
+  start=start||0;
+  const depthOf=v=>{ if(v===start) return 0; if(parent[v]<0) return -1; let d=0,x=v,g=0; while(x!==start&&parent[x]>=0&&g++<n){x=parent[x];d++;} return x===start?d:-1; };
+  const depth=new Array(n); let maxD=0;
+  for(let v=0;v<n;v++){ depth[v]=depthOf(v); if(depth[v]>maxD) maxD=depth[v]; }
+  let orphans=false;
+  for(let v=0;v<n;v++) if(depth[v]<0){ depth[v]=maxD+1; orphans=true; }
+  const rows=orphans?maxD+1:maxD;
+  const byD={}; for(let v=0;v<n;v++){ (byD[depth[v]]=byD[depth[v]]||[]).push(v); }
+  const W=420,H=320,padX=48,padY=46, pos=new Array(n);
+  Object.keys(byD).forEach(dk=>{ const d=+dk, row=byD[dk].sort((a,b)=>a-b), k=row.length;
+    row.forEach((v,i)=>{ pos[v]=[ k===1?W/2:padX+(i/(k-1))*(W-2*padX), rows===0?H/2:padY+(d/rows)*(H-2*padY) ]; }); });
+  return pos;
 }
 
 function simulate(spec){
@@ -566,7 +581,7 @@ function simulate(spec){
       dfs(spec.start||0);
       snap({cur:-1,msg:`DFS order: <b>${order.join(' → ')}</b>.`});
     }
-    F.layout=treeLayout(n,parent);   // nested-tree positions (root = source)
+    F.layout=treeLayout(n,parent,spec.start||0);   // layered tree (root = source)
     return F;
   }
   // ── grid islands ──
@@ -587,7 +602,7 @@ function simulate(spec){
 function vizSVG(spec,frames,f){
   const pos=frames.layout, directed=!!spec.directed, r=18;
   const mk=(id,c)=>`<marker id="${id}" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L9,3 L0,6 Z" fill="${c}"/></marker>`;
-  let s=`<svg viewBox="0 0 400 290">`;
+  let s=`<svg viewBox="0 0 420 320">`;
   if(directed) s+=`<defs>${mk('ah','#3a4a5c')}${mk('aht','#69ff47')}${mk('ahr','#ff5f56')}${mk('ahg','#8b949e')}</defs>`;
   spec.edges.forEach(([a,b])=>{
     const hot=f.edge && (f.edge[0]===a&&f.edge[1]===b || (!directed&&f.edge[0]===b&&f.edge[1]===a));
@@ -650,8 +665,8 @@ function mountViz(host, p, col){
       <button data-m="demo">◈ 3D / grid demo</button>
     </div>
     <div class="vstage" id="vstage"></div>
+    <div class="vtables" id="vtables"></div>
     <div class="vmsg" id="vmsg"></div>
-    <div class="vtables" id="vtables" style="display:none"></div>
     <div class="vctrl" id="vctrl">
       <button id="vRestart" title="restart">⟲</button>
       <button id="vPrev" title="step back">◀</button>
@@ -669,7 +684,7 @@ function mountViz(host, p, col){
     stage.innerHTML = spec.kind==='graph' ? vizSVG(spec,frames,f) : vizGrid(spec,f);
     msg.innerHTML=f.msg||'';
     posEl.textContent=`step ${idx+1} / ${frames.length}`;
-    if(mode==='frames'){ tables.style.display=''; tables.innerHTML=vizTables(spec,f); } else tables.style.display='none';
+    tables.style.display=''; tables.innerHTML=vizTables(spec,f);   // queue/stack + arrays always on
     prevBtn.disabled=idx===0; nextBtn.disabled=idx===frames.length-1;
   }
   function stop(){ playing=false; vizStop(); playBtn.textContent='▶'; }
