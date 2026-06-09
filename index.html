@@ -3,141 +3,158 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Visualise Graph Patterns</title>
+  <title>Visualise · BFS & DFS Pattern Hubs</title>
+  <meta name="description" content="Interactive BFS and DFS graph & grid traversal pattern hubs — animations, call-stack dry-runs, and full LeetCode-style code with click-to-reveal comments.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #0b0f14;
+      --bg: #07090d;
       --panel: #101720;
-      --line: #203040;
+      --line: #1c2837;
       --text: #e6edf3;
       --muted: #8b949e;
+      --faint: #586069;
       --bfs: #00e5ff;
       --dfs: #f78fb3;
       --green: #69ff47;
     }
     * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
     body {
-      margin: 0;
       min-height: 100vh;
-      background: radial-gradient(circle at 70% 0%, #17263a 0, #0b0f14 48%);
       color: var(--text);
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-family: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+      background:
+        radial-gradient(900px 600px at 12% -8%, rgba(0,229,255,.14), transparent 60%),
+        radial-gradient(820px 560px at 92% 4%, rgba(247,143,179,.13), transparent 58%),
+        radial-gradient(1000px 700px at 50% 120%, rgba(105,255,71,.07), transparent 60%),
+        var(--bg);
+      background-attachment: fixed;
+      overflow-x: hidden;
     }
-    main {
-      width: min(1080px, calc(100% - 32px));
-      margin: 0 auto;
-      padding: 44px 0;
+    code, .mono { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; }
+
+    /* nav */
+    nav {
+      display: flex; align-items: center; justify-content: space-between;
+      width: min(1120px, calc(100% - 40px));
+      margin: 0 auto; padding: 22px 0;
     }
-    header {
-      display: grid;
-      gap: 12px;
-      padding: 18px 0 28px;
-      border-bottom: 1px solid var(--line);
+    .logo { display: flex; align-items: center; gap: 10px; font-weight: 700; letter-spacing: -.3px; font-size: 17px; }
+    .logo .dot {
+      width: 12px; height: 12px; border-radius: 50%;
+      background: conic-gradient(from 0deg, var(--bfs), var(--dfs), var(--green), var(--bfs));
+      box-shadow: 0 0 18px rgba(0,229,255,.6);
+      animation: spin 6s linear infinite;
     }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    nav .links { display: flex; gap: 22px; }
+    nav a { color: var(--muted); text-decoration: none; font-size: 13px; transition: color .2s; }
+    nav a:hover { color: var(--text); }
+
+    main { width: min(1120px, calc(100% - 40px)); margin: 0 auto; padding: 40px 0 70px; }
+
+    header { display: grid; gap: 18px; padding: 26px 0 10px; }
     .eyebrow {
-      color: var(--green);
-      font-size: 12px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      font-weight: 700;
+      display: inline-flex; align-items: center; gap: 8px; width: fit-content;
+      color: var(--green); font-size: 12px; letter-spacing: 2px; text-transform: uppercase;
+      font-weight: 700; font-family: 'JetBrains Mono', monospace;
+      border: 1px solid #1f3a2a; background: rgba(105,255,71,.06);
+      padding: 6px 12px; border-radius: 30px;
     }
+    .eyebrow .pulse { width: 7px; height: 7px; border-radius: 50%; background: var(--green); box-shadow: 0 0 10px var(--green); animation: blink 1.6s ease-in-out infinite; }
+    @keyframes blink { 50% { opacity: .25; } }
     h1 {
-      margin: 0;
-      font-size: clamp(32px, 6vw, 64px);
-      line-height: 1;
-      letter-spacing: 0;
+      margin: 0; font-size: clamp(40px, 8vw, 84px); line-height: .98; letter-spacing: -2px; font-weight: 700;
+      background: linear-gradient(100deg, #ffffff 8%, var(--bfs) 42%, #7c93ff 60%, var(--dfs) 88%);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+      background-size: 200% auto; animation: shimmer 9s ease-in-out infinite;
     }
-    p {
-      margin: 0;
-      color: var(--muted);
-      line-height: 1.65;
-      max-width: 760px;
-      font-size: 15px;
-    }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 16px;
-      margin-top: 28px;
-    }
+    @keyframes shimmer { 50% { background-position: 100% center; } }
+    .sub { margin: 4px 0 0; color: var(--muted); line-height: 1.7; max-width: 680px; font-size: 16px; }
+    .stats { display: flex; gap: 28px; flex-wrap: wrap; margin-top: 14px; }
+    .stat .n { font-size: 26px; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+    .stat .l { font-size: 11px; color: var(--faint); letter-spacing: 1px; text-transform: uppercase; }
+    .stat.bfs .n { color: var(--bfs); } .stat.dfs .n { color: var(--dfs); } .stat.gn .n { color: var(--green); }
+
+    .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; margin-top: 40px; }
     a.panel {
-      min-height: 260px;
-      color: inherit;
-      text-decoration: none;
-      border: 1px solid var(--line);
-      background: rgba(16, 23, 32, 0.76);
-      border-radius: 8px;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      overflow: hidden;
-      position: relative;
+      position: relative; overflow: hidden; min-height: 290px;
+      color: inherit; text-decoration: none;
+      border: 1px solid var(--line); border-radius: 16px;
+      background: linear-gradient(180deg, rgba(16,23,32,.86), rgba(10,13,18,.92));
+      padding: 26px; display: flex; flex-direction: column; justify-content: space-between;
+      backdrop-filter: blur(8px);
+      transition: transform .28s cubic-bezier(.2,.7,.3,1), border-color .28s, box-shadow .28s;
     }
     a.panel:before {
-      content: "";
-      position: absolute;
-      inset: auto -80px -90px auto;
-      width: 240px;
-      height: 240px;
-      border: 1px solid currentColor;
-      border-radius: 50%;
-      opacity: 0.16;
+      content: ""; position: absolute; inset: -1px; border-radius: 16px; padding: 1px;
+      background: linear-gradient(135deg, currentColor, transparent 45%); opacity: 0;
+      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor; mask-composite: exclude; transition: opacity .28s;
     }
-    a.panel:hover { border-color: currentColor; }
-    .bfs { color: var(--bfs); }
-    .dfs { color: var(--dfs); }
-    h2 {
-      margin: 0 0 10px;
-      color: var(--text);
-      font-size: 26px;
-      letter-spacing: 0;
+    a.panel:after {
+      content: ""; position: absolute; inset: auto -90px -110px auto; width: 280px; height: 280px;
+      background: radial-gradient(circle, currentColor, transparent 68%); opacity: .1; transition: opacity .28s, transform .4s;
     }
-    .meta {
-      color: currentColor;
-      font-size: 12px;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      font-weight: 700;
-    }
-    .list {
-      margin-top: 20px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-    .chip {
-      border: 1px solid #2a3a4c;
-      color: #a8b3bf;
-      padding: 5px 8px;
-      border-radius: 4px;
-      font-size: 12px;
-      background: #0b1118;
-    }
-    .go {
-      color: currentColor;
-      font-weight: 700;
-      font-size: 13px;
-    }
+    a.panel:hover { transform: translateY(-6px); border-color: currentColor; box-shadow: 0 24px 60px rgba(0,0,0,.5); }
+    a.panel:hover:before { opacity: .55; }
+    a.panel:hover:after { opacity: .2; transform: scale(1.15); }
+    .bfs { color: var(--bfs); } .dfs { color: var(--dfs); }
+    .meta { color: currentColor; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+    h2 { margin: 12px 0 8px; color: var(--text); font-size: 28px; letter-spacing: -.5px; }
+    a.panel p { margin: 0; color: var(--muted); line-height: 1.65; font-size: 14px; }
+    .list { margin-top: 18px; display: flex; flex-wrap: wrap; gap: 8px; }
+    .chip { border: 1px solid #2a3a4c; color: #a8b3bf; padding: 5px 10px; border-radius: 6px; font-size: 12px; background: rgba(11,17,24,.7); font-family: 'JetBrains Mono', monospace; }
+    .go { display: inline-flex; align-items: center; gap: 8px; color: currentColor; font-weight: 700; font-size: 14px; margin-top: 22px; }
+    .go .arr { transition: transform .25s; }
+    a.panel:hover .go .arr { transform: translateX(6px); }
+
+    .feat { margin-top: 22px; border: 1px solid var(--line); border-radius: 14px; background: rgba(11,17,24,.6); padding: 18px 22px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+    .feat .tag { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--green); font-family: 'JetBrains Mono', monospace; font-weight: 700; }
+    .feat p { margin: 0; color: var(--muted); font-size: 13.5px; line-height: 1.6; flex: 1; min-width: 240px; }
+    .feat .demo { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--faint); background: #070a0e; border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+    .feat .demo b { color: var(--green); }
+
+    footer { width: min(1120px, calc(100% - 40px)); margin: 0 auto; padding: 24px 0 40px; border-top: 1px solid var(--line); color: var(--faint); font-size: 12px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+    footer a { color: var(--muted); text-decoration: none; } footer a:hover { color: var(--text); }
+
     @media (max-width: 760px) {
       .grid { grid-template-columns: 1fr; }
-      a.panel { min-height: 220px; }
+      nav .links { display: none; }
+      a.panel { min-height: 250px; }
     }
   </style>
 </head>
 <body>
+  <nav>
+    <div class="logo"><span class="dot"></span> visualise</div>
+    <div class="links">
+      <a href="/graphs/bfs-patterns/">BFS</a>
+      <a href="/graphs/dfs-patterns/">DFS</a>
+      <a href="https://github.com/mightbeanshuu" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </nav>
+
   <main>
     <header>
-      <div class="eyebrow">Graph Pattern Visuals</div>
-      <h1>Visualise BFS and DFS</h1>
-      <p>Two separate interactive hubs for graph and grid traversal patterns. Use BFS for levels, distances, queues, and shortest paths. Use DFS for recursion, call stacks, components, cycles, topo order, and backtracking.</p>
+      <span class="eyebrow"><span class="pulse"></span> Graph Pattern Visuals</span>
+      <h1>Visualise<br>BFS &amp; DFS</h1>
+      <p class="sub">Two interactive hubs for graph and grid traversal patterns — live animations, call-stack dry-runs, and full <b style="color:var(--text)">LeetCode-style code</b> (driver + helper) with click-to-reveal comments. Built around how you actually learn.</p>
+      <div class="stats">
+        <div class="stat bfs"><div class="n">10</div><div class="l">BFS patterns</div></div>
+        <div class="stat dfs"><div class="n">14</div><div class="l">DFS patterns</div></div>
+        <div class="stat gn"><div class="n">3D</div><div class="l">graph demos</div></div>
+      </div>
     </header>
 
     <section class="grid" aria-label="Pattern hubs">
       <a class="panel bfs" href="/graphs/bfs-patterns/">
         <div>
           <div class="meta">BFS Patterns</div>
-          <h2>Queue, levels, distance</h2>
+          <h2>Queue · levels · distance</h2>
           <p>Graph BFS, islands, multi-source BFS, level BFS, boundary BFS, shortest path, 0-1 BFS, state-space BFS, bipartite, and Kahn topo sort.</p>
           <div class="list">
             <span class="chip">multi-source</span>
@@ -146,14 +163,14 @@
             <span class="chip">0-1 BFS</span>
           </div>
         </div>
-        <div class="go">Open BFS hub</div>
+        <span class="go">Open BFS hub <span class="arr">→</span></span>
       </a>
 
       <a class="panel dfs" href="/graphs/dfs-patterns/">
         <div>
           <div class="meta">DFS Algorithms</div>
-          <h2>Call stack, cycles, paths</h2>
-          <p>Recursive DFS, iterative DFS, flood fill, island area, boundary DFS, undirected and directed cycle detection, bipartite coloring, topo sort, and backtracking.</p>
+          <h2>Call stack · cycles · paths</h2>
+          <p>Recursive &amp; iterative DFS, flood fill, island area, boundary DFS, undirected &amp; directed cycle detection, bipartite coloring, topo sort, and backtracking.</p>
           <div class="list">
             <span class="chip">call stack</span>
             <span class="chip">cycle detection</span>
@@ -161,9 +178,20 @@
             <span class="chip">backtracking</span>
           </div>
         </div>
-        <div class="go">Open DFS hub</div>
+        <span class="go">Open DFS hub <span class="arr">→</span></span>
       </a>
     </section>
+
+    <div class="feat">
+      <span class="tag">New</span>
+      <p>Every snippet is now a complete <b style="color:var(--text)">class Solution</b> — driver method <i>and</i> helper. Comments hide behind a <span class="mono" style="color:var(--green)">●</span> dot: click a line to reveal the note, click again to hide.</p>
+      <span class="demo"><b>●</b> &nbsp;cnt++;&nbsp; <span style="color:var(--bfs)">// ★ new island</span></span>
+    </div>
   </main>
+
+  <footer>
+    <span>Built for graph-pattern revision · hand-coded, deployed on Vercel</span>
+    <span><a href="/graphs/bfs-patterns/">BFS hub</a> · <a href="/graphs/dfs-patterns/">DFS hub</a></span>
+  </footer>
 </body>
 </html>

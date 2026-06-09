@@ -77,8 +77,24 @@
   .dots i{width:10px;height:10px;border-radius:50%;display:inline-block;}
   .cbtitle{font-size:11px;color:var(--muted);margin-left:6px;}
   .method{font-size:8.5px;font-weight:700;letter-spacing:1px;padding:2px 8px;border-radius:3px;margin-left:4px;}
-  pre{margin:0;padding:18px 18px;font-size:12.3px;line-height:1.85;overflow-x:auto;white-space:pre;font-family:inherit;}
+  pre{margin:0;padding:18px 14px;font-size:12.3px;line-height:1.85;overflow-x:auto;white-space:pre;font-family:inherit;}
   .kw{color:#ff7b72;} .nm{color:#79c0ff;} .cm{color:#586069;font-style:italic;} .star{color:#ffd60a;font-weight:700;} .str{color:#a5d6ff;}
+  /* click-to-reveal comments: hidden until you click the line */
+  .cl{display:block;padding:0 8px;border-radius:5px;border-left:2px solid transparent;transition:background .14s,border-color .14s;}
+  .cmdot{display:inline-block;width:9px;margin-right:8px;font-size:7px;color:#2c3540;vertical-align:middle;transition:color .14s,transform .14s;}
+  .cl:not(.has-cm) .cmdot{visibility:hidden;}
+  .cl.has-cm{cursor:pointer;}
+  .cl.has-cm:hover{background:#0f1c25;border-left-color:#2a4452;}
+  .cl.has-cm:hover .cmdot{color:var(--level);}
+  .cl .cm{display:none;}
+  .cl.reveal .cm{display:inline;animation:cmin .2s ease;}
+  .cl.reveal .cmdot{color:#69ff47;transform:scale(1.25);}
+  .cl.reveal{background:#0c1a14;border-left-color:#1f7a3a;}
+  @keyframes cmin{from{opacity:0;}to{opacity:1;}}
+  .cbtoggle{margin-left:auto;background:transparent;border:1px solid #30363d;color:var(--txt2);font-family:inherit;font-size:10px;letter-spacing:.5px;padding:4px 10px;border-radius:5px;cursor:pointer;transition:.15s;}
+  .cbtoggle:hover{border-color:#475569;color:var(--head);}
+  .cbtoggle.on{background:#0c1a14;border-color:#1f7a3a;color:#69ff47;}
+  .cbnote{font-size:10px;color:var(--faint);padding:6px 16px 0;letter-spacing:.3px;}
 
   .demo{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:14px;}
   .demo .h{font-size:9px;letter-spacing:1.5px;color:var(--multi);margin-bottom:12px;font-weight:700;}
@@ -788,13 +804,15 @@ function hl(code){
     const codePart = ci>=0 ? line.slice(0,ci) : line;
     const comPart  = ci>=0 ? line.slice(ci)  : '';
     let h = esc(codePart)
-      .replace(/\b(int|void|bool|auto|vector|queue|deque|string|pair|return|while|for|if|else|true|false|const|char|max|min)\b/g,'<span class="kw">$1</span>')
+      .replace(/\b(class|public|private|struct|int|void|bool|auto|vector|queue|deque|stack|string|pair|return|while|for|if|else|true|false|const|char|max|min|reverse|push_back|pop_back|push|pop|top|front|size|begin|end)\b/g,'<span class="kw">$1</span>')
       .replace(/\b(\d+)\b/g,'<span class="nm">$1</span>');
+    let cls = 'cl';
     if(comPart){
+      cls += ' has-cm';                 // ★ this line hides a comment
       h += '<span class="cm">'+esc(comPart).replace(/(★[^<]*)/g,'<span class="star">$1</span>')+'</span>';
     }
-    return h;
-  }).join('\n');
+    return `<span class="${cls}"><span class="cmdot">●</span>${h===''?'&nbsp;':h}</span>`;
+  }).join('');
 }
 
 /* ───────────────────────── RENDER ───────────────────────── */
@@ -850,8 +868,10 @@ function render(){
         <span class="dots"><i style="background:#ff5f56"></i><i style="background:#ffbd2e"></i><i style="background:#27c93f"></i></span>
         ${methods.length>1?`<span class="method" style="background:${col}22;border:1px solid ${col}55;color:${col}">METHOD ${mi+1}</span>`:''}
         <span class="cbtitle">${mth.title}</span>
+        <button class="cbtoggle" data-mi="${mi}">💬 reveal all</button>
       </div>
       <pre>${hl(mth.code)}</pre>
+      <div class="cbnote">● = this line hides a comment — click the line to reveal it, click again to hide.</div>
     </div>`;
   });
 
@@ -874,6 +894,19 @@ function render(){
   const pv=document.getElementById('prevBtn'), nx=document.getElementById('nextBtn');
   if(pv)pv.onclick=()=>{if(active>0){active--;render();}};
   if(nx)nx.onclick=()=>{if(active<P.length-1){active++;render();}};
+
+  // click-to-reveal comments: per-line toggle + "reveal all" per code block
+  main.querySelectorAll('.cl.has-cm').forEach(el=>el.onclick=()=>el.classList.toggle('reveal'));
+  main.querySelectorAll('.cb').forEach(cb=>{
+    const btn=cb.querySelector('.cbtoggle'); if(!btn) return;
+    btn.onclick=()=>{
+      const lines=[...cb.querySelectorAll('.cl.has-cm')];
+      const showing=lines.some(l=>l.classList.contains('reveal'));
+      lines.forEach(l=>l.classList.toggle('reveal',!showing));
+      btn.classList.toggle('on',!showing);
+      btn.textContent=showing?'💬 reveal all':'🙈 hide all';
+    };
+  });
 
   { const A=animFor(p); const host=document.getElementById('demoHost');
     if(A){ A.kind==='graph' ? mount3DGraph(host,A,col) : mountGrid(host,A,col); }
