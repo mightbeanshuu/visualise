@@ -1,8 +1,8 @@
 # DFS Patterns
 
-Main visual hub:
+Main visual hub (this folder's `index.html`):
 
-- [dfs-patterns-hub.html](dfs-patterns-hub.html)
+- [DFS pattern hub](index.html)
 
 DFS pattern assets:
 

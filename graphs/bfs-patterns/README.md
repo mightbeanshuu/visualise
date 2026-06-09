@@ -1,8 +1,8 @@
 # BFS Patterns
 
-Main visual hub:
+Main visual hub (this folder's `index.html`):
 
-- [graph-bfs-patterns-hub.html](graph-bfs-patterns-hub.html)
+- [BFS pattern hub](index.html)
 
 Extra BFS visualizations:
 

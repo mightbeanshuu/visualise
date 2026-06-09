@@ -1,12 +1,459 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="refresh" content="0; url=dfs-patterns-hub.html">
-  <title>DFS Patterns</title>
-  <link rel="canonical" href="dfs-patterns-hub.html">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Graph & Grid DFS — Pattern Revision Hub</title>
+<style>
+  :root{
+    --bg:#0d0f14; --bg2:#0a0c11; --panel:#141920; --border:#1e2a38;
+    --text:#c9d1d9; --txt2:#8b949e; --muted:#586069; --faint:#444d56;
+    --head:#e6edf3;
+    --grid:#69ff47; --multi:#00e5ff; --level:#ffd60a; --boundary:#ff9f0a; --graph:#bf5af2;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'JetBrains Mono','Fira Code','SF Mono',ui-monospace,Menlo,monospace;
+    background:var(--bg); color:var(--text); min-height:100vh;
+  }
+  ::-webkit-scrollbar{width:9px;height:9px;}
+  ::-webkit-scrollbar-thumb{background:#26303d;border-radius:5px;}
+  ::-webkit-scrollbar-track{background:transparent;}
+
+  .top{background:linear-gradient(135deg,#0d0f14,#141920);border-bottom:1px solid var(--border);padding:18px 26px 14px;}
+  .top .row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+  .badge{background:#00e5ff22;border:1px solid #00e5ff55;color:var(--multi);font-size:10px;font-weight:700;letter-spacing:2px;padding:3px 10px;border-radius:3px;}
+  h1{margin:0;font-size:19px;font-weight:700;color:var(--head);letter-spacing:-.3px;}
+  .top .meta{color:var(--faint);font-size:12px;}
+  .top p{margin:6px 0 0;font-size:11px;color:var(--muted);letter-spacing:.3px;}
+
+  .shell{display:flex;min-height:calc(100vh - 84px);}
+
+  .side{width:248px;min-width:248px;background:var(--bg2);border-right:1px solid var(--border);overflow-y:auto;padding:10px 0 30px;}
+  .catlabel{font-size:9px;letter-spacing:1.6px;color:var(--faint);padding:14px 18px 6px;font-weight:700;}
+  .navitem{padding:9px 16px;cursor:pointer;border-left:3px solid transparent;transition:background .15s,border-color .15s;}
+  .navitem:hover{background:#10151c;}
+  .navitem.on{background:var(--panel);}
+  .navitem .tag{font-size:8.5px;font-weight:700;letter-spacing:1.3px;opacity:.65;}
+  .navitem.on .tag{opacity:1;}
+  .navitem .nm{font-size:12px;color:var(--txt2);margin-top:2px;line-height:1.3;}
+  .navitem.on .nm{color:var(--head);font-weight:600;}
+
+  .main{flex:1;overflow-y:auto;padding:24px 30px 60px;max-width:980px;}
+  .fade{animation:fade .35s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+
+  .phead{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:18px;}
+  .ptag{font-size:9px;font-weight:700;letter-spacing:2px;padding:3px 10px;border-radius:3px;}
+  .pcount{color:var(--faint);font-size:11px;margin-left:8px;}
+  .phead h2{margin:8px 0 0;font-size:23px;font-weight:700;color:var(--head);letter-spacing:-.5px;}
+  .copy{background:var(--panel);border:1px solid #30363d;color:var(--txt2);padding:8px 15px;border-radius:6px;cursor:pointer;font-size:11px;font-family:inherit;letter-spacing:.5px;white-space:nowrap;transition:.2s;}
+  .copy:hover{border-color:#475569;color:var(--head);}
+  .copy.done{background:#1a3a1a;border-color:#69ff47;color:#69ff47;}
+
+  .cards{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;}
+  .ic{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:13px 15px;}
+  .ic .h{font-size:9px;letter-spacing:1.5px;margin-bottom:6px;color:var(--muted);font-weight:700;}
+  .ic p{margin:0;font-size:12px;line-height:1.6;color:var(--text);}
+  .ic.analogy{grid-column:1/3;}
+  .ic.analogy .h{color:var(--multi);}
+  .ic.bugs{grid-column:1/3;border-color:#ff6b6b33;}
+  .ic.bugs .h{color:#ff6b6b;}
+  .ic.bugs ul{margin:0;padding-left:16px;}
+  .ic.bugs li{font-size:12px;line-height:1.75;color:var(--text);}
+  .ic.bugs code{background:#1c2530;color:#ffd479;padding:0 4px;border-radius:3px;font-size:11px;}
+  .ic b{color:var(--head);}
+  .ic .keyword{color:var(--multi);}
+
+  .probs{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:11px 15px;margin-bottom:14px;}
+  .probs .h{font-size:9px;letter-spacing:1.5px;color:var(--muted);margin-bottom:8px;font-weight:700;}
+  .chip{display:inline-block;background:var(--panel);border:1px solid #30363d;color:var(--txt2);font-size:11px;padding:4px 10px;border-radius:4px;margin:0 6px 6px 0;}
+  .chip .done{color:#69ff47;}
+
+  .cb{background:var(--bg2);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:14px;}
+  .cbbar{background:var(--panel);border-bottom:1px solid var(--border);padding:9px 14px;display:flex;align-items:center;gap:8px;}
+  .dots{display:flex;gap:6px;}
+  .dots i{width:10px;height:10px;border-radius:50%;display:inline-block;}
+  .cbtitle{font-size:11px;color:var(--muted);margin-left:6px;}
+  .method{font-size:8.5px;font-weight:700;letter-spacing:1px;padding:2px 8px;border-radius:3px;margin-left:4px;}
+  pre{margin:0;padding:18px 14px;font-size:12.3px;line-height:1.85;overflow-x:auto;white-space:pre;font-family:inherit;}
+  .kw{color:#ff7b72;} .nm{color:#79c0ff;} .cm{color:#586069;font-style:italic;} .star{color:#ffd60a;font-weight:700;} .str{color:#a5d6ff;}
+  /* click-to-reveal comments: hidden until you click the line */
+  .cl{display:block;padding:0 8px;border-radius:5px;border-left:2px solid transparent;transition:background .14s,border-color .14s;}
+  .cmdot{display:inline-block;width:9px;margin-right:8px;font-size:7px;color:#2c3540;vertical-align:middle;transition:color .14s,transform .14s;}
+  .cl:not(.has-cm) .cmdot{visibility:hidden;}      /* keep code aligned */
+  .cl.has-cm{cursor:pointer;}
+  .cl.has-cm:hover{background:#0f1c25;border-left-color:#2a4452;}
+  .cl.has-cm:hover .cmdot{color:var(--level);}
+  .cl .cm{display:none;}                            /* ★ comment hidden by default */
+  .cl.reveal .cm{display:inline;animation:cmin .2s ease;}
+  .cl.reveal .cmdot{color:#69ff47;transform:scale(1.25);}
+  .cl.reveal{background:#0c1a14;border-left-color:#1f7a3a;}
+  @keyframes cmin{from{opacity:0;}to{opacity:1;}}
+  .cbtoggle{margin-left:auto;background:transparent;border:1px solid #30363d;color:var(--txt2);font-family:inherit;font-size:10px;letter-spacing:.5px;padding:4px 10px;border-radius:5px;cursor:pointer;transition:.15s;}
+  .cbtoggle:hover{border-color:#475569;color:var(--head);}
+  .cbtoggle.on{background:#0c1a14;border-color:#1f7a3a;color:#69ff47;}
+  .cbnote{font-size:10px;color:var(--faint);padding:6px 16px 0;letter-spacing:.3px;}
+
+  .demo{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:14px;}
+  .demo .h{font-size:9px;letter-spacing:1.5px;color:var(--multi);margin-bottom:12px;font-weight:700;}
+  .demowrap{display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap;}
+  .gd{display:flex;flex-direction:column;gap:3px;}
+  .gdrow{display:flex;gap:3px;}
+  .gc{width:42px;height:42px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;background:#1a212b;color:#3a4452;border:1.5px solid transparent;transition:background .35s,color .35s,border-color .35s,transform .25s;}
+  .demoside{flex:1;min-width:190px;}
+  .demoinfo{font-size:12px;line-height:1.6;color:var(--text);min-height:46px;background:var(--panel);border:1px solid var(--border);border-radius:6px;padding:10px 12px;margin-bottom:10px;}
+  .demoinfo b{color:var(--head);}
+  .counter{font-size:13px;color:var(--multi);font-weight:700;margin-bottom:10px;}
+  .dctrl{display:flex;gap:7px;align-items:center;flex-wrap:wrap;}
+  .dctrl button{background:var(--panel);border:1px solid #30363d;color:var(--text);padding:6px 12px;border-radius:6px;cursor:pointer;font-size:12px;font-family:inherit;font-weight:600;transition:.15s;}
+  .dctrl button:hover{background:#1c2530;}
+  .dctrl button.play{background:var(--multi);border-color:var(--multi);color:#06223f;}
+
+  /* code-traversal panel synced to animation */
+  .trace{margin-top:14px;background:#070a0e;border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+  .trace .th{background:var(--panel);border-bottom:1px solid var(--border);padding:7px 13px;font-size:10px;letter-spacing:1px;color:var(--muted);font-weight:700;}
+  .trace .th b{color:var(--multi);}
+  .trace pre{padding:12px 8px;font-size:12px;line-height:1.7;}
+  .tln{display:block;padding:1px 12px;border-left:3px solid transparent;white-space:pre;color:#7d8895;border-radius:0;transition:background .2s,color .2s,border-color .2s;}
+  .tln.hot{background:#0f2a33;border-left-color:var(--multi);color:#dff6ff;}
+  .tln.hot .nm{color:#9fe0ff;}
+
+  .pnav{display:flex;justify-content:space-between;align-items:center;margin-top:18px;padding-top:16px;border-top:1px solid var(--border);}
+  .pnav button{background:transparent;border:1px solid #30363d;color:var(--txt2);padding:8px 18px;border-radius:6px;cursor:pointer;font-size:12px;font-family:inherit;transition:.15s;}
+  .pnav button:hover:not(:disabled){border-color:#475569;color:var(--head);}
+  .pnav button:disabled{color:#2a323d;cursor:not-allowed;}
+  .pnav .pos{font-size:11px;color:var(--faint);}
+
+  .hint{font-size:10.5px;color:var(--faint);margin-top:4px;}
+
+  .menuToggle{display:none;}
+  @media(max-width:860px){
+    .shell{flex-direction:column;}
+    .side{width:100%;min-width:0;border-right:none;border-bottom:1px solid var(--border);max-height:0;overflow:hidden;padding:0;transition:max-height .3s ease;}
+    .side.open{max-height:1400px;padding:10px 0 20px;}
+    .menuToggle{display:inline-block;}
+    .cards{grid-template-columns:1fr;}
+    .ic.analogy,.ic.bugs{grid-column:auto;}
+    .main{padding:18px 16px 50px;}
+    .gc{width:36px;height:36px;font-size:13px;}
+  }
+
+  /* ---- 3D + glass upgrade ---- */
+  #bg3d{position:fixed;inset:0;width:100vw;height:100vh;z-index:-2;opacity:.5;pointer-events:none;}
+  body{background:radial-gradient(1200px 820px at 72% -12%, #15243c 0%, #0d0f14 56%) fixed;}
+  .top{backdrop-filter:blur(10px);background:rgba(12,16,22,.72)!important;}
+  .side{backdrop-filter:blur(10px);background:rgba(9,11,16,.66)!important;}
+  h1{background:linear-gradient(90deg,#00e5ff,#7c93ff 55%,#f78fb3);-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .ic{background:rgba(10,12,17,.62)!important;backdrop-filter:blur(6px);}
+  .cb,.trace{background:rgba(7,10,14,.78)!important;backdrop-filter:blur(6px);}
+  .probs,.demo{background:rgba(10,12,17,.6)!important;backdrop-filter:blur(6px);}
+  .ic,.cb,.probs,.demo,.trace{box-shadow:0 8px 30px rgba(0,0,0,.28);}
+  .demowrap3d{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start;}
+  .g3dcol{flex:2;min-width:300px;}
+  .g3dside{flex:1;min-width:200px;}
+  .g3dcol canvas{width:100%;height:300px;display:block;border-radius:12px;border:1px solid var(--border);
+    background:radial-gradient(420px 260px at 50% 35%, rgba(0,229,255,.07), rgba(10,12,17,.4));}
+  .g3dhint{font-size:10.5px;color:var(--faint);margin-top:7px;}
+
+  .qrow{display:flex;align-items:center;gap:9px;margin-top:11px;flex-wrap:wrap;min-height:26px;}
+  .qlabel{font-size:10px;color:var(--muted);letter-spacing:1.5px;font-weight:700;}
+  .qpills{display:flex;gap:5px;flex-wrap:wrap;}
+  .qp{background:#a87400;border:1px solid #f0a500;color:#fff4dd;font-size:11.5px;font-weight:700;padding:3px 10px;border-radius:13px;animation:qin .28s ease;}
+  .qp.empty{background:transparent;border:1px dashed #2a3340;color:var(--faint);font-weight:400;font-style:italic;}
+  @keyframes qin{from{opacity:0;transform:translateY(5px) scale(.8);}to{opacity:1;transform:none;}}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="__dfsdata.js"></script>
+<script src="__dfseng.js"></script>
 </head>
 <body>
-  <a href="dfs-patterns-hub.html">Open DFS patterns</a>
+  <canvas id="bg3d"></canvas>
+  <div class="top">
+    <div class="row">
+      <span class="badge">DFS</span>
+      <h1>Graph &amp; Grid DFS — Pattern Revision Hub</h1>
+      <span class="meta">14 patterns · C++ · Anshu</span>
+      <button class="copy menuToggle" id="menuToggle" style="margin-left:auto">☰ patterns</button>
+    </div>
+    <p>DFS templates + call-stack dry-runs with the <b>code line lighting up as it executes</b>. Built around how you actually learn.</p>
+  </div>
+
+  <div class="shell">
+    <div class="side" id="side"></div>
+    <div class="main" id="main"></div>
+  </div>
+
+<script>
+/* ───────────────────────── PATTERN DATA ───────────────────────── */
+const CAT = {
+  CORE:     {color:'#7c93ff', label:'CORE DFS PATTERNS'},
+  GRID:     {color:'#69ff47', label:'GRID TRAVERSAL (DFS)'},
+  BOUNDARY: {color:'#ff9f0a', label:'BOUNDARY (REVERSE)'},
+  PATHS:    {color:'#ff6b6b', label:'BACKTRACKING'},
+  GRAPH:    {color:'#f78fb3', label:'GRAPH DFS PATTERNS'},
+}
+
+const P = P_DFS;
+
+/* ───── trace code shown beside the animation (line highlights as it runs) ───── */
+const TRACE = {
+  distance:[
+    'for (i,j)',                              //0
+    '  if (g[i][j] == 0) q.push({i,j}); // sources, dist 0', //1
+    'while (!q.empty()) {',                   //2
+    '  auto [r,c] = q.front(); q.pop();',     //3
+    '  for (d : 4 dirs) {',                   //4
+    '    if (inBounds && g[nr][nc]==1 && !vis)', //5
+    '      g[nr][nc] = g[r][c] + 1;  // me + 1', //6
+    '      q.push({nr,nc});',                 //7
+    '  }',                                    //8
+    '}'                                       //9
+  ],
+  components:[
+    'for (i,j) {',                            //0
+    '  if (g[i][j]==1 && !vis[i][j]) {',      //1
+    '    cnt++;            // new island',     //2
+    '    q.push({i,j}); vis=1;',              //3
+    '    while (!q.empty()) {',               //4
+    '      auto [r,c]=q.front(); q.pop();',   //5
+    '      for (d : 4 dirs)',                 //6
+    '        if (valid && !vis[nr][nc]) {',   //7
+    '          vis[nr][nc]=1;',               //8
+    '          q.push({nr,nc});',             //9
+    '    }',                                  //10
+    '  }',                                    //11
+    '}'                                       //12
+  ],
+  components_single:[
+    'q.push({sr,sc}); vis[sr][sc]=1;',        //0
+    'while (!q.empty()) {',                   //1
+    '  auto [r,c]=q.front(); q.pop();',       //2
+    '  for (d : 4 dirs)',                     //3
+    '    if (valid && g[nr][nc]==1 && !vis) {', //4
+    '      vis[nr][nc]=1;  // join the blob', //5
+    '      q.push({nr,nc});',                 //6
+    '  }',                                    //7
+    '}'                                       //8
+  ]
+};
+
+/* ───────────────────────── SYNTAX HIGHLIGHT ───────────────────────── */
+function hl(code){
+  const esc = t => t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return code.split('\n').map(line=>{
+    const ci = line.indexOf('//');
+    const codePart = ci>=0 ? line.slice(0,ci) : line;
+    const comPart  = ci>=0 ? line.slice(ci)  : '';
+    let h = esc(codePart)
+      .replace(/\b(class|public|private|struct|int|void|bool|auto|vector|queue|deque|stack|string|pair|return|while|for|if|else|true|false|const|char|max|min|reverse|push_back|pop_back|push|pop|top|front|size|begin|end)\b/g,'<span class="kw">$1</span>')
+      .replace(/\b(\d+)\b/g,'<span class="nm">$1</span>');
+    let cls = 'cl';
+    if(comPart){
+      cls += ' has-cm';                 // ★ this line hides a comment
+      h += '<span class="cm">'+esc(comPart).replace(/(★[^<]*)/g,'<span class="star">$1</span>')+'</span>';
+    }
+    // left gutter dot is the click affordance (kept on every line for alignment)
+    return `<span class="${cls}"><span class="cmdot">●</span>${h===''?'&nbsp;':h}</span>`;
+  }).join('');
+}
+
+/* ───────────────────────── RENDER ───────────────────────── */
+const side=document.getElementById('side');
+const main=document.getElementById('main');
+let active=0;
+
+function buildSidebar(){
+  let html='', lastCat='';
+  P.forEach((p,i)=>{
+    if(p.cat!==lastCat){ html+=`<div class="catlabel" style="color:${CAT[p.cat].color}">${CAT[p.cat].label}</div>`; lastCat=p.cat; }
+    html+=`<div class="navitem ${i===active?'on':''}" data-i="${i}" style="${i===active?'border-left-color:'+CAT[p.cat].color:''}">
+      <div class="tag" style="color:${CAT[p.cat].color}">${p.cat}${p.done?'':' · TODO'}</div>
+      <div class="nm">${p.label}</div></div>`;
+  });
+  side.innerHTML=html;
+  side.querySelectorAll('.navitem').forEach(el=>el.onclick=()=>{active=+el.dataset.i;render();if(window.innerWidth<=860)side.classList.remove('open');});
+}
+
+function render(){
+  dispose3D();
+  const p=P[active], col=CAT[p.cat].color;
+  const methods = p.code ? [{title:p.label.toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'')+'.cpp', code:p.code}] : (p.methods||[]);
+
+  let html=`<div class="fade">
+    <div class="phead">
+      <div>
+        <span class="ptag" style="background:${col}22;border:1px solid ${col}55;color:${col}">${p.cat}</span>
+        <span class="pcount">Pattern ${active+1} / ${P.length}${p.hero?' · ⭐ your hero pattern':''}</span>
+        <h2>${p.label}</h2>
+      </div>
+      <button class="copy" id="copyBtn">copy code</button>
+    </div>
+
+    <div class="cards">
+      <div class="ic"><div class="h">WHEN TO USE</div><p>${p.when}</p></div>
+      <div class="ic" style="border-color:${col}33"><div class="h" style="color:${col}">★ KEY INSIGHT</div><p>${p.insight}</p></div>
+      <div class="ic analogy"><div class="h">◈ ANALOGY / MENTAL MODEL</div><p>${p.analogy}</p></div>`;
+  if(p.bugs&&p.bugs.length){
+    html+=`<div class="ic bugs"><div class="h">⚠ BUGS YOU ACTUALLY HIT</div><ul>${p.bugs.map(b=>`<li>${b}</li>`).join('')}</ul></div>`;
+  }
+  html+=`</div>`;
+
+  html+=`<div class="probs"><div class="h">EXAMPLE PROBLEMS</div>${
+    p.problems.map(([name,done])=>`<span class="chip">${done?'<span class="done">✓ </span>':''}${name}</span>`).join('')
+  }</div>`;
+
+  html+=`<div class="demo" id="demoHost"></div>`;
+
+  methods.forEach((mth,mi)=>{
+    html+=`<div class="cb">
+      <div class="cbbar">
+        <span class="dots"><i style="background:#ff5f56"></i><i style="background:#ffbd2e"></i><i style="background:#27c93f"></i></span>
+        ${methods.length>1?`<span class="method" style="background:${col}22;border:1px solid ${col}55;color:${col}">METHOD ${mi+1}</span>`:''}
+        <span class="cbtitle">${mth.title}</span>
+        <button class="cbtoggle" data-mi="${mi}">💬 reveal all</button>
+      </div>
+      <pre>${hl(mth.code)}</pre>
+      <div class="cbnote">● = this line hides a comment — click the line to reveal it, click again to hide.</div>
+    </div>`;
+  });
+
+  if(p.link){ html+=`<div class="hint">▶ Full step-through animation for this pattern: open <b>${p.link}</b> in this same folder.</div>`; }
+
+  html+=`<div class="pnav">
+    <button id="prevBtn" ${active===0?'disabled':''}>← prev</button>
+    <span class="pos">${active+1} of ${P.length}</span>
+    <button id="nextBtn" ${active===P.length-1?'disabled':''}>next →</button>
+  </div></div>`;
+
+  main.innerHTML=html;
+  main.scrollTop=0;
+
+  document.getElementById('copyBtn').onclick=e=>{
+    navigator.clipboard.writeText(methods.map(m=>m.code).join('\n\n'));
+    e.target.textContent='✓ copied'; e.target.classList.add('done');
+    setTimeout(()=>{e.target.textContent='copy code';e.target.classList.remove('done');},1600);
+  };
+  const pv=document.getElementById('prevBtn'), nx=document.getElementById('nextBtn');
+  if(pv)pv.onclick=()=>{if(active>0){active--;render();}};
+  if(nx)nx.onclick=()=>{if(active<P.length-1){active++;render();}};
+
+  // click-to-reveal comments: per-line toggle + "reveal all" per code block
+  main.querySelectorAll('.cl.has-cm').forEach(el=>el.onclick=()=>el.classList.toggle('reveal'));
+  main.querySelectorAll('.cb').forEach(cb=>{
+    const btn=cb.querySelector('.cbtoggle'); if(!btn) return;
+    btn.onclick=()=>{
+      const lines=[...cb.querySelectorAll('.cl.has-cm')];
+      const showing=lines.some(l=>l.classList.contains('reveal'));
+      lines.forEach(l=>l.classList.toggle('reveal',!showing));   // all on / all off
+      btn.classList.toggle('on',!showing);
+      btn.textContent=showing?'💬 reveal all':'🙈 hide all';
+    };
+  });
+
+  { const A=animForDFS(p); const host=document.getElementById('demoHost');
+    if(A){ A.kind==='graph' ? mount3DGraph(host,A,col) : mountGridDFS(host,A,col); }
+    else host.style.display='none'; }
+  buildSidebar();
+}
+
+let active3D=null;
+function dispose3D(){ if(active3D){ try{active3D.cancel();}catch(e){} active3D=null; } }
+
+function mount3DGraph(host, cfg, col){
+  if(typeof THREE==='undefined'){ host.innerHTML=`<div class="h">◈ 3D graph demo needs internet (three.js failed to load) — code &amp; notes below still work.</div>`; return; }
+  const frames=genGraphDFS(cfg), nodes=cfg.nodes, edges=cfg.edges, N=nodes.length;
+  const hasQ=frames.some(f=>f.queue);
+  const wrap=document.createElement('div');
+  wrap.innerHTML=`<div class="h">◈ 3D GRAPH + LIVE CALL STACK — ${cfg.caption||''}</div>
+    <div class="demowrap3d">
+      <div class="g3dcol">
+        <canvas id="g3d"></canvas>
+        <div class="qrow" id="gdQrow"><span class="qlabel">CALL&nbsp;STACK&nbsp;↓</span><span id="gdQ" class="qpills"></span></div>
+        <div class="g3dhint">${cfg.caption||''}</div>
+      </div>
+      <div class="g3dside">
+        <div class="counter" id="gdCount"></div>
+        <div class="demoinfo" id="gdInfo"></div>
+        <div class="dctrl"><button class="play" id="gdPlay">▶ play</button><button id="gdStep">step ›</button><button id="gdReset">⟲ reset</button></div>
+        <div class="hint">queue, graph &amp; code all move together — step through it slowly</div>
+      </div>
+    </div>
+    <div class="trace"><div class="th">CODE BEING TRAVERSED — <b>active line highlights live</b></div><pre id="gdTrace"></pre></div>`;
+  host.appendChild(wrap);
+  if(!hasQ) wrap.querySelector('#gdQrow').style.display='none';
+  const infoEl=wrap.querySelector('#gdInfo'),countEl=wrap.querySelector('#gdCount'),Qel=wrap.querySelector('#gdQ');
+  const traceLines=cfg.trace||[],traceEl=wrap.querySelector('#gdTrace'),tEls=[];
+  traceLines.forEach(ln=>{const x=document.createElement('span');x.className='tln';x.innerHTML=hl(ln)||'&nbsp;';traceEl.appendChild(x);tEls.push(x);});
+
+  const canvas=wrap.querySelector('#g3d');
+  const renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+  const scene=new THREE.Scene();
+  const camera=new THREE.PerspectiveCamera(50,1.5,0.1,100);camera.position.set(0,0,7.0);
+  const grp=new THREE.Group();scene.add(grp);
+  scene.add(new THREE.AmbientLight(0xffffff,0.7));
+  const pl=new THREE.PointLight(0x99bbff,1.0);pl.position.set(4,5,6);scene.add(pl);
+  const v3=p=>new THREE.Vector3(p[0],p[1],p[2]);
+  function makeLabel(text){
+    const c=document.createElement('canvas');const ctx=c.getContext('2d');
+    ctx.font='bold 44px ui-monospace,monospace';
+    c.width=Math.max(64,Math.ceil(ctx.measureText(text).width)+26);c.height=64;
+    ctx.font='bold 44px ui-monospace,monospace';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.lineWidth=8;ctx.strokeStyle='#04121c';ctx.strokeText(text,c.width/2,34);
+    ctx.fillStyle='#eaf6ff';ctx.fillText(text,c.width/2,34);
+    const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),depthTest:false,transparent:true}));
+    sp.scale.set(c.width/115,0.56,1);return sp;
+  }
+  const edgeObjs=edges.map(e=>{const geo=new THREE.BufferGeometry().setFromPoints([v3(nodes[e[0]].pos),v3(nodes[e[1]].pos)]);const mat=new THREE.LineBasicMaterial({color:0x33405a,transparent:true,opacity:0.45});grp.add(new THREE.Line(geo,mat));return mat;});
+  const nodeObjs=nodes.map(nd=>{const geo=new THREE.SphereGeometry(0.3,30,30);const mat=new THREE.MeshStandardMaterial({color:0x2a3340,emissive:0x000000,roughness:0.45,metalness:0.05});const me=new THREE.Mesh(geo,mat);me.position.copy(v3(nd.pos));grp.add(me);return mat;});
+  nodes.forEach((nd,i)=>{const t=nd.label!=null?String(nd.label):String(i);const sp=makeLabel(t);sp.position.copy(v3(nd.pos));sp.position.y+=0.55;grp.add(sp);});
+  function resize(){const w=canvas.clientWidth||400,h=300;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();}
+  window.addEventListener('resize',resize);resize();
+
+  let idx=0,timer=null,raf;
+  function draw(){const f=frames[idx];
+    nodeObjs.forEach((mat,i)=>{const s=f.node[i];mat.color.set(s.c);mat.emissive.set(s.c);mat.emissiveIntensity=s.ei;});
+    edgeObjs.forEach((mat,k)=>{ if(f.edgeRed===k){mat.color.set('#ff4d5e');mat.opacity=1;} else if(f.edge[k]){mat.color.set('#5a86b8');mat.opacity=0.95;} else {mat.color.set('#33405a');mat.opacity=0.4;} });
+    infoEl.innerHTML=f.info;countEl.textContent=f.count||'';
+    if(hasQ){ Qel.innerHTML=''; const arr=f.queue||[]; if(!arr.length){const s=document.createElement('span');s.className='qp empty';s.textContent='empty';Qel.appendChild(s);} else arr.forEach(t=>{const s=document.createElement('span');s.className='qp';s.textContent=t;Qel.appendChild(s);}); }
+    const hot=(cfg.hot&&cfg.hot[f.phase])||[];tEls.forEach((e,i)=>e.classList.toggle('hot',hot.indexOf(i)>=0));
+  }
+  function stop(){if(timer){clearInterval(timer);timer=null;}wrap.querySelector('#gdPlay').textContent='▶ play';}
+  function play(){if(timer){stop();return;}if(idx>=frames.length-1)idx=0;wrap.querySelector('#gdPlay').textContent='❚❚ pause';timer=setInterval(()=>{if(idx>=frames.length-1){stop();return;}idx++;draw();},900);}
+  wrap.querySelector('#gdPlay').onclick=play;
+  wrap.querySelector('#gdStep').onclick=()=>{stop();if(idx<frames.length-1){idx++;draw();}};
+  wrap.querySelector('#gdReset').onclick=()=>{stop();idx=0;draw();};
+  draw();
+  (function loop(){grp.rotation.y+=0.0032;renderer.render(scene,camera);raf=requestAnimationFrame(loop);})();
+  active3D={cancel:()=>{cancelAnimationFrame(raf);if(timer)clearInterval(timer);window.removeEventListener('resize',resize);try{renderer.dispose();}catch(e){}}};
+}
+
+function initBG(){
+  if(typeof THREE==='undefined')return;
+  const canvas=document.getElementById('bg3d');if(!canvas)return;
+  const renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+  const scene=new THREE.Scene();
+  const camera=new THREE.PerspectiveCamera(60,window.innerWidth/window.innerHeight,0.1,100);camera.position.z=14;
+  const N=150,pos=new Float32Array(N*3);
+  for(let i=0;i<N;i++){const r=8*Math.cbrt(Math.random()),th=Math.random()*6.283,ph=Math.acos(2*Math.random()-1);pos[i*3]=r*Math.sin(ph)*Math.cos(th);pos[i*3+1]=r*Math.sin(ph)*Math.sin(th);pos[i*3+2]=r*Math.cos(ph);}
+  const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.BufferAttribute(pos,3));
+  const pts=new THREE.Points(geo,new THREE.PointsMaterial({color:0x00e5ff,size:0.09,transparent:true,opacity:0.75}));scene.add(pts);
+  const lp=[];for(let i=0;i<N;i++)for(let j=i+1;j<N;j++){const dx=pos[i*3]-pos[j*3],dy=pos[i*3+1]-pos[j*3+1],dz=pos[i*3+2]-pos[j*3+2];if(dx*dx+dy*dy+dz*dz<2.3){lp.push(pos[i*3],pos[i*3+1],pos[i*3+2],pos[j*3],pos[j*3+1],pos[j*3+2]);}}
+  const lg=new THREE.BufferGeometry();lg.setAttribute('position',new THREE.BufferAttribute(new Float32Array(lp),3));
+  const lines=new THREE.LineSegments(lg,new THREE.LineBasicMaterial({color:0x2766aa,transparent:true,opacity:0.25}));scene.add(lines);
+  function resize(){renderer.setSize(window.innerWidth,window.innerHeight,false);camera.aspect=window.innerWidth/window.innerHeight;camera.updateProjectionMatrix();}
+  window.addEventListener('resize',resize);resize();
+  (function loop(){pts.rotation.y+=0.0009;pts.rotation.x+=0.0004;lines.rotation.copy(pts.rotation);renderer.render(scene,camera);requestAnimationFrame(loop);})();
+}
+
+/* ───────────────────────── INIT ───────────────────────── */
+document.getElementById('menuToggle').onclick=()=>side.classList.toggle('open');
+buildSidebar();
+render();
+initBG();
+</script>
 </body>
 </html>
