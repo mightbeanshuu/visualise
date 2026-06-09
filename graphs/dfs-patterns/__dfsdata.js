@@ -400,5 +400,6 @@ public:
 };`
 }
 ];
-let TECH='dfs';
-let P = P_DFS;
+// P_DFS is consumed by the hub's inline script (const P = P_DFS).
+// Do NOT also declare `P`/`TECH` here — that collides with the inline
+// declaration and throws "Identifier 'P' has already been declared".
