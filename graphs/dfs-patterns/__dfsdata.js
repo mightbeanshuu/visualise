@@ -51,6 +51,7 @@ public:
 },
 {
   cat:'CORE', label:'Connected Components (DFS)', done:true,
+  sim:{kind:'graph', n:8, edges:[[0,1],[1,2],[3,4],[5,6],[6,7],[5,7]], algo:'comp', caption:'One DFS per unvisited node — count the launches'},
   when:`Count disconnected pieces of a graph.`,
   insight:`Outer loop over all V nodes; each unvisited node launches one DFS = one component. Never reset vis.`,
   analogy:`Number of Islands on an adjacency list — each fresh DFS drowns one whole component.`,
@@ -325,6 +326,7 @@ public:
 },
 {
   cat:'GRAPH', label:'Bipartite Check (DFS colouring)', done:true,
+  sim:{kind:'graph', n:5, edges:[[0,1],[0,2],[1,3],[2,3],[3,4],[4,2]], algo:'bipartite', caption:'Alternate colours — the odd cycle 2-3-4 forces a clash'},
   when:`Can the graph be 2-coloured so no edge joins same colours?`,
   insight:`DFS, give each neighbour the opposite colour. If a neighbour already has the SAME colour → not bipartite.`,
   analogy:`Two teams; every edge must cross teams. Forced to put teammates on one edge → impossible.`,
@@ -353,6 +355,7 @@ public:
 },
 {
   cat:'GRAPH', label:'Topological Sort (DFS post-order)', done:true,
+  sim:{kind:'graph', n:6, directed:true, edges:[[5,0],[5,2],[4,0],[4,1],[2,3],[3,1]], algo:'topo', caption:'Push a node only AFTER its children finish — reverse the stack'},
   when:`Order a DAG by dependencies.`,
   insight:`DFS, and push a node to the order <b>after</b> all its children finish (post-order). Reverse that list = a valid topological order.`,
   analogy:`You can only "finish" a task once everything it points to is finished — so finished-order, reversed, respects every dependency.`,
