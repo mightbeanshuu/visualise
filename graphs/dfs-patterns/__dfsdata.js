@@ -1,6 +1,7 @@
 const P_DFS = [
 {
   cat:'CORE', label:'Basic Graph DFS (recursive)', done:true,
+  sim:{kind:'graph', n:6, edges:[[0,1],[0,2],[1,3],[2,3],[2,4],[4,5]], start:0, algo:'dfs', caption:'DFS traversal from source 0'},
   when:`Traverse one connected graph by going as DEEP as possible before backing up.`,
   insight:`<code>dfs(u)</code>: mark <code>u</code> on entry, recurse into each unvisited neighbour. <b>Returning from a call = backtracking.</b> The call stack remembers where to resume.`,
   analogy:`A maze where you always take the first unexplored door; when you hit a dead end you walk back to the last junction and try its next door. Recursion's call stack <i>is</i> that trail of junctions.`,
@@ -101,6 +102,7 @@ public:
 },
 {
   cat:'GRID', label:'Number of Islands (DFS)', done:true,
+  sim:{kind:'grid', algo:'islands', caption:'Sink each island with DFS', grid:[[1,1,0,0,1],[1,0,0,1,1],[0,0,0,0,0],[0,1,1,0,1]]},
   when:`Count connected regions in a grid.`,
   insight:`Double loop; each unvisited land cell → <code>cnt++</code> and a DFS that sinks the whole island.`,
   analogy:`Exactly your BFS Number of Islands — swap the queue-flood for a recursive sink. Same answer, different traversal order.`,
@@ -292,6 +294,7 @@ public:
 },
 {
   cat:'GRAPH', label:'Cycle Detection — Directed (DFS, 3-colour)', done:true,
+  sim:{kind:'graph', n:5, directed:true, edges:[[0,1],[1,2],[2,0],[2,3],[3,4]], start:0, algo:'dfs3', caption:'3-colour DFS — edge to a GRAY node = cycle'},
   when:`Detect a cycle in a DIRECTED graph.`,
   insight:`Colour nodes white (unseen) → gray (on the recursion stack) → black (done). An edge to a <b>gray</b> node is a back-edge → cycle. Visited (black) alone is NOT a cycle.`,
   analogy:`Gray = "still in the room I'm exploring". If I find a door back into a room I'm currently inside, I've gone in a circle.`,
