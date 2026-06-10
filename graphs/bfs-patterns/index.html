@@ -150,7 +150,18 @@
   .vstack .b{background:#0a2a33;border:1px solid #00e5ff;color:#9fe8ff;font-size:11px;font-weight:700;padding:3px 9px;border-radius:6px;font-family:'JetBrains Mono',monospace;}
   .vstack .e{color:var(--faint);font-style:italic;font-size:11px;}
   /* ── manim-style scene ── */
-  .vstage svg.scene{max-width:780px;}
+  .vstage svg.scene{max-width:100%;width:100%;}
+  .scene .ptr{transition:transform .5s cubic-bezier(.3,.9,.35,1),opacity .3s;}
+  .scene .ptr path{fill:#ffd60a;animation:bob .9s ease-in-out infinite;}
+  .scene .ptr text{fill:#ffd60a;font-size:10px;font-style:italic;font-family:'Fraunces',Georgia,serif;font-weight:500;}
+  @keyframes bob{50%{transform:translateY(-4px);}}
+  .split.nocode{grid-template-columns:1fr;}
+  .split.nocode .codeCol{display:none;}
+  .spd{display:inline-flex;align-items:center;gap:7px;margin-left:6px;}
+  .spd input{width:120px;accent-color:var(--multi);cursor:pointer;}
+  .spd b{font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace;min-width:42px;}
+  .demo:fullscreen{background:#07090d;overflow:auto;padding:30px 40px;border:none;border-radius:0;}
+  .demo:fullscreen .vstage{min-height:62vh;}
   .scene text{font-family:'JetBrains Mono',monospace;font-weight:700;}
   .scene .slbl{font-family:'Fraunces',Georgia,serif;font-style:italic;font-weight:500;font-size:19px;fill:#dbe4ee;letter-spacing:.3px;}
   .scene .nd .ring{fill:#131a22;stroke:#7e5151;stroke-width:2;transition:stroke .4s,fill .4s,stroke-width .3s;}
@@ -181,7 +192,8 @@
   .demowrap{display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap;}
   .gd{display:flex;flex-direction:column;gap:3px;}
   .gdrow{display:flex;gap:3px;}
-  .gc{width:42px;height:42px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;background:#1a212b;color:#3a4452;border:1.5px solid transparent;transition:background .35s,color .35s,border-color .35s,transform .25s;}
+    .ghere{position:absolute;top:-17px;left:50%;transform:translateX(-50%);color:#ffd60a;font-size:13px;animation:bob .9s ease-in-out infinite;pointer-events:none;}
+  .gc{position:relative;width:42px;height:42px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;background:#1a212b;color:#3a4452;border:1.5px solid transparent;transition:background .35s,color .35s,border-color .35s,transform .25s;}
   .demoside{flex:1;min-width:190px;}
   .demoinfo{font-size:12px;line-height:1.6;color:var(--text);min-height:46px;background:var(--panel);border:1px solid var(--border);border-radius:6px;padding:10px 12px;margin-bottom:10px;}
   .demoinfo b{color:var(--head);}
@@ -986,6 +998,7 @@ function render(){
       </div>
       <div class="pheadbtns">
         <button class="copy" id="notesBtn">📝 show notes</button>
+        <button class="copy" id="codeBtn">⌨ hide code</button>
         <button class="copy" id="copyBtn">copy code</button>
       </div>
     </div>
@@ -1009,6 +1022,12 @@ function render(){
   { const nb=document.getElementById('notesBtn'), nw=document.getElementById('notesWrap');
     nb.onclick=()=>{ const show=nw.style.display==='none'; nw.style.display=show?'':'none';
       nb.textContent=show?'📝 hide notes':'📝 show notes'; nb.classList.toggle('done',show); }; }
+
+  // code column collapses → animation takes the whole width (persisted)
+  { const cb2=document.getElementById('codeBtn'), sp=document.querySelector('.split');
+    const apply=h=>{ sp.classList.toggle('nocode',h); cb2.textContent=h?'⌨ show code':'⌨ hide code'; cb2.classList.toggle('done',h); };
+    let hid=localStorage.getItem('vcodehide')==='1'; apply(hid);
+    cb2.onclick=()=>{ hid=!hid; localStorage.setItem('vcodehide',hid?'1':'0'); apply(hid); }; }
 
   document.getElementById('copyBtn').onclick=e=>{
     navigator.clipboard.writeText(methods.map(m=>m.code).join('\n\n'));
@@ -1769,6 +1788,8 @@ function vizSVG(spec,frames){
     if(i===(spec.start||0)) s+=`<text x="${p[0]}" y="${p[1]-r-8}" fill="#ff6b6b" font-size="10" text-anchor="middle" font-style="italic">source</text>`;
     if(spec.target!=null&&i===spec.target) s+=`<text x="${p[0]}" y="${p[1]-r-8}" fill="#69ff47" font-size="10" text-anchor="middle" font-style="italic">target</text>`;
   });
+  // "we are here" pointer — glides from node to node as the algorithm walks
+  s+=`<g id="ptr" class="ptr" opacity="0"><path d="M0,2 L-8,-12 L8,-12 Z"/><text x="0" y="-19" text-anchor="middle">here</text></g>`;
   s+=`</g>`;
   // ── Queue column (front of queue at the top) ──
   const qx=500, qw=120, qh=40;
@@ -1817,6 +1838,10 @@ function vizUpd(svg,spec,frames,f){
   const has=f.cur!=null&&f.cur>=0;
   if(ct){ ct.textContent=has?String(lbl(f.cur)):'—'; }
   if(cb){ cb.setAttribute('class','curB'+(has?' live':'')); }
+  const ptr=Q('#ptr');
+  if(ptr){ if(has){ const p=frames.layout[f.cur];
+      ptr.style.transform=`translate(${p[0]}px,${p[1]-24}px)`; ptr.setAttribute('opacity','1'); }
+    else ptr.setAttribute('opacity','0'); }
 }
 
 function vizGrid(spec,f){
@@ -1827,7 +1852,7 @@ function vizGrid(spec,f){
     if(oranges){
       const bg= val===0?'#0e141b':(v?'#2a1313':'#20290e'), bd= cur?'#fff':(to?'#ff6b6b':'transparent'),
             t= val===0?'·':(v?'🦠':'🍊');
-      s+=`<div class="gc" style="background:${bg};border-color:${bd};color:#39424d">${t}</div>`;
+      s+=`<div class="gc" style="background:${bg};border-color:${bd};color:#39424d">${t}${cur?'<span class="ghere">▾</span>':''}</div>`;
     } else if(spec.algo==='distwave'){   // cells fill with distance numbers as waves arrive
       const d=f.dgrid?f.dgrid[r][c]:-1, wall=spec.wallVal!=null&&val===spec.wallVal,
             tgt=spec.target&&spec.target[0]===r&&spec.target[1]===c;
@@ -1835,21 +1860,21 @@ function vizGrid(spec,f){
             fg= wall?'#6b4040':(d<0?'#39424d':(d===0?'#69ff47':'#7fd1ff')),
             t = wall?'■':(d<0?'·':d),
             bd2= cur?'#fff':(to?'#00e5ff':(tgt?'#ffd60a':'transparent'));
-      s+=`<div class="gc" style="background:${bg};border-color:${bd2};color:${fg}">${t}</div>`;
+      s+=`<div class="gc" style="background:${bg};border-color:${bd2};color:${fg}">${t}${cur?'<span class="ghere">▾</span>':''}</div>`;
     } else if(spec.algo==='flood'){      // cells show their colour value
       const PAL=[['#0e141b','#39424d'],['#13283a','#7fd1ff'],['#0c2417','#69ff47'],['#241430','#d29bff']];
       const [bg,fg]=PAL[val%PAL.length], bd2= cur?'#fff':(to?'#00e5ff':'transparent');
-      s+=`<div class="gc" style="background:${bg};border-color:${bd2};color:${fg}">${val}</div>`;
+      s+=`<div class="gc" style="background:${bg};border-color:${bd2};color:${fg}">${val}${cur?'<span class="ghere">▾</span>':''}</div>`;
     } else if(spec.algo==='subisl'){     // ✗ = land of B that is water in A
       const badc=val===1&&spec.grid1[r][c]===0, bd2= cur?'#fff':(to?'#00e5ff':'transparent');
       const bg= val===0?'#0e141b':(v?(badc?'#2a1313':'#0c2417'):'#13283a'),
             fg= val===0?'#39424d':(v?(badc?'#ff6b6b':'#69ff47'):(badc?'#ffb38a':'#7fd1ff')),
             t = val===0?'~':(v?(badc?'✗':'✓'):'1');
-      s+=`<div class="gc" style="background:${bg};border-color:${bd2};color:${fg}">${t}</div>`;
+      s+=`<div class="gc" style="background:${bg};border-color:${bd2};color:${fg}">${t}${cur?'<span class="ghere">▾</span>':''}</div>`;
     } else {
       const bg= val===0?'#0e141b':(v?'#0c2417':'#13283a'), bd= cur?'#fff':(to?'#00e5ff':'transparent'),
             fg= val===0?'#39424d':(v?'#69ff47':'#7fd1ff'), t= val===0?'~':(v?'✓':'1');
-      s+=`<div class="gc" style="background:${bg};border-color:${bd};color:${fg}">${t}</div>`;
+      s+=`<div class="gc" style="background:${bg};border-color:${bd};color:${fg}">${t}${cur?'<span class="ghere">▾</span>':''}</div>`;
     }
   }); s+='</div>'; }); return s+'</div>';
 }
@@ -1899,6 +1924,8 @@ function mountViz(host, p, col){
       <button id="vPrev" title="step back">◀</button>
       <button id="vPlay" class="play" title="play / pause">▶</button>
       <button id="vNext" title="step forward">▶▮</button>
+      <button id="vFull" title="fullscreen">⛶</button>
+      <span class="spd" title="playback speed"><input type="range" id="vSpeed" min="0.1" max="4" step="0.05" value="1"><b id="vSpdLbl">1×</b></span>
       <span class="vpos" id="vpos"></span>
     </div>`;
   const stage=host.querySelector('#vstage'), msg=host.querySelector('#vmsg'),
@@ -1907,6 +1934,7 @@ function mountViz(host, p, col){
         prevBtn=host.querySelector('#vPrev'), nextBtn=host.querySelector('#vNext'),
         vcode=host.querySelector('#vcode');
   const esc=t=>t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  let speed=+(localStorage.getItem('vspeed')||1)||1;
 
   function paint(){
     const f=frames[idx];
@@ -1926,12 +1954,20 @@ function mountViz(host, p, col){
   }
   function stop(){ playing=false; vizStop(); playBtn.textContent='▶'; }
   function play(){ if(idx>=frames.length-1) idx=0; playing=true; playBtn.textContent='⏸';
-    vizStop(); vizTimer=setInterval(()=>{ if(idx<frames.length-1){idx++;paint();} else stop(); }, 950); }
+    vizStop(); vizTimer=setInterval(()=>{ if(idx<frames.length-1){idx++;paint();} else stop(); }, 950/speed); }
 
   host.querySelector('#vRestart').onclick=()=>{ stop(); idx=0; paint(); };
   prevBtn.onclick=()=>{ stop(); if(idx>0){idx--;paint();} };
   nextBtn.onclick=()=>{ stop(); if(idx<frames.length-1){idx++;paint();} };
   playBtn.onclick=()=>{ playing?stop():play(); };
+
+  // speed slider 0.1× – 4× (persisted); retimes the loop live
+  { const sl=host.querySelector('#vSpeed'), lbl=host.querySelector('#vSpdLbl');
+    const show=()=>lbl.textContent=(Math.round(speed*100)/100)+'×';
+    sl.value=speed; show();
+    sl.oninput=()=>{ speed=+sl.value; localStorage.setItem('vspeed',speed); show();
+      if(playing){ vizStop(); vizTimer=setInterval(()=>{ if(idx<frames.length-1){idx++;paint();} else stop(); }, 950/speed); } }; }
+  host.querySelector('#vFull').onclick=()=>{ document.fullscreenElement?document.exitFullscreen():(host.requestFullscreen&&host.requestFullscreen()); };
 
   host.querySelectorAll('.vmode button').forEach(b=>b.onclick=()=>{
     host.querySelectorAll('.vmode button').forEach(x=>x.classList.remove('on'));
