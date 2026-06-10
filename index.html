@@ -7,7 +7,7 @@
   <meta name="description" content="An interactive roadmap of Data Structures & Algorithms — visual pattern hubs, live animations, and full LeetCode-style code. Starting with Graphs.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Fraunces:ital,wght@0,400..700;1,400..700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
   <style>
     :root{
       --bg:#07090d; --line:#1b2533; --line2:#243244;
@@ -18,7 +18,7 @@
     html,body{margin:0;padding:0;scroll-behavior:smooth;}
     body{
       min-height:100vh; color:var(--text);
-      font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;
+      font-family:'IBM Plex Sans',ui-sans-serif,system-ui,sans-serif;
       background:
         radial-gradient(900px 600px at 12% -10%, rgba(0,229,255,.13), transparent 60%),
         radial-gradient(820px 560px at 92% 2%, rgba(247,143,179,.12), transparent 58%),
@@ -44,13 +44,13 @@
     .eyebrow{display:inline-flex;align-items:center;gap:8px;color:var(--green);font-size:12px;letter-spacing:2px;text-transform:uppercase;font-weight:700;font-family:'JetBrains Mono',monospace;border:1px solid #1f3a2a;background:rgba(105,255,71,.06);padding:6px 13px;border-radius:30px;}
     .eyebrow .pulse{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green);animation:blink 1.6s ease-in-out infinite;}
     @keyframes blink{50%{opacity:.25;}}
-    h1{margin:0;font-family:'Fraunces',Georgia,serif;font-style:italic;font-size:clamp(44px,8vw,86px);line-height:1.02;letter-spacing:-1.5px;font-weight:600;background:linear-gradient(100deg,#fff 6%,var(--bfs) 42%,var(--accent) 62%,var(--dfs) 92%);-webkit-background-clip:text;background-clip:text;color:transparent;background-size:200% auto;animation:shimmer 9s ease-in-out infinite;}
+    h1{margin:0;font-family:'IBM Plex Sans',sans-serif;font-size:clamp(44px,8vw,86px);line-height:1.02;letter-spacing:-1.5px;font-weight:600;background:linear-gradient(100deg,#fff 6%,var(--bfs) 42%,var(--accent) 62%,var(--dfs) 92%);-webkit-background-clip:text;background-clip:text;color:transparent;background-size:200% auto;animation:shimmer 9s ease-in-out infinite;}
     @keyframes shimmer{50%{background-position:100% center;}}
     .sub{margin:0;color:var(--muted);line-height:1.7;max-width:660px;font-size:17px;}
 
     /* topics */
     .sectionhead{display:flex;align-items:baseline;justify-content:space-between;gap:14px;margin:26px 0 18px;flex-wrap:wrap;}
-    .sectionhead h2{margin:0;font-family:'Fraunces',Georgia,serif;font-style:italic;font-weight:500;font-size:23px;letter-spacing:0;}
+    .sectionhead h2{margin:0;font-family:'IBM Plex Sans',sans-serif;font-weight:500;font-size:23px;letter-spacing:0;}
     .sectionhead .note{font-size:12.5px;color:var(--faint);font-family:'JetBrains Mono',monospace;}
     .topics{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;padding-bottom:70px;}
     .topic{position:relative;border:1px solid var(--line);border-radius:15px;background:linear-gradient(180deg,rgba(16,22,31,.6),rgba(10,13,18,.8));padding:20px;min-height:150px;display:flex;flex-direction:column;gap:8px;text-decoration:none;color:inherit;transition:transform .24s,border-color .24s,box-shadow .24s,opacity .24s;}
