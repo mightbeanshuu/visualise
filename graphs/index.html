@@ -149,8 +149,8 @@ main>*:first-child h1,header+* h1{animation:rise .7s cubic-bezier(.2,.7,.3,1) bo
       <div class="stats">
         <div class="stat bfs"><div class="n">10</div><div class="l">BFS patterns</div></div>
         <div class="stat dfs"><div class="n">14</div><div class="l">DFS patterns</div></div>
-        <div class="stat gn"><div class="n">24</div><div class="l">full solutions</div></div>
-        <div class="stat ac"><div class="n">3D</div><div class="l">graph demos</div></div>
+        <div class="stat gn"><div class="n">4</div><div class="l">weighted / greedy</div></div>
+        <div class="stat ac"><div class="n">28</div><div class="l">full solutions</div></div>
       </div>
     </section>
 
@@ -209,6 +209,15 @@ main>*:first-child h1,header+* h1{animation:rise .7s cubic-bezier(.2,.7,.3,1) bo
           </div>
           <span class="go">Open DFS hub <span class="arr">→</span></span>
         </a>
+        <a class="panel" style="color:var(--green);grid-column:1/-1" href="/graphs/weighted-patterns/">
+          <div>
+            <div class="meta">Weighted &amp; Greedy · NEW</div>
+            <h3>Heaps · disjoint sets · MST</h3>
+            <p>Dijkstra (min-heap relaxation), Disjoint Set Union (rank + path compression), and Minimum Spanning Tree via Kruskal &amp; Prim — every step animated. AlgoMaster-style notes, Striver C++ code.</p>
+            <div class="list"><span class="chip">dijkstra</span><span class="chip">union-find</span><span class="chip">kruskal</span><span class="chip">prim</span></div>
+          </div>
+          <span class="go">Open weighted hub <span class="arr">→</span></span>
+        </a>
       </div>
     </section>
 
@@ -239,7 +248,7 @@ main>*:first-child h1,header+* h1{animation:rise .7s cubic-bezier(.2,.7,.3,1) bo
   <footer>
     <div class="wrap">
       <span>Built for graph-pattern revision · hand-coded, deployed on Vercel</span>
-      <span><a href="/graphs/bfs-patterns/">BFS hub</a> · <a href="/graphs/dfs-patterns/">DFS hub</a> · <a href="https://github.com/mightbeanshuu" target="_blank" rel="noopener">GitHub</a></span>
+      <span><a href="/graphs/bfs-patterns/">BFS hub</a> · <a href="/graphs/dfs-patterns/">DFS hub</a> · <a href="/graphs/weighted-patterns/">Weighted hub</a> · <a href="https://github.com/mightbeanshuu" target="_blank" rel="noopener">GitHub</a></span>
     </div>
   </footer>
 </body>
