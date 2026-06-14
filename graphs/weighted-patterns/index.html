@@ -173,6 +173,10 @@
   svg .wt{fill:#aeb9c6;font:700 12px 'JetBrains Mono',monospace;text-anchor:middle;dominant-baseline:central;}
   svg .nlabel{fill:#e6edf3;font:700 15px 'JetBrains Mono',monospace;text-anchor:middle;dominant-baseline:central;}
   svg .arrow{stroke:#bf5af2;stroke-width:2.4;marker-end:url(#ah);transition:.3s;}
+  svg .ed.dir{marker-end:url(#ad);}
+  .vtbl td.kk{color:#ffd60a;}
+  .vtbl td.kcol{background:#0f1c25;}
+  .vtbl td.cellhot{background:#241d04;color:#ffd60a;font-weight:700;border-color:#ffd60a;}
 
   .menuToggle{display:none;}
   @media(max-width:860px){
@@ -192,7 +196,7 @@
       <a class="backbtn" href="/graphs/" title="Back to Graphs">← Back</a>
       <span class="badge">WEIGHTED · GREEDY</span>
       <h1>Weighted &amp; Greedy Graphs — Dijkstra · DSU · MST</h1>
-      <span class="meta">4 patterns · C++ · Anshu</span>
+      <span class="meta">9 patterns · C++ · Anshu</span>
       <button class="copy menuToggle" id="menuToggle" style="margin-left:auto">☰ patterns</button>
     </div>
     <p>AlgoMaster-style pattern notes + <b>Striver (takeUforward) C++</b>, with a heap / set / MST that animates <b>step by step</b> while the matching code line lights up.</p>
@@ -212,6 +216,25 @@ const ek=(a,b)=>a<b?a+'-'+b:b+'-'+a;
 const ADJ=Array.from({length:N},()=>[]);
 EDGES.forEach(([a,b,w])=>{ADJ[a].push([b,w]);ADJ[b].push([a,w]);});
 const GROUPCOL=['#69ff47','#00e5ff','#f78fb3','#ffd60a','#bf5af2','#ff9f0a'];
+
+/* graphs for the directed / topo / all-pairs patterns */
+const UG ={nodes:NODES,edges:EDGES,directed:false,weighted:true};
+const DAG_E=[[0,1,2],[0,2,4],[1,2,1],[1,3,7],[2,4,3],[3,4,2],[3,5,1],[4,5,5]];
+const DAG={nodes:NODES,edges:DAG_E,directed:true,weighted:true};            // shortest path in DAG
+const TOPOG={nodes:NODES,edges:DAG_E,directed:true,weighted:false};         // Kahn topo
+const BN=[[60,170],[215,64],[215,276],[388,64],[388,276]];
+const BE=[[0,1,6],[0,3,7],[1,2,5],[1,3,8],[1,4,-4],[2,1,-2],[3,2,-3],[3,4,9],[4,0,2],[4,2,7]];
+const BG={nodes:BN,edges:BE,directed:true,weighted:true};                   // Bellman-Ford (CLRS, neg edge)
+const FN=[[120,82],[372,82],[120,262],[372,262]];
+const FE=[[0,1,3],[1,2,2],[2,3,1],[3,0,2],[0,3,7],[2,0,5]];
+const FG={nodes:FN,edges:FE,directed:true,weighted:true};                   // Floyd-Warshall
+const WN=[[60,170],[205,72],[205,268],[360,170],[472,170]];
+const WE=[[0,1,1],[0,2,1],[1,3,1],[2,3,1],[3,4,1]];
+const WG={nodes:WN,edges:WE,directed:false,weighted:true};                  // number of ways
+const DSUG={nodes:NODES,dsu:true};
+function adjOf(edges,n,directed){const a=Array.from({length:n},()=>[]);edges.forEach(([u,v,w])=>{a[u].push([v,w]);if(!directed)a[v].push([u,w]);});return a;}
+const fmt=x=>x===Infinity?'∞':x;
+const dk=(u,v)=>u+'>'+v;
 
 /* ════════════════ FRAME GENERATORS ════════════════ */
 // Each returns an array of frames. A frame may carry:
@@ -336,13 +359,118 @@ function genDSU(){
   return F;
 }
 
+function genKahn(){
+  const g=TOPOG,n=g.nodes.length,adj=adjOf(g.edges,n,true),F=[];
+  const indeg=Array(n).fill(0); g.edges.forEach(([u,v])=>indeg[v]++);
+  let q=[]; const order=[];
+  const snap=(o={})=>F.push({indeg:indeg.slice(),fifo:q.slice(),order:order.slice(),node:o.node||{},edge:o.edge||{},msg:o.msg||'',line:o.line??0});
+  snap({line:0,msg:`Count in-degrees — how many edges point <i>into</i> each node.`});
+  for(let i=0;i<n;i++) if(indeg[i]===0) q.push(i);
+  snap({line:1,node:Object.fromEntries(q.map(x=>[x,'frontier'])),msg:`Push every node with in-degree 0 → queue starts [${q.join(', ')}] (the "sources").`});
+  while(q.length){
+    const u=q.shift(); order.push(u);
+    snap({line:3,node:{[u]:'current'},msg:`Pop <b>${u}</b> → append to topo order. Order: [${order.join(', ')}].`});
+    for(const [v] of adj[u]){
+      indeg[v]--;
+      if(indeg[v]===0){ q.push(v); snap({line:5,node:{[u]:'settled',[v]:'frontier'},edge:{[dk(u,v)]:'tree'},msg:`Edge ${u}→${v}: in-degree[${v}] hits 0 → push ${v}.`}); }
+      else snap({line:4,node:{[u]:'settled',[v]:'current'},edge:{[dk(u,v)]:'look'},msg:`Edge ${u}→${v}: in-degree[${v}] = ${indeg[v]} (still waiting on other parents).`});
+    }
+  }
+  snap({line:6,node:Object.fromEntries(order.map(x=>[x,'settled'])),msg:order.length===n?`<span class="ok">Valid order:</span> [${order.join(' → ')}]. order.size==V ⇒ no cycle — this is exactly Course Schedule's yes/no answer.`:`<span class="bad">Cycle!</span> only ${order.length}/${n} placed.`});
+  return F;
+}
+
+function genDAGsp(){
+  const g=DAG,n=g.nodes.length,adj=adjOf(g.edges,n,true),F=[];
+  const ind=Array(n).fill(0); g.edges.forEach(([u,v])=>ind[v]++);
+  let q=[],topo=[]; for(let i=0;i<n;i++) if(!ind[i])q.push(i);
+  while(q.length){const u=q.shift();topo.push(u);for(const[v]of adj[u])if(--ind[v]===0)q.push(v);}
+  const dist=Array(n).fill(Infinity); dist[0]=0; const settled=Array(n).fill(false);
+  const snap=(o={})=>{const node={};for(let i=0;i<n;i++)if(settled[i])node[i]='settled';Object.assign(node,o.node||{});F.push({dist:dist.slice(),order:topo.slice(),node,edge:o.edge||{},msg:o.msg||'',line:o.line??0});};
+  snap({line:0,msg:`Get a topological order first: [${topo.join(', ')}]. Then relax strictly in that order.`});
+  snap({line:1,node:{0:'current'},msg:`dist[0]=0, everything else ∞.`});
+  topo.forEach((u)=>{
+    settled[u]=true;
+    snap({line:2,node:{[u]:'current'},msg:`Take <b>${u}</b> from topo order. All paths into it are finalized ⇒ dist[${u}]=${fmt(dist[u])} is locked.`});
+    if(dist[u]===Infinity) return;
+    for(const [v,w] of adj[u]){
+      const nd=dist[u]+w;
+      if(nd<dist[v]){const old=dist[v];dist[v]=nd;snap({line:5,node:{[u]:'settled',[v]:'frontier'},edge:{[dk(u,v)]:'relax'},msg:`Relax ${u}→${v} (w=${w}): ${dist[u]}+${w}=${nd} &lt; ${fmt(old)} ⇒ dist[${v}]=<b>${nd}</b>.`});}
+      else snap({line:4,node:{[u]:'settled',[v]:'frontier'},edge:{[dk(u,v)]:'look'},msg:`Check ${u}→${v}: ${dist[u]}+${w}=${nd} ≥ ${fmt(dist[v])} ⇒ keep.`});
+    }
+  });
+  for(let i=0;i<n;i++)settled[i]=true;
+  snap({line:-1,msg:`<span class="ok">Done in O(V+E)</span> — no heap needed. dist = [${dist.map(fmt).join(', ')}].`});
+  return F;
+}
+
+function genBellman(){
+  const g=BG,n=g.nodes.length,E=g.edges,F=[];
+  const dist=Array(n).fill(Infinity); dist[0]=0;
+  const snap=(o={})=>F.push({dist:dist.slice(),round:o.round,node:o.node||{},edge:o.edge||{},msg:o.msg||'',line:o.line??0});
+  snap({line:0,node:{0:'current'},msg:`Source 0: dist[0]=0, rest ∞. Relax <b>all ${E.length} edges</b>, V−1 = ${n-1} times.`});
+  for(let i=1;i<=n-1;i++){
+    let changed=false;
+    snap({line:0,round:i,msg:`<b>Round ${i}/${n-1}</b> — sweep every edge once.`});
+    for(const [u,v,w] of E){
+      if(dist[u]===Infinity) continue;
+      const nd=dist[u]+w;
+      if(nd<dist[v]){const old=dist[v];dist[v]=nd;changed=true;snap({line:2,round:i,node:{[u]:'settled',[v]:'frontier'},edge:{[dk(u,v)]:'relax'},msg:`Relax ${u}→${v} (w=${w}): ${dist[u]}+${w}=${nd} &lt; ${fmt(old)} ⇒ dist[${v}]=<b>${nd}</b>${w<0?' <span style="color:#ffd479">(negative edge!)</span>':''}.`});}
+    }
+    if(!changed){ snap({line:2,round:i,msg:`No edge improved → distances converged early, stop.`}); break; }
+  }
+  let neg=false; for(const [u,v,w] of E){ if(dist[u]!==Infinity && dist[u]+w<dist[v]){neg=true;break;} }
+  snap({line:4,node:Object.fromEntries([...Array(n)].map((_,i)=>[i,'settled'])),msg:neg?`<span class="bad">Negative cycle</span> — a Vth pass still relaxes.`:`<span class="ok">Done.</span> dist = [${dist.map(fmt).join(', ')}] — note the negative result, which Dijkstra could never produce.`});
+  return F;
+}
+
+function genFloyd(){
+  const g=FG,n=g.nodes.length,F=[];
+  const d=Array.from({length:n},(_,i)=>Array.from({length:n},(_,j)=>i===j?0:Infinity));
+  g.edges.forEach(([u,v,w])=>{d[u][v]=Math.min(d[u][v],w);});
+  const M=()=>d.map(r=>r.slice());
+  const snap=(o={})=>F.push({matrix:M(),fk:o.fk,fi:o.fi,fj:o.fj,node:o.node||{},msg:o.msg||'',line:o.line??0});
+  snap({line:0,msg:`Init the matrix: 0 on the diagonal, edge weights where an edge exists, ∞ otherwise.`});
+  for(let k=0;k<n;k++){
+    snap({line:0,fk:k,node:{[k]:'current'},msg:`<b>k=${k}</b> — now allow paths that route <i>through</i> node ${k}.`});
+    for(let i=0;i<n;i++)for(let j=0;j<n;j++){
+      if(d[i][k]+d[k][j]<d[i][j]){const old=d[i][j];d[i][j]=d[i][k]+d[k][j];snap({line:4,fk:k,fi:i,fj:j,node:{[k]:'current',[i]:'frontier',[j]:'frontier'},msg:`d[${i}][${j}] via ${k}: ${fmt(d[i][k])}+${fmt(d[k][j])} = <b>${d[i][j]}</b> &lt; ${fmt(old)} ⇒ update.`});}
+    }
+  }
+  snap({line:-1,node:Object.fromEntries([...Array(n)].map((_,i)=>[i,'settled'])),msg:`<span class="ok">All-pairs shortest paths</span> in O(V³). Row i = shortest distance from i to every other node.`});
+  return F;
+}
+
+function genWays(){
+  const g=WG,n=g.nodes.length,adj=adjOf(g.edges,n,false),F=[],MOD=1e9+7;
+  const dist=Array(n).fill(Infinity),ways=Array(n).fill(0),settled=Array(n).fill(false);
+  let pq=[]; const pqStr=()=>pq.slice().sort((a,b)=>a[0]-b[0]).map(([d,u])=>d+':'+u);
+  const snap=(o={})=>{const node={};for(let i=0;i<n;i++)if(settled[i])node[i]='settled';Object.assign(node,o.node||{});F.push({dist:dist.slice(),ways:ways.slice(),pq:pqStr(),node,edge:o.edge||{},msg:o.msg||'',line:o.line??0});};
+  dist[0]=0; ways[0]=1; pq.push([0,0]);
+  snap({line:0,node:{0:'current'},msg:`dist[0]=0, <b>ways[0]=1</b>. Push {0,0}.`});
+  while(pq.length){
+    pq.sort((a,b)=>a[0]-b[0]); const [d,u]=pq.shift();
+    if(settled[u]) continue; settled[u]=true;
+    snap({line:2,node:{[u]:'current'},msg:`Settle <b>${u}</b> (dist ${d}, ways ${ways[u]}).`});
+    for(const [v,w] of adj[u]){
+      const nd=d+w;
+      if(nd<dist[v]){dist[v]=nd;ways[v]=ways[u];pq.push([nd,v]);snap({line:4,node:{[u]:'settled',[v]:'frontier'},edge:{[ek(u,v)]:'relax'},msg:`Shorter route to ${v}: dist[${v}]=${nd}, <b>ways[${v}] = ways[${u}] = ${ways[v]}</b> (inherit).`});}
+      else if(nd===dist[v]){ways[v]=(ways[v]+ways[u])%MOD;snap({line:5,node:{[u]:'settled',[v]:'frontier'},edge:{[ek(u,v)]:'look'},msg:`<b>Equal</b>-length route to ${v} ⇒ ways[${v}] += ways[${u}] = <b>${ways[v]}</b>.`});}
+    }
+  }
+  for(let i=0;i<n;i++)settled[i]=true;
+  snap({line:-1,msg:`<span class="ok">Done.</span> Shortest 0→${n-1} = ${dist[n-1]} with <b>${ways[n-1]} distinct shortest paths</b>.`});
+  return F;
+}
+
 /* ════════════════ PATTERN DATA ════════════════ */
-const CAT={ SP:{c:'#00e5ff',label:'SHORTEST PATH'}, DSU:{c:'#bf5af2',label:'DISJOINT SET UNION'}, MST:{c:'#69ff47',label:'MINIMUM SPANNING TREE'} };
+const CAT={ SP:{c:'#00e5ff',label:'SHORTEST PATH'}, TOPO:{c:'#ff9f0a',label:'TOPOLOGICAL SORT'}, DSU:{c:'#bf5af2',label:'DISJOINT SET UNION'}, MST:{c:'#69ff47',label:'MINIMUM SPANNING TREE'} };
+const SRC='Pattern framing · <b>AlgoMaster</b> &nbsp;|&nbsp; Code · <b>Striver / takeUforward</b>';
 
 const P=[
 {
-  cat:'SP', label:'Dijkstra (min-heap)', mode:'weighted', gen:genDijkstra,
-  src:'Pattern framing · <b>AlgoMaster</b> &nbsp;|&nbsp; Code · <b>Striver / takeUforward</b>',
+  cat:'SP', label:'Dijkstra (min-heap)', graph:UG, gen:genDijkstra,
+  src:SRC,
   when:'Single-source shortest paths on a graph with <b>non-negative</b> edge weights.',
   insight:'A min-heap always hands you the closest <i>unsettled</i> node. The instant you pop it, its distance is final — that\'s greedy + relaxation. Negative edges break the guarantee (use Bellman-Ford instead).',
   analogy:'Ripples in a pond, but some directions are "thicker" (heavier edges). The wavefront always expands next from the cheapest reachable point, and never re-touches a node whose cost is already locked.',
@@ -371,8 +499,131 @@ vector<int> dijkstra(int V,
   trace:['dist[src]=0; pq.push({0,src});','while(!pq.empty()){','  auto [d,u]=pq.top(); pq.pop();','  if(d>dist[u]) continue;','  for(auto [v,w]: adj[u]){','    if(dist[u]+w < dist[v]) {  // no','      dist[v]=dist[u]+w; pq.push({.,v}); }}}']
 },
 {
-  cat:'DSU', label:'Disjoint Set Union', mode:'dsu', gen:genDSU,
-  src:'Pattern framing · <b>AlgoMaster</b> &nbsp;|&nbsp; Code · <b>Striver / takeUforward</b>',
+  cat:'SP', label:'Shortest Path in a DAG', graph:DAG, gen:genDAGsp,
+  src:SRC,
+  when:'Shortest paths from a source on a <b>directed acyclic</b> graph — weights may even be negative (no cycles to exploit).',
+  insight:'Topologically order the nodes, then relax edges in that order. By the time you reach a node, every path into it is already finalized — so one linear sweep beats Dijkstra\'s heap. O(V+E).',
+  analogy:'Course prerequisites with durations: once every prerequisite of a course is scheduled, that course\'s earliest start is locked. Process courses in prerequisite order.',
+  bugs:['Using it on a graph with cycles — a topological order won\'t exist.','Relaxing in arbitrary (non-topo) order → stale, wrong distances.','Forgetting to skip nodes still at ∞ (unreachable so far).'],
+  problems:['Shortest Path in DAG (GFG)','Parallel Courses','Longest Path in a DAG (negate weights)'],
+  code:`// Striver — Shortest path in a DAG (topo + relax)
+vector<int> shortestPathDAG(int V,
+    vector<vector<pair<int,int>>>& adj, int src){
+    vector<int> topo = topoSort(V, adj);       // Kahn / DFS order
+    vector<int> dist(V, 1e9);
+    dist[src] = 0;
+    for(int u : topo){                         // ★ strict topo order
+        if(dist[u] == 1e9) continue;           // unreachable yet
+        for(auto [v, w] : adj[u])
+            if(dist[u] + w < dist[v])          // relax forward edge
+                dist[v] = dist[u] + w;
+    }
+    return dist;
+}`,
+  trace:['topo = topological_order(graph);','dist[src]=0;','for(int u : topo){','  for(auto [v,w] : adj[u])','    if(dist[u]+w < dist[v])  // no','      dist[v]=dist[u]+w;  }']
+},
+{
+  cat:'SP', label:'Bellman-Ford (negative edges)', graph:BG, gen:genBellman,
+  src:SRC,
+  when:'Single-source shortest paths when edges can be <b>negative</b> — and you need to detect negative cycles.',
+  insight:'A shortest path uses at most V−1 edges, so relaxing <b>every</b> edge V−1 times is enough to settle all distances. One extra pass that still improves something ⇒ a negative cycle exists.',
+  analogy:'Currency arbitrage: keep applying every exchange rate; if after V−1 full rounds you can <i>still</i> get richer on a loop, that loop is free money — a negative cycle.',
+  bugs:['Stopping after fewer than V−1 rounds.','Skipping the Vth pass → missing negative-cycle detection.','Relaxing from a node whose dist is still ∞ (treat ∞+w carefully).','Assuming Dijkstra would work — it silently breaks on negatives.'],
+  problems:['Bellman-Ford (GFG)','Cheapest Flights Within K Stops','Negative Weight Cycle','Distance from the Source'],
+  code:`// Striver — Bellman-Ford (handles negative edges)
+vector<int> bellmanFord(int V,
+    vector<array<int,3>>& edges, int src){     // edges = {u, v, w}
+    vector<int> dist(V, 1e9);
+    dist[src] = 0;
+    for(int i = 1; i <= V - 1; i++)            // V-1 relaxation rounds
+        for(auto& [u, v, w] : edges)
+            if(dist[u] != 1e9 && dist[u] + w < dist[v])
+                dist[v] = dist[u] + w;
+    for(auto& [u, v, w] : edges)               // ★ Vth pass = neg-cycle check
+        if(dist[u] != 1e9 && dist[u] + w < dist[v])
+            return {-1};                        // negative cycle
+    return dist;
+}`,
+  trace:['for(i=1; i<=V-1; i++)','  for([u,v,w] : edges)','    if(dist[u]+w < dist[v])','      dist[v]=dist[u]+w;','// Vth pass relaxes again ⇒ neg cycle']
+},
+{
+  cat:'SP', label:'Floyd-Warshall (all-pairs)', graph:FG, gen:genFloyd,
+  src:SRC,
+  when:'<b>All-pairs</b> shortest paths on a small, dense graph (V ≲ 400). Also detects negative cycles via the diagonal.',
+  insight:'It\'s DP over an "allowed intermediate set". For each k, ask: is going i→k→j cheaper than i→j? After trying every k as a waypoint, every pair is optimal. The k-loop must be the <b>outermost</b>.',
+  analogy:'Flight connections: first allow zero layovers, then permit layovers at city 0, then also city 1, … each new allowed hub can only shorten routes.',
+  bugs:['Putting i or j outermost instead of k — the classic fatal ordering bug.','Not initializing the diagonal to 0 / missing edges to ∞.','Letting ∞+∞ overflow (guard or use a big-but-safe INF).','Forgetting it\'s O(V³) — wrong tool for large sparse graphs.'],
+  problems:['Floyd-Warshall (GFG)','Find the City With Smallest Number of Neighbors','City With the Smallest Threshold','All-Pairs Shortest Path'],
+  code:`// Striver — Floyd-Warshall (all-pairs shortest path)
+void floydWarshall(vector<vector<int>>& d){    // d[i][j] = weight or INF
+    int n = d.size();
+    for(int k = 0; k < n; k++)                 // ★ intermediate node (outer!)
+        for(int i = 0; i < n; i++)
+            for(int j = 0; j < n; j++)
+                if(d[i][k] + d[k][j] < d[i][j])
+                    d[i][j] = d[i][k] + d[k][j];
+}`,
+  trace:['for(k=0; k<n; k++)','  for(i=0; i<n; i++)','    for(j=0; j<n; j++)','      if(d[i][k]+d[k][j] < d[i][j])','        d[i][j]=d[i][k]+d[k][j];']
+},
+{
+  cat:'SP', label:'Number of Ways (Dijkstra + count)', graph:WG, gen:genWays,
+  src:SRC,
+  when:'Count how many <b>distinct shortest paths</b> reach the destination — Dijkstra augmented with a ways[] counter.',
+  insight:'Carry a ways[] alongside dist[]. A strictly shorter path <i>replaces</i> the count (ways[v]=ways[u]); an equally short path <i>adds</i> to it (ways[v]+=ways[u]). Take everything mod 1e9+7.',
+  analogy:'Counting the number of equally-cheapest train itineraries to a city: a cheaper route resets the tally; another route of the same lowest price increments it.',
+  bugs:['Adding counts on a <i>strictly</i> shorter path instead of replacing.','Forgetting the <code>== dist</code> (equal-length) branch entirely.','Overflow — use long and apply MOD every addition.','Re-processing a settled node and double-counting.'],
+  problems:['Number of Ways to Arrive at Destination','Count Paths (GFG)','Shortest Path Count'],
+  code:`// Striver — Number of ways to arrive at destination
+int countPaths(int n, vector<vector<pair<int,int>>>& adj){
+    priority_queue<pair<long,long>,
+        vector<pair<long,long>>, greater<>> pq;
+    vector<long> dist(n, LONG_MAX), ways(n, 0);
+    dist[0] = 0; ways[0] = 1; pq.push({0, 0});
+    const int MOD = 1e9 + 7;
+    while(!pq.empty()){
+        auto [d, u] = pq.top(); pq.pop();
+        for(auto [v, w] : adj[u]){
+            if(d + w < dist[v]){               // strictly shorter
+                dist[v] = d + w;
+                ways[v] = ways[u];             // ★ inherit the count
+                pq.push({dist[v], v});
+            } else if(d + w == dist[v])        // equally short
+                ways[v] = (ways[v] + ways[u]) % MOD;
+        }
+    }
+    return ways[n-1];
+}`,
+  trace:['dist[0]=0; ways[0]=1; pq.push({0,0});','while(!pq.empty()){','  [d,u]=pq.top(); pq.pop();','  for([v,w]: adj[u]){','    if(d+w<dist[v]){dist[v]=d+w; ways[v]=ways[u];}','    else if(d+w==dist[v]) ways[v]+=ways[u]; }}']
+},
+{
+  cat:'TOPO', label:"Kahn's Topological Sort (BFS)", graph:TOPOG, gen:genKahn,
+  src:SRC,
+  when:'Linearly order a <b>directed acyclic</b> graph so every edge points forward — and detect cycles for free.',
+  insight:'Repeatedly remove a node with in-degree 0 (no unmet dependency) and decrement its neighbors. If you can\'t place all V nodes, a cycle exists. This <i>is</i> the answer to Course Schedule I/II.',
+  analogy:'Getting dressed: you can only put on an item once everything it depends on is already on. Pick any "ready" item, wear it, which unlocks the next ready items.',
+  bugs:['Using a stack instead of a FIFO queue (gives a valid but different order — fine unless order is constrained).','Not checking <code>order.size()==V</code> → miss the cycle case (Course Schedule returns false).','Decrementing in-degree of the wrong endpoint.','Building in-degree from the wrong edge direction.'],
+  problems:['Topological Sort (Kahn)','Course Schedule I','Course Schedule II','Alien Dictionary','Find Eventual Safe States'],
+  code:`// Striver — Kahn's algorithm (BFS topological sort)
+vector<int> topoSort(int V, vector<vector<int>>& adj){
+    vector<int> indeg(V, 0), order;
+    for(int u = 0; u < V; u++)
+        for(int v : adj[u]) indeg[v]++;        // count incoming edges
+    queue<int> q;
+    for(int i = 0; i < V; i++)
+        if(indeg[i] == 0) q.push(i);           // sources first
+    while(!q.empty()){
+        int u = q.front(); q.pop();
+        order.push_back(u);
+        for(int v : adj[u])
+            if(--indeg[v] == 0) q.push(v);      // ★ v becomes a source
+    }
+    return order;   // order.size() < V  ⇒  a cycle exists
+}`,
+  trace:['indeg[v]++ for every edge u→v;','q.push(all v with indeg==0);','while(!q.empty()){','  u=q.front(); q.pop(); order.add(u);','  for(v: adj[u])','    if(--indeg[v]==0) q.push(v); }','// order.size()<V ⇒ cycle']
+},
+{
+  cat:'DSU', label:'Disjoint Set Union', graph:DSUG, gen:genDSU,
+  src:SRC,
   when:'Dynamic connectivity — repeatedly <b>merge groups</b> and ask "are these two in the same set?" in near-O(1).',
   insight:'Each set is a tree and its root is the set\'s ID. Two tricks make it nearly constant: <b>union by rank</b> (attach the shorter tree under the taller) and <b>path compression</b> (flatten the path to root on every find).',
   analogy:'Friend circles. find(x) = "who is the leader of your circle?". union(a,b) = merge two circles under one leader. Path compression = everyone just remembers the leader directly, so next time the answer is instant.',
@@ -401,8 +652,8 @@ public:
   trace:['find(x):','  if(parent[x]==x) return x;','  return parent[x]=find(parent[x]);','unite(a,b):','  pa=find(a); pb=find(b);','  if(pa==pb) return;','  if(rnk[pa]<rnk[pb]) swap(pa,pb);','  parent[pb]=pa;','  if(rnk[pa]==rnk[pb]) rnk[pa]++;']
 },
 {
-  cat:'MST', label:"Kruskal's MST (edges + DSU)", mode:'kruskal', gen:genKruskal,
-  src:'Pattern framing · <b>AlgoMaster</b> &nbsp;|&nbsp; Code · <b>Striver / takeUforward</b>',
+  cat:'MST', label:"Kruskal's MST (edges + DSU)", graph:UG, gen:genKruskal,
+  src:SRC,
   when:'Minimum Spanning Tree when you can see <b>all edges at once</b> — sparse graphs / edge-list input.',
   insight:'Sort edges cheapest-first and greedily add any edge that doesn\'t form a cycle. <b>DSU is the cycle detector</b>: same root ⇒ cycle ⇒ skip. Stop once you have V−1 edges.',
   analogy:'Laying the cheapest cables first to connect every city — but refusing any cable that links two districts already wired together (that would be redundant).',
@@ -425,8 +676,8 @@ int kruskal(int V, vector<array<int,3>>& edges){  // {w, u, v}
   trace:['sort(edges);   // by weight','for([w,u,v] : edges){','  if(find(u)!=find(v)){','    unite(u,v);','    cost+=w;  }  // keep edge','  else  /* cycle → skip */ }']
 },
 {
-  cat:'MST', label:"Prim's MST (min-heap)", mode:'weighted', gen:genPrim,
-  src:'Pattern framing · <b>AlgoMaster</b> &nbsp;|&nbsp; Code · <b>Striver / takeUforward</b>',
+  cat:'MST', label:"Prim's MST (min-heap)", graph:UG, gen:genPrim,
+  src:SRC,
   when:'MST when the graph is <b>dense</b> or given as an adjacency list — grow one tree outward from a start node.',
   insight:'Keep the edges crossing from the tree to the outside in a min-heap, and always pull the cheapest crossing edge, skipping nodes already inside. The lazy version tolerates stale heap entries via a visited-check.',
   analogy:'A growing kingdom: every turn you annex the territory reachable by the single cheapest road leading out from your current borders.',
@@ -460,7 +711,7 @@ function hl(code){
     const codePart=ci>=0?line.slice(0,ci):line;
     const comPart =ci>=0?line.slice(ci) :'';
     let h=esc(codePart)
-      .replace(/\b(class|public|private|struct|int|void|bool|auto|vector|priority_queue|greater|pair|array|return|while|for|if|else|true|false|const|swap|sort|push|pop|top|empty|resize|assign|begin|end)\b/g,'<span class="kw">$1</span>')
+      .replace(/\b(class|public|private|struct|int|void|bool|long|auto|vector|queue|priority_queue|greater|pair|array|return|while|for|if|else|true|false|const|swap|sort|push|pop|push_back|front|top|empty|size|resize|assign|begin|end)\b/g,'<span class="kw">$1</span>')
       .replace(/\b(\d+)\b/g,'<span class="nm">$1</span>');
     let cls='cl';
     if(comPart){ cls+=' has-cm'; h+='<span class="cm">'+esc(comPart).replace(/(★[^<]*)/g,'<span class="star">$1</span>')+'</span>'; }
@@ -469,32 +720,35 @@ function hl(code){
 }
 
 /* ════════════════ SCENE RENDERING ════════════════ */
-function svgScene(f,mode){
+function svgScene(f,g){
+  const nodes=g.nodes;
   let s=`<svg viewBox="0 0 522 336" preserveAspectRatio="xMidYMid meet">
-    <defs><marker id="ah" markerWidth="9" markerHeight="9" refX="7.5" refY="3" orient="auto">
-      <path d="M0,0 L8,3 L0,6 Z" fill="#bf5af2"/></marker></defs>`;
-  if(mode==='dsu'){
-    // parent arrows
-    for(let i=0;i<N;i++){ const p=f.parent?f.parent[i]:i; if(p!==i){
-      const [x1,y1]=NODES[i],[x2,y2]=NODES[p];
-      const dx=x2-x1,dy=y2-y1,L=Math.hypot(dx,dy),ux=dx/L,uy=dy/L;
+    <defs>
+      <marker id="ah" markerWidth="9" markerHeight="9" refX="7.5" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#bf5af2"/></marker>
+      <marker id="ad" markerWidth="11" markerHeight="11" refX="9" refY="3.2" orient="auto"><path d="M0,0 L9,3.2 L0,6.4 Z" fill="#8b98a8"/></marker>
+    </defs>`;
+  if(g.dsu){
+    for(let i=0;i<nodes.length;i++){ const p=f.parent?f.parent[i]:i; if(p!==i){
+      const [x1,y1]=nodes[i],[x2,y2]=nodes[p],dx=x2-x1,dy=y2-y1,L=Math.hypot(dx,dy),ux=dx/L,uy=dy/L;
       s+=`<line class="arrow" x1="${x1+ux*22}" y1="${y1+uy*22}" x2="${x2-ux*24}" y2="${y2-uy*24}"/>`;
     }}
   } else {
-    EDGES.forEach(([a,b,w])=>{
-      const [x1,y1]=NODES[a],[x2,y2]=NODES[b], cls=(f.edge&&f.edge[ek(a,b)])||'';
-      const mx=(x1+x2)/2,my=(y1+y2)/2;
-      s+=`<line class="ed ${cls}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/>
-          <circle class="wbg" cx="${mx}" cy="${my}" r="11"/><text class="wt" x="${mx}" y="${my}">${w}</text>`;
+    (g.edges||[]).forEach(([a,b,w])=>{
+      const [x1,y1]=nodes[a],[x2,y2]=nodes[b];
+      const key=g.directed?dk(a,b):ek(a,b), cls=(f.edge&&f.edge[key])||'';
+      let X1=x1,Y1=y1,X2=x2,Y2=y2, off=0;
+      if(g.directed){const dx=x2-x1,dy=y2-y1,L=Math.hypot(dx,dy),ux=dx/L,uy=dy/L;X1=x1+ux*21;Y1=y1+uy*21;X2=x2-ux*24;Y2=y2-uy*24;off=a<b?-9:9;}
+      s+=`<line class="ed ${cls}${g.directed?' dir':''}" x1="${X1}" y1="${Y1}" x2="${X2}" y2="${Y2}"/>`;
+      if(g.weighted!==false){const mx=(x1+x2)/2,my=(y1+y2)/2+off;
+        s+=`<circle class="wbg" cx="${mx}" cy="${my}" r="11"/><text class="wt" x="${mx}" y="${my}">${w}</text>`;}
     });
   }
-  NODES.forEach(([x,y],i)=>{
-    const st=(f.node&&f.node[i])||'';
-    let stroke='#44505f',fill='#131a22',sw=2.4;
-    const g=f.group?f.group[i]:null;
-    if(g!=null){ stroke=GROUPCOL[g%GROUPCOL.length]; fill='#10151c'; }
+  nodes.forEach(([x,y],i)=>{
+    const st=(f.node&&f.node[i])||''; let stroke='#44505f',fill='#131a22',sw=2.4;
+    const grp=f.group?f.group[i]:null;
+    if(grp!=null){ stroke=GROUPCOL[grp%GROUPCOL.length]; fill='#10151c'; }
     if(st==='frontier'){ stroke='#00e5ff'; fill='#06222b'; sw=3; }
-    if(st==='settled'&&g==null){ stroke='#69ff47'; fill='#0c2417'; }
+    if(st==='settled'&&grp==null){ stroke='#69ff47'; fill='#0c2417'; }
     if(st==='current'){ stroke='#ffd60a'; fill='#241d04'; sw=4; }
     const halo = st==='current'?`<circle cx="${x}" cy="${y}" r="27" fill="none" stroke="#ffd60a" stroke-width="1.4" opacity=".5"/>`:'';
     s+=`${halo}<circle cx="${x}" cy="${y}" r="20" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/><text class="nlabel" x="${x}" y="${y}">${i}</text>`;
@@ -502,44 +756,48 @@ function svgScene(f,mode){
   return s+'</svg>';
 }
 
-function sidePanel(f,mode){
+function numTable(cap,arr,doneFn){
+  let h=`<div class="vtbl"><div class="cap">${cap}</div><table><tr>`;
+  for(let i=0;i<arr.length;i++) h+=`<td class="k">${i}</td>`; h+=`</tr><tr>`;
+  for(let i=0;i<arr.length;i++) h+=`<td class="${doneFn(i)?'done':''}">${arr[i]===Infinity?'∞':arr[i]}</td>`;
+  return h+`</tr></table></div>`;
+}
+function qpills(label,arr){
+  let h=`<div class="qrow"><span class="qlabel">${label}</span>`;
+  if(!arr.length) h+=`<span class="qp empty">empty</span>`; else arr.forEach(t=>h+=`<span class="qp">${t}</span>`);
+  return h+`</div>`;
+}
+function matrixPanel(f){
+  const m=f.matrix,n=m.length;
+  let h=`<div class="vtbl"><div class="cap">dist matrix · k=${f.fk??'–'}</div><table><tr><td class="k"></td>`;
+  for(let j=0;j<n;j++) h+=`<td class="k${j===f.fk?' kk':''}">${j}</td>`; h+=`</tr>`;
+  for(let i=0;i<n;i++){ h+=`<tr><td class="k${i===f.fk?' kk':''}">${i}</td>`;
+    for(let j=0;j<n;j++){ let c=''; if(i===f.fk||j===f.fk)c='kcol'; if(i===f.fi&&j===f.fj)c='cellhot';
+      h+=`<td class="${c}">${m[i][j]===Infinity?'∞':m[i][j]}</td>`; }
+    h+=`</tr>`; }
+  return h+`</table></div>`;
+}
+
+function sidePanel(f){
   let h='';
-  if(f.dist){
-    h+=`<div class="vtbl"><div class="cap">dist[ ]</div><table><tr>`;
-    for(let i=0;i<N;i++) h+=`<td class="k">${i}</td>`;
-    h+=`</tr><tr>`;
-    for(let i=0;i<N;i++){ const v=f.dist[i]; const done=f.node&&f.node[i]==='settled';
-      h+=`<td class="${done?'done':''}">${v===Infinity?'∞':v}</td>`; }
-    h+=`</tr></table></div>`;
-  }
-  if(f.parent){
-    h+=`<div class="vtbl"><div class="cap">parent[ ]</div><table><tr>`;
-    for(let i=0;i<N;i++) h+=`<td class="k">${i}</td>`; h+=`</tr><tr>`;
-    for(let i=0;i<N;i++) h+=`<td${f.parent[i]===i?' class="done"':''}>${f.parent[i]}</td>`;
-    h+=`</tr></table></div>`;
-    h+=`<div class="vtbl"><div class="cap">rank[ ]</div><table><tr>`;
-    for(let i=0;i<N;i++) h+=`<td class="k">${i}</td>`; h+=`</tr><tr>`;
-    for(let i=0;i<N;i++) h+=`<td>${f.rank[i]}</td>`;
-    h+=`</tr></table></div>`;
-  }
+  if(f.dist)  h+=numTable('dist[ ]',f.dist,i=>f.node&&f.node[i]==='settled');
+  if(f.ways)  h+=numTable('ways[ ]',f.ways,()=>false);
+  if(f.indeg) h+=numTable('in-degree',f.indeg,i=>f.indeg[i]===0);
+  if(f.parent){ h+=numTable('parent[ ]',f.parent,i=>f.parent[i]===i)+numTable('rank[ ]',f.rank,()=>false); }
+  if(f.order){ h+=`<div class="vtbl"><div class="cap">topo order</div><div class="qrow" style="min-height:0">${f.order.length?f.order.map(x=>`<span class="qp" style="background:#14424f;border-color:#1f7a8a;color:#bdf0ff">${x}</span>`).join(''):'<span class="qp empty">—</span>'}</div></div>`; }
   if(f.edgeList){
     h+=`<div class="vtbl" style="flex:1;min-width:150px"><div class="cap">edges (sorted)</div><div class="elist">`;
-    f.edgeList.forEach(([w,u,v],i)=>{
-      const key=ek(u,v); const isTree=f.edge&&f.edge[key]==='tree';
-      const isCyc=f.edge&&f.edge[key]==='cycle';
+    f.edgeList.forEach(([w,u,v],i)=>{ const key=ek(u,v),isTree=f.edge&&f.edge[key]==='tree',isCyc=f.edge&&f.edge[key]==='cycle';
       const cls=(i===f.edgeIdx?'cur ':'')+(isTree?'tree':(isCyc?'cycle':''));
-      h+=`<div class="erow ${cls}"><span class="w">w=${w}</span>${u}–${v}${isTree?' ✓':''}</div>`;
-    });
+      h+=`<div class="erow ${cls}"><span class="w">w=${w}</span>${u}–${v}${isTree?' ✓':''}</div>`; });
     h+=`</div></div>`;
   }
+  if(f.matrix) h+=matrixPanel(f);
   let h2='';
-  if(f.pq){
-    h2+=`<div class="qrow"><span class="qlabel">MIN-HEAP ↓</span>`;
-    if(!f.pq.length) h2+=`<span class="qp empty">empty</span>`;
-    else f.pq.forEach(t=>h2+=`<span class="qp">${t}</span>`);
-    h2+=`</div>`;
-  }
-  if(f.cost!=null) h2+=`<div class="cost">MST cost = ${f.cost}</div>`;
+  if(f.pq)   h2+=qpills('MIN-HEAP ↓',f.pq);
+  if(f.fifo) h2+=qpills('QUEUE →',f.fifo);
+  if(f.cost!=null)  h2+=`<div class="cost">MST cost = ${f.cost}</div>`;
+  if(f.round!=null) h2+=`<div class="cost" style="color:#ffd479">relaxation round ${f.round}</div>`;
   return {tables:h, heap:h2};
 }
 
@@ -645,10 +903,10 @@ function mountStepper(p){
   let idx=0;
   function draw(){
     const f=frames[idx];
-    stage.innerHTML=svgScene(f,p.mode);
+    stage.innerHTML=svgScene(f,p.graph);
     vmsg.classList.remove('flash');void vmsg.offsetWidth;vmsg.classList.add('flash');
     vmsg.innerHTML=`<span class="stepchip">STEP ${idx+1}</span>${f.msg}`;
-    const sp=sidePanel(f,p.mode);
+    const sp=sidePanel(f);
     vtables.innerHTML=(sp.heap?`<div style="flex:1;min-width:100%">${sp.heap}</div>`:'')+sp.tables;
     tEls.forEach((e,i)=>e.classList.toggle('hot',i===f.line));
     vpos.textContent=`${idx+1} / ${frames.length}`;
