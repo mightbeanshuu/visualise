@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arrays & Searching — Hashing · Two Pointers · Sliding Window · Binary Search</title>
+<meta name="description" content="Step-by-step animated hub for array patterns: hashing, two pointers, sliding window, binary search. AlgoMaster notes, Striver + NeetCode code, LeetCode problems, and variation templates.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0d0f14; --bg2:#0a0c11; --panel:#141920; --border:#1e2a38;
+    --text:#c9d1d9; --txt2:#8b949e; --muted:#586069; --faint:#444d56; --head:#e6edf3;
+    --hash:#00e5ff; --two:#ff9f0a; --win:#69ff47; --bs:#bf5af2; --warn:#ffd60a; --bad:#ff6b6b;
+  }
+  *{box-sizing:border-box;} html,body{margin:0;padding:0;}
+  body{font-family:'IBM Plex Sans',ui-sans-serif,system-ui,-apple-system,sans-serif;
+    background:radial-gradient(1200px 820px at 72% -12%, #122a3c 0%, #0d0f14 56%) fixed;
+    color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;}
+  code,kbd,samp{font-family:'JetBrains Mono','Fira Code',ui-monospace,Menlo,monospace;}
+  ::-webkit-scrollbar{width:9px;height:9px;}::-webkit-scrollbar-thumb{background:#26303d;border-radius:5px;}::-webkit-scrollbar-track{background:transparent;}
+  .top{border-bottom:1px solid var(--border);padding:18px 26px 14px;backdrop-filter:blur(10px);background:rgba(12,16,22,.72);}
+  .top .row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+  .badge{background:#00e5ff22;border:1px solid #00e5ff55;color:var(--hash);font-size:10px;font-weight:700;letter-spacing:2px;padding:3px 10px;border-radius:3px;}
+  .backbtn{text-decoration:none;color:var(--txt2);border:1px solid var(--border);background:rgba(255,255,255,.02);font-size:12px;font-weight:600;padding:5px 12px;border-radius:7px;transition:.15s;white-space:nowrap;}
+  .backbtn:hover{border-color:#475569;color:var(--head);background:rgba(255,255,255,.05);}
+  h1{margin:0;font-size:18px;font-weight:700;letter-spacing:-.3px;background:linear-gradient(90deg,#00e5ff,#ff9f0a 45%,#69ff47 70%,#bf5af2);-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .top .meta{color:var(--faint);font-size:12px;} .top p{margin:6px 0 0;font-size:11px;color:var(--muted);letter-spacing:.3px;}
+  .shell{display:flex;min-height:calc(100vh - 84px);}
+  .side{width:262px;min-width:262px;border-right:1px solid var(--border);overflow-y:auto;padding:10px 0 30px;backdrop-filter:blur(10px);background:rgba(9,11,16,.66);}
+  .catlabel{font-size:9px;letter-spacing:1.5px;padding:13px 16px 8px;font-weight:700;font-family:'JetBrains Mono',monospace;display:flex;align-items:center;gap:7px;}
+  .catlabel .catn{margin-left:auto;font-size:9px;color:var(--faint);background:#0e151d;border:1px solid var(--border);border-radius:10px;padding:1px 7px;}
+  .navitem{padding:9px 16px;cursor:pointer;border-left:3px solid transparent;transition:background .15s,border-color .15s;}
+  .navitem:hover{background:#10151c;} .navitem.on{background:var(--panel);}
+  .navitem .tag{font-size:8.5px;font-weight:700;letter-spacing:1.3px;opacity:.65;} .navitem.on .tag{opacity:1;}
+  .navitem .nm{font-size:12.5px;color:var(--txt2);margin-top:2px;line-height:1.3;} .navitem.on .nm{color:var(--head);font-weight:600;}
+  .main{flex:1;overflow-y:auto;padding:24px 30px 60px;max-width:1040px;}
+  .fade{animation:fade .35s ease;} @keyframes fade{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+  .phead{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:18px;}
+  .ptag{font-size:9px;font-weight:700;letter-spacing:2px;padding:3px 10px;border-radius:3px;}
+  .pcount{color:var(--faint);font-size:11px;margin-left:8px;}
+  .phead h2{margin:8px 0 0;font-size:23px;font-weight:700;color:var(--head);letter-spacing:-.5px;}
+  .srcline{margin-top:5px;font-size:11px;color:var(--muted);} .srcline b{color:var(--txt2);}
+  .copy{background:var(--panel);border:1px solid #30363d;color:var(--txt2);padding:8px 15px;border-radius:6px;cursor:pointer;font-size:11px;font-family:inherit;letter-spacing:.5px;white-space:nowrap;transition:.2s;}
+  .copy:hover{border-color:#475569;color:var(--head);} .copy.done{background:#1a3a1a;border-color:#69ff47;color:#69ff47;}
+  .pheadbtns{display:flex;gap:8px;flex-wrap:wrap;}
+  .cards{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;}
+  .ic{background:rgba(10,12,17,.62);border:1px solid var(--border);border-radius:12px;padding:16px 18px;backdrop-filter:blur(6px);box-shadow:0 8px 30px rgba(0,0,0,.28);}
+  .ic .h{font-size:9.5px;letter-spacing:1.6px;margin-bottom:8px;color:var(--muted);font-weight:700;font-family:'JetBrains Mono',monospace;}
+  .ic p{margin:0;font-size:13.5px;line-height:1.72;color:var(--text);}
+  .ic.analogy{grid-column:1/3;} .ic.bugs{grid-column:1/3;border-color:#ff6b6b33;} .ic.bugs .h{color:var(--bad);}
+  .ic.bugs ul{margin:0;padding-left:18px;} .ic.bugs li{font-size:13px;line-height:1.8;color:var(--text);margin-bottom:3px;}
+  .ic.bugs code{background:#1c2530;color:#ffd479;padding:0 4px;border-radius:3px;font-size:11px;} .ic b{color:var(--head);}
+  .probs{background:rgba(10,12,17,.6);border:1px solid var(--border);border-radius:8px;padding:11px 15px;margin-bottom:16px;}
+  .probs .h{font-size:9px;letter-spacing:1.5px;color:var(--muted);margin-bottom:8px;font-weight:700;}
+  .chip{display:inline-block;background:var(--panel);border:1px solid #30363d;color:var(--txt2);font-size:11px;padding:4px 10px;border-radius:4px;margin:0 6px 6px 0;}
+  .split{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:16px;align-items:start;margin-bottom:14px;}
+  .split.nocode{grid-template-columns:1fr;} .split.nocode .codeCol{display:none;}
+  @media(max-width:1080px){ .split{grid-template-columns:1fr;} }
+  .cb{background:rgba(7,10,14,.82);border:1px solid var(--border);border-radius:8px;overflow:hidden;backdrop-filter:blur(6px);box-shadow:0 8px 30px rgba(0,0,0,.28);}
+  .cbbar{background:var(--panel);border-bottom:1px solid var(--border);padding:9px 14px;display:flex;align-items:center;gap:8px;}
+  .dots{display:flex;gap:6px;} .dots i{width:10px;height:10px;border-radius:50%;display:inline-block;}
+  .cbtitle{font-size:11px;color:var(--muted);margin-left:6px;}
+  pre{margin:0;padding:16px 12px;font-size:12.5px;line-height:1.8;overflow-x:auto;white-space:pre;font-family:'JetBrains Mono','Fira Code',ui-monospace,Menlo,monospace;}
+  .kw{color:#ff7b72;} .nm{color:#79c0ff;} .cm{color:#586069;font-style:italic;} .star{color:#ffd60a;font-weight:700;} .str{color:#a5d6ff;}
+  .cl{display:block;padding:0 8px;border-radius:5px;border-left:2px solid transparent;transition:background .14s,border-color .14s;}
+  .cmdot{display:inline-block;width:9px;margin-right:8px;font-size:7px;color:#2c3540;vertical-align:middle;transition:color .14s,transform .14s;}
+  .cl:not(.has-cm) .cmdot{visibility:hidden;} .cl.has-cm{cursor:pointer;}
+  .cl.has-cm:hover{background:#0f1c25;border-left-color:#2a4452;} .cl.has-cm:hover .cmdot{color:var(--warn);}
+  .cl .cm{display:none;} .cl.reveal .cm{display:inline;animation:cmin .2s ease;}
+  .cl.reveal .cmdot{color:#69ff47;transform:scale(1.25);} .cl.reveal{background:#0c1a14;border-left-color:#1f7a3a;}
+  @keyframes cmin{from{opacity:0;}to{opacity:1;}}
+  .cbtoggle{margin-left:auto;background:transparent;border:1px solid #30363d;color:var(--txt2);font-family:inherit;font-size:10px;letter-spacing:.5px;padding:4px 10px;border-radius:5px;cursor:pointer;transition:.15s;}
+  .cbtoggle:hover{border-color:#475569;color:var(--head);} .cbtoggle.on{background:#0c1a14;border-color:#1f7a3a;color:#69ff47;}
+  .cbnote{font-size:10px;color:var(--faint);padding:6px 16px 10px;letter-spacing:.3px;}
+  .varWrap{margin-bottom:16px;animation:fade .3s ease;}
+  .varhead{font-size:10px;letter-spacing:1.6px;color:#ffd479;font-weight:700;font-family:'JetBrains Mono',monospace;margin:2px 0 12px;}
+  .varcb{margin-bottom:12px;}
+  .vtag{font-size:8.5px;font-weight:700;letter-spacing:1px;padding:2px 8px;border-radius:3px;background:#3a2e0a;border:1px solid #6b5212;color:#ffd479;}
+  .varwhen{font-size:12px;line-height:1.55;color:var(--txt2);padding:9px 14px 0;}
+  .varwhen b{color:var(--head);} .varwhen code{background:#1c2530;color:#ffd479;padding:0 4px;border-radius:3px;font-size:11px;}
+  .demo{background:rgba(10,12,17,.6);border:1px solid var(--border);border-radius:10px;padding:14px;backdrop-filter:blur(6px);box-shadow:0 8px 30px rgba(0,0,0,.28);}
+  .demo .h{font-size:9px;letter-spacing:1.5px;color:var(--hash);margin-bottom:11px;font-weight:700;}
+  .stage{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:10px;}
+  .stage svg{width:100%;height:auto;display:block;}
+  .stepchip{display:inline-block;margin-right:9px;font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:1.2px;font-weight:700;color:var(--hash);background:#0a1f2a;border:1px solid #14424f;border-radius:20px;padding:2px 9px;vertical-align:1px;}
+  .vmsg{margin-top:11px;font-size:13.5px;line-height:1.6;color:var(--text);background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--hash);border-radius:7px;padding:11px 13px;min-height:22px;}
+  .vmsg b{color:var(--head);} .vmsg .ok{color:#69ff47;font-weight:700;} .vmsg .bad{color:#ff6b6b;font-weight:700;}
+  .vmsg.flash{animation:stepin .35s ease;} @keyframes stepin{from{opacity:.3;transform:translateY(3px);}to{opacity:1;transform:none;}}
+  .vctrl{display:flex;gap:7px;align-items:center;margin-top:11px;flex-wrap:wrap;}
+  .vctrl button{background:var(--panel);border:1px solid #30363d;color:var(--text);padding:6px 13px;border-radius:6px;cursor:pointer;font-size:13px;font-family:inherit;font-weight:600;transition:.15s;}
+  .vctrl button:hover:not(:disabled){background:#1c2530;} .vctrl button:disabled{opacity:.4;cursor:not-allowed;}
+  .vctrl button.play{background:var(--hash);border-color:var(--hash);color:#06223f;}
+  .spd{display:inline-flex;align-items:center;gap:7px;margin-left:auto;} .spd input{width:104px;accent-color:var(--hash);cursor:pointer;}
+  .spd b{font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace;} .vpos{font-size:11px;color:var(--faint);font-family:'JetBrains Mono',monospace;}
+  .vtables{margin-top:11px;display:flex;gap:14px;flex-wrap:wrap;}
+  .vtbl{font-family:'JetBrains Mono',monospace;font-size:11px;background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:10px 11px;}
+  .vtbl .cap{color:var(--muted);margin-bottom:7px;letter-spacing:1px;font-weight:700;}
+  .qrow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-height:26px;}
+  .qlabel{font-size:10px;color:var(--muted);letter-spacing:1.2px;font-weight:700;}
+  .qp{background:#0a5f7a;border:1px solid #14a8d0;color:#d6f4ff;font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:13px;font-family:'JetBrains Mono',monospace;animation:qin .28s ease;}
+  .qp.empty{background:transparent;border:1px dashed #2a3340;color:var(--faint);font-weight:400;font-style:italic;}
+  @keyframes qin{from{opacity:0;transform:translateY(5px) scale(.85);}to{opacity:1;transform:none;}}
+  .cost{margin-top:9px;font-size:13px;font-weight:700;color:var(--hash);font-family:'JetBrains Mono',monospace;}
+  .trace{margin-top:13px;background:#070a0e;border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+  .trace .th{background:var(--panel);border-bottom:1px solid var(--border);padding:7px 13px;font-size:10px;letter-spacing:1px;color:var(--muted);font-weight:700;} .trace .th b{color:var(--hash);}
+  .trace pre{padding:11px 8px;font-size:11.5px;line-height:1.7;}
+  .tln{display:block;padding:1px 12px;border-left:3px solid transparent;white-space:pre;color:#7d8895;transition:background .2s,color .2s,border-color .2s;}
+  .tln.hot{background:#0f2a33;border-left-color:var(--hash);color:#dff6ff;font-weight:700;}
+  .pnav{display:flex;justify-content:space-between;align-items:center;margin-top:18px;padding-top:16px;border-top:1px solid var(--border);}
+  .pnav button{background:transparent;border:1px solid #30363d;color:var(--txt2);padding:8px 18px;border-radius:6px;cursor:pointer;font-size:12px;font-family:inherit;transition:.15s;}
+  .pnav button:hover:not(:disabled){border-color:#475569;color:var(--head);} .pnav button:disabled{color:#2a323d;cursor:not-allowed;} .pnav .pos{font-size:11px;color:var(--faint);}
+  svg .acell{transition:fill .3s,stroke .3s;}
+  svg .aval{fill:#e6edf3;font:700 15px 'JetBrains Mono',monospace;text-anchor:middle;dominant-baseline:central;}
+  svg .aidx{fill:#5b6675;font:600 10px 'JetBrains Mono',monospace;text-anchor:middle;}
+  svg .aptr{fill:#ffd60a;font:700 11px 'JetBrains Mono',monospace;text-anchor:middle;}
+  .menuToggle{display:none;}
+  @media(max-width:860px){
+    .shell{flex-direction:column;}
+    .side{width:100%;min-width:0;border-right:none;border-bottom:1px solid var(--border);max-height:0;overflow:hidden;padding:0;transition:max-height .3s ease;}
+    .side.open{max-height:1500px;padding:10px 0 20px;} .menuToggle{display:inline-block;}
+    .cards{grid-template-columns:1fr;} .ic.analogy,.ic.bugs{grid-column:auto;} .main{padding:18px 16px 50px;}
+  }
+</style>
+</head>
+<body>
+  <div class="top">
+    <div class="row">
+      <a class="backbtn" href="/" title="Topics">← Topics</a>
+      <span class="badge">ARRAYS · SEARCHING</span>
+      <h1>Arrays &amp; Searching — Hashing · Two Pointers · Sliding Window · Binary Search</h1>
+      <span class="meta">12 patterns · C++ · Anshu</span>
+      <button class="copy menuToggle" id="menuToggle" style="margin-left:auto">☰ patterns</button>
+    </div>
+    <p>AlgoMaster notes + <b>Striver + NeetCode</b> C++, with the array, pointers, window and hash-map animating <b>line by line</b>. Real LeetCode questions, with variation templates per pattern.</p>
+  </div>
+
+  <div class="shell">
+    <div class="side" id="side"></div>
+    <div class="main" id="main"></div>
+  </div>
+
+<script>
+/* ════════════════ 1-D ARRAY ENGINE ════════════════ */
+function svgArray(arr,f){
+  const n=arr.length, cw=Math.min(44, Math.max(30, Math.floor(460/n))), gap=7, pad=18, top=56;
+  const W=pad*2+n*cw+(n-1)*gap, H=top+78;
+  const xOf=i=>pad+i*(cw+gap);
+  let s=`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet">`;
+  const ptr=f.ptr||{}, byIdx={};
+  Object.entries(ptr).forEach(([name,idx])=>{ if(idx>=0&&idx<n)(byIdx[idx]=byIdx[idx]||[]).push(name); });
+  Object.entries(byIdx).forEach(([idx,names])=>{ const x=xOf(+idx)+cw/2;
+    s+=`<text class="aptr" x="${x}" y="${top-28}">${names.join(' ')}</text><text class="aptr" x="${x}" y="${top-13}">▼</text>`; });
+  arr.forEach((v,i)=>{ const st=(f.cells&&f.cells[i])||''; const x=xOf(i);
+    let stroke='#3a4658',fill='#10161e';
+    if(st==='win'){stroke='#00e5ff';fill='#06222b';}
+    if(st==='check'){stroke='#ffd60a';fill='#241d04';}
+    if(st==='found'){stroke='#69ff47';fill='#123a1f';}
+    if(st==='dead'){stroke='#ff6b6b';fill='#2a0e0e';}
+    s+=`<rect class="acell" x="${x}" y="${top}" width="${cw}" height="40" rx="7" fill="${fill}" stroke="${stroke}" stroke-width="2"/><text class="aval" x="${x+cw/2}" y="${top+20}">${v}</text><text class="aidx" x="${x+cw/2}" y="${top+56}">${i}</text>`; });
+  return s+'</svg>';
+}
+function qpills(label,arr){let h=`<div class="qrow"><span class="qlabel">${label}</span>`;if(!arr.length)h+=`<span class="qp empty">empty</span>`;else arr.forEach(t=>h+=`<span class="qp">${t}</span>`);return h+`</div>`;}
+function arraySide(f){
+  let tables='',heap='';
+  if(f.result) heap+=qpills('RESULT →',f.result);
+  if(f.stats) f.stats.forEach(([k,v])=>heap+=`<div class="cost" style="color:#9fe0ff">${k} = ${v}</div>`);
+  if(f.kv && Object.keys(f.kv).length) tables+=`<div class="vtbl"><div class="cap">hash map</div><div class="qrow" style="min-height:0">${Object.entries(f.kv).map(([k,v])=>`<span class="qp" style="background:#2a1a3a;border-color:#7c3aa8;color:#ecd9ff">${k}→${v}</span>`).join('')}</div></div>`;
+  return {tables,heap};
+}
+
+/* ════════════════ FRAME GENERATORS ════════════════ */
+function genTwoSum(){
+  const arr=[3,2,7,11,15],target=9,seen={},F=[];
+  const snap=(i,line,msg,extra={})=>F.push({arr,cells:extra.cells||{[i]:'check'},ptr:i>=0?{i}:{},kv:Object.assign({},seen),result:extra.result,msg,line});
+  for(let i=0;i<arr.length;i++){
+    const need=target-arr[i];
+    snap(i,2,`i=${i} (a[i]=${arr[i]}): need ${target} − ${arr[i]} = <b>${need}</b>. Is ${need} in the map?`);
+    if(seen[need]!==undefined){ snap(i,3,`<span class="ok">Yes!</span> ${need} was seen at index ${seen[need]} → answer [${seen[need]}, ${i}].`,{cells:{[i]:'found',[seen[need]]:'found'},result:[seen[need],i]}); return F; }
+    seen[arr[i]]=i;
+    snap(i,4,`No → store ${arr[i]}→${i} and continue.`);
+  }
+  return F;
+}
+function genKadane(){
+  const arr=[-2,1,-3,4,-1,2,1,-5,4],F=[]; let cur=0,best=-1e9;
+  F.push({arr,cells:{},stats:[['cur',0],['best','−∞']],msg:`cur = running best ending here; best = global best.`,line:0});
+  for(let i=0;i<arr.length;i++){
+    cur=Math.max(arr[i],cur+arr[i]); best=Math.max(best,cur);
+    F.push({arr,cells:{[i]:cur===arr[i]?'check':'win'},ptr:{i},stats:[['cur',cur],['best',best]],msg:`i=${i} (${arr[i]}): cur = max(${arr[i]}, prev+${arr[i]}) = <b>${cur}</b>. best = <b>${best}</b>.`,line:2});
+  }
+  F.push({arr,cells:{},stats:[['best',best]],msg:`<span class="ok">Max subarray sum = ${best}.</span>`,line:-1});
+  return F;
+}
+function genSubK(){
+  const arr=[1,2,3,1,-1],k=3,seen={0:1},F=[]; let pre=0,cnt=0;
+  F.push({arr,cells:{},kv:Object.assign({},seen),stats:[['prefix',0],['count',0]],msg:`Map holds counts of each prefix sum; seed prefix 0 → once.`,line:0});
+  for(let i=0;i<arr.length;i++){
+    pre+=arr[i]; const need=pre-k;
+    if(seen[need]) cnt+=seen[need];
+    F.push({arr,cells:{[i]:'check'},ptr:{i},kv:Object.assign({},seen),stats:[['prefix',pre],['count',cnt]],msg:`i=${i}: prefix=${pre}. Earlier prefix ${need} seen ${seen[need]||0}× → count=<b>${cnt}</b>.`,line:3});
+    seen[pre]=(seen[pre]||0)+1;
+  }
+  F.push({arr,cells:{},kv:Object.assign({},seen),stats:[['count',cnt]],msg:`<span class="ok">${cnt} subarrays sum to ${k}.</span>`,line:-1});
+  return F;
+}
+function genTwoPtrSum(){
+  const arr=[2,3,4,7,11,15],target=18,F=[]; let l=0,r=arr.length-1;
+  while(l<r){
+    const s=arr[l]+arr[r];
+    if(s===target){F.push({arr,cells:{[l]:'found',[r]:'found'},ptr:{L:l,R:r},stats:[['sum',s],['target',target]],result:[l,r],msg:`a[L]+a[R] = ${arr[l]}+${arr[r]} = <b>${s}</b> = target → <span class="ok">found [${l}, ${r}]!</span>`,line:2});return F;}
+    if(s<target){F.push({arr,cells:{[l]:'win',[r]:'win'},ptr:{L:l,R:r},stats:[['sum',s],['target',target]],msg:`sum ${s} &lt; ${target} → need bigger, move <b>L →</b>.`,line:4});l++;}
+    else{F.push({arr,cells:{[l]:'win',[r]:'win'},ptr:{L:l,R:r},stats:[['sum',s],['target',target]],msg:`sum ${s} &gt; ${target} → need smaller, move <b>← R</b>.`,line:6});r--;}
+  }
+  return F;
+}
+function genContainer(){
+  const arr=[1,8,6,2,5,4,8,3,7],F=[]; let l=0,r=arr.length-1,best=0;
+  while(l<r){
+    const area=Math.min(arr[l],arr[r])*(r-l); best=Math.max(best,area);
+    F.push({arr,cells:{[l]:'win',[r]:'win'},ptr:{L:l,R:r},stats:[['area',area],['best',best]],msg:`width ${r-l} × min(${arr[l]},${arr[r]}) = <b>${area}</b>. best=<b>${best}</b>.`,line:2});
+    if(arr[l]<arr[r]){F.push({arr,cells:{[l]:'dead',[r]:'win'},ptr:{L:l,R:r},stats:[['best',best]],msg:`left wall ${arr[l]} shorter → move <b>L →</b> (only a taller left can grow the area).`,line:3});l++;}
+    else{F.push({arr,cells:{[l]:'win',[r]:'dead'},ptr:{L:l,R:r},stats:[['best',best]],msg:`right wall ${arr[r]} ≤ left → move <b>← R</b>.`,line:4});r--;}
+  }
+  F.push({arr,cells:{},stats:[['best',best]],msg:`<span class="ok">Max area = ${best}.</span>`,line:-1});
+  return F;
+}
+function gen3Sum(){
+  const arr=[-4,-1,-1,0,1,2],F=[],res=[];
+  const R=()=>res.map(t=>'['+t.join(',')+']');
+  for(let i=0;i<arr.length-2;i++){
+    if(i>0&&arr[i]===arr[i-1]){F.push({arr,cells:{[i]:'dead'},ptr:{i},result:R(),msg:`i=${i}: duplicate value ${arr[i]} → skip to avoid repeat triplets.`,line:2});continue;}
+    let l=i+1,r=arr.length-1;
+    while(l<r){
+      const s=arr[i]+arr[l]+arr[r];
+      if(s===0){res.push([arr[i],arr[l],arr[r]]);F.push({arr,cells:{[i]:'found',[l]:'found',[r]:'found'},ptr:{i,L:l,R:r},result:R(),msg:`${arr[i]}+${arr[l]}+${arr[r]} = 0 → <span class="ok">triplet found!</span>`,line:6});l++;r--;}
+      else if(s<0){F.push({arr,cells:{[i]:'check',[l]:'win',[r]:'win'},ptr:{i,L:l,R:r},result:R(),msg:`sum ${s} &lt; 0 → move <b>L →</b>.`,line:8});l++;}
+      else{F.push({arr,cells:{[i]:'check',[l]:'win',[r]:'win'},ptr:{i,L:l,R:r},result:R(),msg:`sum ${s} &gt; 0 → move <b>← R</b>.`,line:9});r--;}
+    }
+  }
+  F.push({arr,cells:{},result:R(),msg:`<span class="ok">Triplets: ${R().join(' ')||'none'}.</span>`,line:-1});
+  return F;
+}
+function genFixedWin(){
+  const arr=[2,1,5,1,3,2],k=3,F=[]; let sum=0,best=0;
+  const win=(s,e)=>{const c={};for(let x=s;x<=e;x++)c[x]='win';return c;};
+  for(let i=0;i<k;i++) sum+=arr[i]; best=sum;
+  F.push({arr,cells:win(0,k-1),ptr:{L:0,R:k-1},stats:[['sum',sum],['best',best]],msg:`Build the first window [0..${k-1}] → sum=<b>${sum}</b>.`,line:0});
+  for(let r=k;r<arr.length;r++){
+    sum+=arr[r]-arr[r-k]; best=Math.max(best,sum);
+    F.push({arr,cells:win(r-k+1,r),ptr:{L:r-k+1,R:r},stats:[['sum',sum],['best',best]],msg:`Slide right: +${arr[r]} −${arr[r-k]} → sum=<b>${sum}</b>. best=<b>${best}</b>.`,line:3});
+  }
+  F.push({arr,cells:{},stats:[['best',best]],msg:`<span class="ok">Max window sum = ${best}.</span>`,line:-1});
+  return F;
+}
+function genLongestUniq(){
+  const arr=[...'abcabcbb'],seen={},F=[]; let l=0,best=0,bs=0;
+  const win=(s,e)=>{const c={};for(let x=s;x<=e;x++)c[x]='win';return c;};
+  for(let r=0;r<arr.length;r++){
+    if(seen[arr[r]]!==undefined && seen[arr[r]]>=l) l=seen[arr[r]]+1;
+    seen[arr[r]]=r;
+    if(r-l+1>best){best=r-l+1;bs=l;}
+    F.push({arr,cells:win(l,r),ptr:{L:l,R:r},stats:[['window',`"${arr.slice(l,r+1).join('')}"`],['best',best]],msg:`r=${r} ('${arr[r]}'): if it repeats inside the window, jump L past it. Window len ${r-l+1}, best=<b>${best}</b>.`,line:2});
+  }
+  F.push({arr,cells:win(bs,bs+best-1),stats:[['best',best]],msg:`<span class="ok">Longest = ${best} ("${arr.slice(bs,bs+best).join('')}").</span>`,line:-1});
+  return F;
+}
+function genMinSub(){
+  const arr=[2,3,1,2,4,3],target=7,F=[]; let l=0,sum=0,best=1e9;
+  const win=(s,e)=>{const c={};for(let x=s;x<=e;x++)c[x]='win';return c;};
+  for(let r=0;r<arr.length;r++){
+    sum+=arr[r];
+    F.push({arr,cells:win(l,r),ptr:{L:l,R:r},stats:[['sum',sum],['best',best===1e9?'∞':best]],msg:`Expand: add a[${r}]=${arr[r]} → sum=<b>${sum}</b>.`,line:2});
+    while(sum>=target){ best=Math.min(best,r-l+1);
+      F.push({arr,cells:win(l,r),ptr:{L:l,R:r},stats:[['sum',sum],['best',best]],msg:`sum ${sum} ≥ ${target} → valid window len ${r-l+1}, best=<b>${best}</b>. Shrink from left.`,line:4});
+      sum-=arr[l]; l++;
+    }
+  }
+  F.push({arr,cells:{},stats:[['best',best]],msg:`<span class="ok">Min length = ${best}.</span>`,line:-1});
+  return F;
+}
+function genBinary(){
+  const arr=[1,3,5,7,9,11,13],target=9,F=[]; let lo=0,hi=arr.length-1;
+  const range=(s,e)=>{const c={};for(let x=s;x<=e;x++)c[x]='win';return c;};
+  while(lo<=hi){
+    const mid=(lo+hi)>>1, c=range(lo,hi); c[mid]='check';
+    F.push({arr,cells:c,ptr:{lo,mid,hi},stats:[['a[mid]',arr[mid]],['target',target]],msg:`lo=${lo}, hi=${hi} → mid=${mid}, a[mid]=${arr[mid]}.`,line:1});
+    if(arr[mid]===target){F.push({arr,cells:{[mid]:'found'},ptr:{mid},msg:`<span class="ok">a[${mid}]=${arr[mid]} = target → found at index ${mid}!</span>`,line:2});return F;}
+    if(arr[mid]<target){F.push({arr,cells:range(mid+1,hi),ptr:{lo:mid+1,hi},msg:`${arr[mid]} &lt; ${target} → discard left half, lo=${mid+1}.`,line:3});lo=mid+1;}
+    else{F.push({arr,cells:range(lo,mid-1),ptr:{lo,hi:mid-1},msg:`${arr[mid]} &gt; ${target} → discard right half, hi=${mid-1}.`,line:4});hi=mid-1;}
+  }
+  F.push({arr,cells:{},msg:`Not found.`,line:-1});
+  return F;
+}
+function genRotated(){
+  const arr=[4,5,6,7,0,1,2],target=0,F=[]; let lo=0,hi=arr.length-1;
+  const range=(s,e)=>{const c={};for(let x=s;x<=e;x++)c[x]='win';return c;};
+  while(lo<=hi){
+    const mid=(lo+hi)>>1, c=range(lo,hi); c[mid]='check';
+    F.push({arr,cells:c,ptr:{lo,mid,hi},stats:[['a[mid]',arr[mid]],['target',target]],msg:`mid=${mid} (a[mid]=${arr[mid]}). Decide which half is sorted.`,line:2});
+    if(arr[mid]===target){F.push({arr,cells:{[mid]:'found'},ptr:{mid},msg:`<span class="ok">Found ${target} at index ${mid}!</span>`,line:3});return F;}
+    if(arr[lo]<=arr[mid]){
+      if(arr[lo]<=target&&target<arr[mid]){F.push({arr,cells:range(lo,mid-1),ptr:{lo,hi:mid-1},msg:`Left half [${arr[lo]}..${arr[mid]}] is sorted and holds ${target} → go left.`,line:5});hi=mid-1;}
+      else{F.push({arr,cells:range(mid+1,hi),ptr:{lo:mid+1,hi},msg:`Left sorted but ${target} not inside → go right.`,line:6});lo=mid+1;}
+    } else {
+      if(arr[mid]<target&&target<=arr[hi]){F.push({arr,cells:range(mid+1,hi),ptr:{lo:mid+1,hi},msg:`Right half is sorted and holds ${target} → go right.`,line:8});lo=mid+1;}
+      else{F.push({arr,cells:range(lo,mid-1),ptr:{lo,hi:mid-1},msg:`Right sorted but ${target} not inside → go left.`,line:9});hi=mid-1;}
+    }
+  }
+  F.push({arr,cells:{},msg:`Not found.`,line:-1});
+  return F;
+}
+function genKoko(){
+  const piles=[3,6,7,11],H=8,F=[]; let lo=1,hi=Math.max(...piles);
+  const hours=k=>piles.reduce((s,p)=>s+Math.ceil(p/k),0);
+  F.push({arr:piles,cells:{},stats:[['lo',lo],['hi',hi],['H',H]],msg:`Binary-search the <b>answer</b>: eating speed in [1, ${hi}]. Feasible = total hours ≤ ${H}.`,line:0});
+  while(lo<hi){
+    const mid=(lo+hi)>>1, h=hours(mid);
+    F.push({arr:piles,cells:{},stats:[['lo',lo],['mid',mid],['hi',hi],['hours@mid',h+' vs '+H]],msg:`Try speed ${mid} → needs ${h} h. ${h<=H?`≤ ${H}: feasible, try slower → hi=${mid}.`:`&gt; ${H}: too slow → lo=${mid+1}.`}`,line:3});
+    if(h<=H) hi=mid; else lo=mid+1;
+  }
+  F.push({arr:piles,cells:{},stats:[['answer',lo]],msg:`<span class="ok">Minimum eating speed = ${lo}.</span>`,line:-1});
+  return F;
+}
+
+/* ════════════════ PATTERN DATA ════════════════ */
+const CAT={ HASH:{c:'#00e5ff',label:'ARRAYS & HASHING'}, TWO:{c:'#ff9f0a',label:'TWO POINTERS'}, WIN:{c:'#69ff47',label:'SLIDING WINDOW'}, BS:{c:'#bf5af2',label:'BINARY SEARCH'} };
+const SRC='Pattern framing · <b>AlgoMaster</b> &nbsp;|&nbsp; Code · <b>Striver + NeetCode</b>';
+
+const P=[
+{ cat:'HASH', label:'Two Sum (hash map)', gen:genTwoSum, src:SRC,
+  when:'Find two elements that satisfy a relation (sum to target) in one pass over an <b>unsorted</b> array.',
+  insight:'For each value, the partner you need is fixed (<code>target − a[i]</code>). A hash map of seen values turns the O(n²) pair search into O(n): ask the map, then insert.',
+  analogy:'At a party looking for someone whose age completes 60 with yours — keep a guest book of who you’ve met so the moment the match walks in, you recognise them.',
+  bugs:['Inserting <code>a[i]</code> <i>before</i> checking → can match an element with itself.','Returning values instead of indices.','Assuming the array is sorted (that’s the two-pointer variant).'],
+  problems:['LC 1 · Two Sum','LC 454 · 4Sum II','LC 1 follow-up · Two Sum III','LC 560 · Subarray Sum = K'],
+  code:`// Striver / NeetCode — Two Sum (hash map, one pass)
+vector<int> twoSum(vector<int>& a, int target){
+    unordered_map<int,int> seen;          // value -> index
+    for(int i = 0; i < a.size(); i++){
+        int need = target - a[i];         // partner we want
+        if(seen.count(need))              // ★ already met it?
+            return {seen[need], i};
+        seen[a[i]] = i;                   // record current
+    }
+    return {};
+}`,
+  trace:['for(i=0;i<n;i++){','  int need=target-a[i];','  if(seen.count(need))','    return {seen[need], i};','  seen[a[i]]=i; }']
+},
+{ cat:'HASH', label:"Kadane's — Max Subarray", gen:genKadane, src:SRC,
+  when:'Maximum sum of a <b>contiguous</b> subarray — the canonical 1-D DP / running-sum pattern.',
+  insight:'At each index decide: extend the previous subarray, or start fresh here. <code>cur = max(a[i], cur + a[i])</code>; track the best cur ever seen. A negative running sum is never worth keeping.',
+  analogy:'Walking a trail tracking elevation gain — the instant your running total goes negative, you reset your "start" to right here, because carrying a deficit forward only hurts.',
+  bugs:['Initialising best to 0 when all numbers are negative (use a[0] or −∞).','Resetting cur to 0 instead of to a[i].','Confusing it with max <i>product</i> subarray (needs min too).'],
+  problems:['LC 53 · Maximum Subarray','LC 152 · Maximum Product Subarray','LC 918 · Max Circular Subarray','LC 1191 · Concatenated'],
+  code:`// Striver / NeetCode — Kadane's max subarray sum
+int maxSubArray(vector<int>& a){
+    int cur = 0, best = INT_MIN;
+    for(int x : a){
+        cur = max(x, cur + x);   // ★ extend, or restart at x
+        best = max(best, cur);   // record running best
+    }
+    return best;
+}`,
+  trace:['cur=0; best=INT_MIN;','for(int x : a){','  cur = max(x, cur + x);','  best = max(best, cur); }']
+},
+{ cat:'HASH', label:'Subarray Sum = K (prefix + map)', gen:genSubK, src:SRC,
+  when:'Count (or find) subarrays whose sum equals K — works even with negative numbers, where sliding window fails.',
+  insight:'If prefix[j] − prefix[i] = K, the subarray (i, j] sums to K. So for each prefix, look for <code>prefix − K</code> among earlier prefixes. A count-map of prefixes does it in O(n).',
+  analogy:'Mile-markers on a road: a stretch is exactly K long if two markers differ by K — keep a tally of markers you’ve passed and check for the matching one.',
+  bugs:['Forgetting to seed <code>map[0] = 1</code> (subarrays starting at index 0).','Storing booleans instead of counts.','Trying sliding window with negatives present.'],
+  problems:['LC 560 · Subarray Sum = K','LC 974 · Divisible by K','LC 523 · Continuous Subarray Sum','LC 525 · Contiguous Array'],
+  code:`// Striver / NeetCode — Subarray sum equals K
+int subarraySum(vector<int>& a, int k){
+    unordered_map<int,int> cnt{{0,1}};    // prefix 0 seen once
+    int pre = 0, ans = 0;
+    for(int x : a){
+        pre += x;
+        ans += cnt[pre - k];              // ★ earlier prefix = pre-k
+        cnt[pre]++;
+    }
+    return ans;
+}`,
+  trace:['cnt[0]=1; pre=0; ans=0;','for(int x : a){','  pre += x;','  ans += cnt[pre - k];','  cnt[pre]++; }']
+},
+{ cat:'TWO', label:'Two Sum II (sorted, opposite ends)', gen:genTwoPtrSum, src:SRC,
+  when:'A <b>sorted</b> array and you want a pair (or to compare ends) — O(1) space, O(n) time.',
+  insight:'Start L at the left, R at the right. The sum moves monotonically: too small → L++ (only way to grow it), too big → R−− (only way to shrink it). No element is ever revisited.',
+  analogy:'Tuning a balance scale from both ends — add weight on the light side, remove from the heavy side, converging on balance.',
+  bugs:['Using it on an unsorted array.','Moving the wrong pointer.','Off-by-one with 1-indexed answers (LC 167).'],
+  problems:['LC 167 · Two Sum II','LC 15 · 3Sum','LC 18 · 4Sum','LC 11 · Container With Most Water'],
+  code:`// Striver / NeetCode — Two Sum II (sorted, two pointers)
+vector<int> twoSum(vector<int>& a, int target){
+    int l = 0, r = a.size() - 1;
+    while(l < r){
+        int s = a[l] + a[r];
+        if(s == target) return {l, r};
+        else if(s < target) l++;     // ★ need a bigger sum
+        else                 r--;     // need a smaller sum
+    }
+    return {};
+}`,
+  trace:['l=0; r=n-1;','while(l<r){','  if(a[l]+a[r]==t) return {l,r};','  else if(a[l]+a[r]<t)','     l++;','  else','     r--; }']
+},
+{ cat:'TWO', label:'Container With Most Water', gen:genContainer, src:SRC,
+  when:'Maximise an area/quantity bounded by two ends, where one end limits the result.',
+  insight:'Area = width × min(height[L], height[R]). Moving the <b>taller</b> wall can only shrink width without raising the limiting height — so always move the <b>shorter</b> wall inward.',
+  analogy:'Two people holding a sagging rope between buildings: widening helps only if you can also raise the lower hand, so the shorter holder must step in.',
+  bugs:['Moving the taller pointer (loses the optimal).','Using height instead of min of the two.','Recomputing area for all pairs (O(n²)).'],
+  problems:['LC 11 · Container With Most Water','LC 42 · Trapping Rain Water','LC 75 · Sort Colors','LC 977 · Squares of Sorted Array'],
+  code:`// Striver / NeetCode — Container with most water
+int maxArea(vector<int>& h){
+    int l = 0, r = h.size() - 1, best = 0;
+    while(l < r){
+        best = max(best, (r - l) * min(h[l], h[r]));
+        if(h[l] < h[r]) l++;        // ★ move the shorter wall
+        else            r--;
+    }
+    return best;
+}`,
+  trace:['l=0; r=n-1; best=0;','while(l<r){','  best=max(best, (r-l)*min(h[l],h[r]));','  if(h[l]<h[r]) l++;','  else r--; }']
+},
+{ cat:'TWO', label:'3Sum (fix one + two pointers)', gen:gen3Sum, src:SRC,
+  when:'Find triplets (or k-tuples) summing to a target — the workhorse two-pointer reduction.',
+  insight:'Sort, fix the first element, then two-pointer the rest for the remaining target. Sorting also makes <b>duplicate-skipping</b> trivial: jump over equal values at i, l and r.',
+  analogy:'Pinning one corner of a triangle and sliding the other two corners inward until the three sides balance.',
+  bugs:['Not sorting first.','Forgetting to skip duplicates → repeated triplets.','Moving only one pointer after a hit.'],
+  problems:['LC 15 · 3Sum','LC 16 · 3Sum Closest','LC 18 · 4Sum','LC 259 · 3Sum Smaller'],
+  code:`// Striver / NeetCode — 3Sum (sorted + two pointers)
+sort(a.begin(), a.end());
+for(int i = 0; i < n; i++){
+    if(i && a[i] == a[i-1]) continue;       // skip dup i
+    int l = i+1, r = n-1;
+    while(l < r){
+        int s = a[i] + a[l] + a[r];
+        if(s == 0){ res.push_back({a[i],a[l],a[r]});
+            l++; r--;
+            while(l<r && a[l]==a[l-1]) l++;     // skip dups
+        }
+        else if(s < 0) l++;
+        else           r--;
+    }
+}`,
+  trace:['sort(a);','for(i=0;i<n;i++){','  if(i && a[i]==a[i-1]) continue;','  l=i+1; r=n-1;','  while(l<r){','    s=a[i]+a[l]+a[r];','    if(s==0){ add; l++; r--; }','    else if(s<0) l++;','    else r--; } }']
+},
+{ cat:'WIN', label:'Fixed-Size Window (max sum size K)', gen:genFixedWin, src:SRC,
+  when:'Any "of every K consecutive elements" question — the simplest sliding window.',
+  insight:'Compute the first window once, then <b>slide</b>: add the entering element, subtract the leaving one. O(n) instead of recomputing each window in O(K).',
+  analogy:'A train of K seats moving down the platform — at each step one passenger boards at the front and one alights at the back; you never recount everyone.',
+  bugs:['Recomputing the whole window each step (O(n·K)).','Off-by-one on which index leaves (<code>r−k</code>).','Initialising best before the first window is built.'],
+  problems:['Max Sum Subarray of size K (Striver)','LC 643 · Max Average Subarray I','LC 239 · Sliding Window Maximum','LC 567 · Permutation in String'],
+  code:`// Striver / NeetCode — Fixed window (max sum of size k)
+int maxSum(vector<int>& a, int k){
+    int sum = 0, best;
+    for(int i = 0; i < k; i++) sum += a[i];   // first window
+    best = sum;
+    for(int r = k; r < a.size(); r++){
+        sum += a[r] - a[r - k];               // ★ slide by one
+        best = max(best, sum);
+    }
+    return best;
+}`,
+  trace:['sum = sum of first k;','best = sum;','for(r=k;r<n;r++){','  sum += a[r] - a[r-k];','  best = max(best, sum); }']
+},
+{ cat:'WIN', label:'Longest Substring w/o Repeating', gen:genLongestUniq, src:SRC,
+  when:'Longest/“at most” window with a constraint — the variable-size sliding window.',
+  insight:'Grow R; when the new char breaks the rule, jump L to just past its last occurrence. A last-seen map makes the shrink O(1) instead of stepping L one at a time.',
+  analogy:'Reading a sentence and underlining the longest run with no repeated letter — the moment a letter repeats, you start the underline right after its earlier copy.',
+  bugs:['Only jumping L if the duplicate is <i>inside</i> the current window (<code>last ≥ l</code>).','Forgetting to update last-seen every step.','Resetting best at the wrong time.'],
+  problems:['LC 3 · Longest Substring w/o Repeating','LC 340 · At Most K Distinct','LC 424 · Longest Repeating Replacement','LC 76 · Minimum Window Substring'],
+  code:`// Striver / NeetCode — Longest substring without repeating
+int lengthOfLongest(string s){
+    vector<int> last(128, -1);
+    int l = 0, best = 0;
+    for(int r = 0; r < s.size(); r++){
+        if(last[s[r]] >= l) l = last[s[r]] + 1;  // ★ jump L
+        last[s[r]] = r;
+        best = max(best, r - l + 1);
+    }
+    return best;
+}`,
+  trace:['for(r=0;r<n;r++){','  if(last[c] >= l) l = last[c]+1;','  last[c] = r;','  best = max(best, r-l+1); }']
+},
+{ cat:'WIN', label:'Minimum Size Subarray Sum', gen:genMinSub, src:SRC,
+  when:'Shortest window meeting a threshold — the expand-then-shrink (grow/contract) window.',
+  insight:'Expand R adding to the sum; while the window is valid (sum ≥ target), record the length and shrink from L. Each index enters and leaves at most once → O(n).',
+  analogy:'Inflating a balloon to a target pressure, then letting air out from the other side to find the smallest balloon that still holds pressure.',
+  bugs:['Using <code>if</code> instead of <code>while</code> to shrink.','Forgetting the no-valid-window answer (0 / -1).','Subtracting before recording the length.'],
+  problems:['LC 209 · Minimum Size Subarray Sum','LC 76 · Minimum Window Substring','LC 904 · Fruit Into Baskets','LC 1004 · Max Consecutive Ones III'],
+  code:`// Striver / NeetCode — Minimum size subarray sum >= target
+int minSubArrayLen(int target, vector<int>& a){
+    int l = 0, sum = 0, best = INT_MAX;
+    for(int r = 0; r < a.size(); r++){
+        sum += a[r];                       // expand right
+        while(sum >= target){              // ★ shrink while valid
+            best = min(best, r - l + 1);
+            sum -= a[l++];
+        }
+    }
+    return best == INT_MAX ? 0 : best;
+}`,
+  trace:['for(r=0;r<n;r++){','  sum += a[r];','  while(sum >= target){','    best = min(best, r-l+1);','    sum -= a[l++]; } }']
+},
+{ cat:'BS', label:'Binary Search (classic)', gen:genBinary, src:SRC,
+  when:'Search a <b>sorted</b> array in O(log n) — and the template behind every other binary-search variant.',
+  insight:'Maintain an inclusive [lo, hi]. Compare the midpoint; the half that cannot contain the target is discarded each step. Use <code>lo + (hi−lo)/2</code> to avoid overflow.',
+  analogy:'Finding a word in a dictionary by flipping to the middle and throwing away the half that can’t contain it — repeatedly.',
+  bugs:['<code>(lo+hi)/2</code> integer overflow on large bounds.','Wrong loop condition (<code>&lt;</code> vs <code>&lt;=</code>) for inclusive ranges.','Updating to <code>mid</code> instead of <code>mid±1</code> → infinite loop.'],
+  problems:['LC 704 · Binary Search','LC 35 · Search Insert Position','LC 34 · First & Last Position','LC 278 · First Bad Version'],
+  code:`// Striver / NeetCode — Classic binary search
+int search(vector<int>& a, int target){
+    int lo = 0, hi = a.size() - 1;
+    while(lo <= hi){
+        int mid = lo + (hi - lo) / 2;
+        if(a[mid] == target) return mid;
+        else if(a[mid] < target) lo = mid + 1;  // ★ go right
+        else                     hi = mid - 1;  // go left
+    }
+    return -1;
+}`,
+  trace:['while(lo<=hi){','  mid = lo + (hi-lo)/2;','  if(a[mid]==t) return mid;','  else if(a[mid]<t) lo=mid+1;','  else hi=mid-1; }']
+},
+{ cat:'BS', label:'Search in Rotated Sorted Array', gen:genRotated, src:SRC,
+  when:'Binary search on a rotated sorted array — find a target in O(log n) despite the pivot.',
+  insight:'At each mid, one half is always still sorted. Detect which (compare <code>a[lo]</code> vs <code>a[mid]</code>), then check whether the target lies within that sorted half to decide the direction.',
+  analogy:'A clock face cut and rotated — wherever you cut it in half, one arc still runs in order, so you can tell instantly which arc could hold your hour.',
+  bugs:['Using <code>&lt;</code> vs <code>≤</code> wrong when comparing <code>a[lo]</code> and <code>a[mid]</code>.','Bounds checks for "target in sorted half" off by one.','Not handling duplicates (LC 81 variant).'],
+  problems:['LC 33 · Search in Rotated Sorted Array','LC 81 · Rotated w/ Duplicates','LC 153 · Find Minimum in Rotated','LC 162 · Find Peak Element'],
+  code:`// Striver / NeetCode — Search in rotated sorted array
+int search(vector<int>& a, int t){
+    int lo = 0, hi = a.size() - 1;
+    while(lo <= hi){
+        int mid = lo + (hi - lo) / 2;
+        if(a[mid] == t) return mid;
+        if(a[lo] <= a[mid]){                 // ★ left half sorted
+            if(a[lo] <= t && t < a[mid]) hi = mid - 1;
+            else                         lo = mid + 1;
+        } else {                             // right half sorted
+            if(a[mid] < t && t <= a[hi]) lo = mid + 1;
+            else                         hi = mid - 1;
+        }
+    }
+    return -1;
+}`,
+  trace:['while(lo<=hi){','  mid=lo+(hi-lo)/2;','  if(a[mid]==t) return mid;','  if(a[lo]<=a[mid]){       // left sorted','    if(a[lo]<=t&&t<a[mid]) hi=mid-1;','    else lo=mid+1;','  } else {                 // right sorted','    if(a[mid]<t&&t<=a[hi]) lo=mid+1;','    else hi=mid-1; } }']
+},
+{ cat:'BS', label:'Binary Search on Answer (Koko)', gen:genKoko, src:SRC,
+  when:'The answer is a number in a range and "is X feasible?" is monotonic — search the <b>answer space</b>, not the array.',
+  insight:'Define a boolean <code>feasible(x)</code> that’s false…false…true…true as x grows. Binary search for the boundary: if feasible, try smaller; else try larger. Works for min-of-max / max-of-min problems.',
+  analogy:'Finding the lowest thermostat setting that keeps a room warm enough — too low fails, and every setting above the threshold works, so you binary-search the dial.',
+  bugs:['Getting the feasibility monotonicity backwards.','Wrong search bounds (max element vs total sum).','Using <code>lo ≤ hi</code> with <code>hi=mid</code> → infinite loop (use <code>lo &lt; hi</code>).'],
+  problems:['LC 875 · Koko Eating Bananas','LC 1011 · Ship Within D Days','LC 410 · Split Array Largest Sum','LC 1482 · Min Days to Make Bouquets'],
+  code:`// Striver / NeetCode — Binary search on the answer (Koko)
+int minEatingSpeed(vector<int>& piles, int H){
+    auto hours = [&](int k){
+        long h = 0; for(int p : piles) h += (p + k - 1) / k; return h;
+    };
+    int lo = 1, hi = *max_element(piles.begin(), piles.end());
+    while(lo < hi){
+        int mid = lo + (hi - lo) / 2;
+        if(hours(mid) <= H) hi = mid;     // ★ feasible → try slower
+        else                lo = mid + 1; // too slow → faster
+    }
+    return lo;
+}`,
+  trace:['lo=1; hi=max(piles);','while(lo<hi){','  mid=lo+(hi-lo)/2;','  if(hours(mid)<=H) hi=mid;','  else lo=mid+1; }','return lo;']
+}
+];
+
+/* ════════════════ VARIATION TEMPLATES ════════════════ */
+const VARS={
+'Two Sum (hash map)':[
+  {name:'Two Sum on a sorted array',when:'If sorted, drop the map and use two pointers — O(1) space.',code:
+`int l=0,r=n-1;
+while(l<r){
+  int s=a[l]+a[r];
+  if(s==t) return {l,r};
+  s<t ? l++ : r--;
+}`},
+  {name:'4Sum II (two maps)',when:'Count a+b sums from two arrays, then look up −(c+d).',code:
+`unordered_map<int,int> m;
+for(int x:A) for(int y:B) m[x+y]++;
+int cnt=0;
+for(int x:C) for(int y:D) cnt += m[-(x+y)];`}
+],
+"Kadane's — Max Subarray":[
+  {name:'Return the subarray indices',when:'Track where the current run started.',code:
+`int cur=0,best=INT_MIN,start=0,bl=0,br=0;
+for(int i=0;i<n;i++){
+  if(cur<=0){ cur=a[i]; start=i; } else cur+=a[i];
+  if(cur>best){ best=cur; bl=start; br=i; }
+}`},
+  {name:'Maximum Product Subarray',when:'Carry both max and min (a negative flips them).',code:
+`int mx=a[0],mn=a[0],ans=a[0];
+for(int i=1;i<n;i++){
+  if(a[i]<0) swap(mx,mn);
+  mx=max(a[i],mx*a[i]); mn=min(a[i],mn*a[i]);
+  ans=max(ans,mx);
+}`}
+],
+'Subarray Sum = K (prefix + map)':[
+  {name:'Longest subarray sum = K (positives)',when:'All-positive → sliding window beats the map.',code:
+`int l=0,sum=0,best=0;
+for(int r=0;r<n;r++){
+  sum+=a[r];
+  while(sum>k) sum-=a[l++];
+  if(sum==k) best=max(best, r-l+1);
+}`},
+  {name:'Binary subarray with sum K',when:'Store first index of each prefix for longest length.',code:
+`unordered_map<int,int> first{{0,-1}};
+for(int r=0;r<n;r++){ pre+=a[r];
+  if(first.count(pre-k)) best=max(best, r-first[pre-k]);
+  if(!first.count(pre)) first[pre]=r; }`}
+],
+'Two Sum II (sorted, opposite ends)':[
+  {name:'4Sum (two fixed + two pointers)',when:'Sort, fix i and j, two-pointer the rest; skip dups.',code:
+`for(i) for(j>i){
+  int l=j+1,r=n-1;
+  while(l<r){ long s=a[i]+a[j]+a[l]+a[r];
+    if(s==t){ add; l++; r--; }
+    else if(s<t) l++; else r--; }
+}`},
+  {name:'Squares of a sorted array',when:'Largest squares come from the ends — fill result right-to-left.',code:
+`int l=0,r=n-1;
+for(int k=n-1;k>=0;k--){
+  if(abs(a[l])>abs(a[r])) res[k]=a[l]*a[l++];
+  else                    res[k]=a[r]*a[r--];
+}`}
+],
+'Container With Most Water':[
+  {name:'Trapping Rain Water (two pointers)',when:'Water at i = min(maxL,maxR) − h[i]; move the smaller side.',code:
+`int l=0,r=n-1,ml=0,mr=0,water=0;
+while(l<r){
+  if(h[l]<h[r]){ ml=max(ml,h[l]); water+=ml-h[l++]; }
+  else         { mr=max(mr,h[r]); water+=mr-h[r--]; }
+}`}
+],
+'3Sum (fix one + two pointers)':[
+  {name:'3Sum Closest',when:'Track the triplet sum nearest to target instead of == 0.',code:
+`int best=a[0]+a[1]+a[2];
+// inside two-pointer loop:
+if(abs(s-t) < abs(best-t)) best=s;
+s<t ? l++ : r--;`},
+  {name:'3Sum Smaller (count)',when:'For a fixed l, all r’ ≤ r also work → add (r−l).',code:
+`if(a[i]+a[l]+a[r] < t){ cnt += r-l; l++; }
+else r--;`}
+],
+'Fixed-Size Window (max sum size K)':[
+  {name:'Sliding Window Maximum (deque)',when:'Keep indices in a decreasing deque; front is the window max.',code:
+`deque<int> dq;
+for(int i=0;i<n;i++){
+  if(!dq.empty() && dq.front()<=i-k) dq.pop_front();
+  while(!dq.empty() && a[dq.back()]<=a[i]) dq.pop_back();
+  dq.push_back(i);
+  if(i>=k-1) res.push_back(a[dq.front()]);
+}`},
+  {name:'First negative in every window',when:'Queue the negative indices; pop those that left.',code:
+`for(i){ if(a[i]<0) q.push(i);
+  if(!q.empty()&&q.front()<=i-k) q.pop();
+  if(i>=k-1) out.push(q.empty()?0:a[q.front()]); }`}
+],
+'Longest Substring w/o Repeating':[
+  {name:'Longest with at most K distinct',when:'Shrink while the map has more than K keys.',code:
+`for(r){ cnt[s[r]]++;
+  while(cnt.size()>k){ if(--cnt[s[l]]==0) cnt.erase(s[l]); l++; }
+  best=max(best, r-l+1); }`},
+  {name:'Minimum Window Substring',when:'Expand to cover all of t, then shrink to the smallest valid.',code:
+`while(have==need){            // valid window
+  if(r-l+1<best){ best=r-l+1; bl=l; }
+  if(--win[s[l]] < cnt[s[l]]) have--; l++;
+}`}
+],
+'Minimum Size Subarray Sum':[
+  {name:'Max Consecutive Ones III (flip ≤ k zeros)',when:'Window valid while zeros used ≤ k; else shrink.',code:
+`for(r){ if(a[r]==0) zeros++;
+  while(zeros>k){ if(a[l]==0) zeros--; l++; }
+  best=max(best, r-l+1); }`},
+  {name:'Fruit Into Baskets (≤ 2 types)',when:'Longest window with at most 2 distinct values.',code:
+`for(r){ cnt[a[r]]++;
+  while(cnt.size()>2){ if(--cnt[a[l]]==0) cnt.erase(a[l]); l++; }
+  best=max(best, r-l+1); }`}
+],
+'Binary Search (classic)':[
+  {name:'Lower bound / first occurrence',when:'On a hit, keep searching left to find the earliest.',code:
+`int lo=0,hi=n,ans=-1;          // [lo,hi)
+while(lo<hi){ int mid=(lo+hi)/2;
+  if(a[mid]>=t) hi=mid; else lo=mid+1;
+}
+return lo;   // first index with a[i] >= t`},
+  {name:'Search Insert Position',when:'Where t would go = lower bound of t.',code:
+`int lo=0,hi=n;
+while(lo<hi){ int mid=(lo+hi)/2;
+  if(a[mid]<t) lo=mid+1; else hi=mid; }
+return lo;`}
+],
+'Search in Rotated Sorted Array':[
+  {name:'Find Minimum in Rotated Array',when:'Compare mid to hi to find the pivot side.',code:
+`int lo=0,hi=n-1;
+while(lo<hi){ int mid=(lo+hi)/2;
+  if(a[mid] > a[hi]) lo=mid+1;   // min is to the right
+  else               hi=mid;
+}
+return a[lo];`},
+  {name:'Find Peak Element',when:'Climb toward the larger neighbour.',code:
+`int lo=0,hi=n-1;
+while(lo<hi){ int mid=(lo+hi)/2;
+  if(a[mid] < a[mid+1]) lo=mid+1; else hi=mid;
+}
+return lo;`}
+],
+'Binary Search on Answer (Koko)':[
+  {name:'Ship Within D Days',when:'feasible(cap) = days needed ≤ D; lo=max weight, hi=sum.',code:
+`auto days=[&](int cap){ int d=1,cur=0;
+  for(int w:wt){ if(cur+w>cap){ d++; cur=0; } cur+=w; } return d; };
+// binary search smallest cap with days(cap) <= D`},
+  {name:'Split Array Largest Sum',when:'Minimise the largest subarray sum over k splits — same template.',code:
+`auto parts=[&](int cap){ int p=1,cur=0;
+  for(int x:a){ if(cur+x>cap){ p++; cur=0; } cur+=x; } return p; };
+// smallest cap with parts(cap) <= k`}
+]
+};
+
+/* ════════════════ SYNTAX HIGHLIGHT ════════════════ */
+function hl(code){
+  const esc=t=>t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return code.split('\n').map(line=>{
+    const ci=line.indexOf('//');
+    const codePart=ci>=0?line.slice(0,ci):line, comPart=ci>=0?line.slice(ci):'';
+    let h=esc(codePart)
+      .replace(/\b(class|public|private|struct|int|long|void|bool|auto|char|string|vector|deque|unordered_map|map|set|pair|return|while|for|if|else|true|false|const|max|min|abs|swap|sort|push_back|pop_back|push|pop|front|back|empty|size|count|erase|begin|end|max_element)\b/g,'<span class="kw">$1</span>')
+      .replace(/\b(\d+)\b/g,'<span class="nm">$1</span>');
+    let cls='cl';
+    if(comPart){ cls+=' has-cm'; h+='<span class="cm">'+esc(comPart).replace(/(★[^<]*)/g,'<span class="star">$1</span>')+'</span>'; }
+    return `<span class="${cls}"><span class="cmdot">●</span>${h===''?'&nbsp;':h}</span>`;
+  }).join('');
+}
+
+/* ════════════════ VARIATIONS PANEL ════════════════ */
+function varPanel(p){
+  const vs=VARS[p.label]||[];
+  if(!vs.length) return '';
+  return `<div class="varhead">🔀 VARIATION TEMPLATES — same skeleton, small twists</div>`+
+    vs.map((v,i)=>`<div class="cb varcb">
+      <div class="cbbar"><span class="vtag">VARIATION ${i+1}</span><span class="cbtitle">${v.name}</span><button class="cbtoggle varcopy" data-vi="${i}">copy</button></div>
+      <div class="varwhen">${v.when}</div>
+      <pre>${hl(v.code)}</pre>
+    </div>`).join('');
+}
+
+/* ════════════════ RENDER ════════════════ */
+const side=document.getElementById('side'), main=document.getElementById('main');
+let active=0, stepTimer=null;
+document.getElementById('menuToggle').onclick=()=>side.classList.toggle('open');
+// deep-link: /arrays/#two-pointers etc.
+(function(){ const map={'arrays':'HASH','hashing':'HASH','two-pointers':'TWO','sliding-window':'WIN','binary-search':'BS'};
+  const h=(location.hash||'').replace('#','').toLowerCase(); const cat=map[h];
+  if(cat){ const i=P.findIndex(p=>p.cat===cat); if(i>=0) active=i; } })();
+
+function buildSidebar(){
+  const groups=[]; let cur=null;
+  P.forEach((p,i)=>{ if(!cur||cur.cat!==p.cat){cur={cat:p.cat,items:[]};groups.push(cur);} cur.items.push({p,i}); });
+  let html='';
+  groups.forEach(g=>{ const c=CAT[g.cat].c;
+    html+=`<div class="catlabel" style="color:${c}">${CAT[g.cat].label}<span class="catn">${g.items.length}</span></div>`+
+    g.items.map(({p,i})=>`<div class="navitem ${i===active?'on':''}" data-i="${i}" style="${i===active?'border-left-color:'+c:''}">
+        <div class="tag" style="color:${c}">${CAT[p.cat].label}</div><div class="nm">${p.label}</div></div>`).join('');
+  });
+  side.innerHTML=html;
+  side.querySelectorAll('.navitem').forEach(el=>el.onclick=()=>{active=+el.dataset.i;render();if(window.innerWidth<=860)side.classList.remove('open');});
+}
+
+function render(){
+  if(stepTimer){clearInterval(stepTimer);stepTimer=null;}
+  const p=P[active], col=CAT[p.cat].c;
+  const notes=`<div class="cards">
+      <div class="ic"><div class="h">WHEN TO USE</div><p>${p.when}</p></div>
+      <div class="ic" style="border-color:${col}33"><div class="h" style="color:${col}">★ KEY INSIGHT</div><p>${p.insight}</p></div>
+      <div class="ic analogy"><div class="h" style="color:${col}">◈ ANALOGY / MENTAL MODEL</div><p>${p.analogy}</p></div>
+      <div class="ic bugs"><div class="h">⚠ BUGS YOU ACTUALLY HIT</div><ul>${p.bugs.map(b=>`<li>${b}</li>`).join('')}</ul></div>
+    </div>
+    <div class="probs"><div class="h">LEETCODE PROBLEMS</div>${p.problems.map(n=>`<span class="chip">${n}</span>`).join('')}</div>`;
+  const codeHtml=`<div class="cb">
+      <div class="cbbar"><span class="dots"><i style="background:#ff5f56"></i><i style="background:#ffbd2e"></i><i style="background:#27c93f"></i></span>
+        <span class="cbtitle">${p.label.toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'')}.cpp</span>
+        <button class="cbtoggle" id="revealAll">💬 reveal all</button></div>
+      <pre>${hl(p.code)}</pre>
+      <div class="cbnote">● = this line hides a note — click to reveal, click again to hide.</div>
+    </div>`;
+  main.innerHTML=`<div class="fade">
+    <div class="phead">
+      <div>
+        <span class="ptag" style="background:${col}22;border:1px solid ${col}55;color:${col}">${CAT[p.cat].label}</span>
+        <span class="pcount">Pattern ${active+1} / ${P.length}</span>
+        <h2>${p.label}</h2>
+        <div class="srcline">${p.src}</div>
+      </div>
+      <div class="pheadbtns">
+        <button class="copy" id="notesBtn">📝 show notes</button>
+        <button class="copy" id="varBtn">🔀 variations</button>
+        <button class="copy" id="codeBtn">⌨ hide code</button>
+        <button class="copy" id="copyBtn">copy code</button>
+      </div>
+    </div>
+    <div class="notesWrap" id="notesWrap" style="display:none">${notes}</div>
+    <div class="varWrap" id="varWrap" style="display:none">${varPanel(p)}</div>
+    <div class="split" id="split">
+      <div class="demo">
+        <div class="h">◈ STEP-BY-STEP — ${p.label.toUpperCase()}</div>
+        <div class="stage" id="stage"></div>
+        <div class="vmsg" id="vmsg"></div>
+        <div class="vtables" id="vtables"></div>
+        <div class="vctrl">
+          <button class="play" id="play">▶ play</button>
+          <button id="stepBtn">step ›</button>
+          <button id="resetBtn">⟲ reset</button>
+          <span class="vpos" id="vpos"></span>
+          <span class="spd">speed <input type="range" id="spd" min="280" max="1700" value="950"><b id="spdlbl"></b></span>
+        </div>
+        <div class="trace"><div class="th">CODE BEING TRACED — <b>active line highlights live</b></div><pre id="trace"></pre></div>
+      </div>
+      <div class="codeCol">${codeHtml}</div>
+    </div>
+    <div class="pnav">
+      <button id="prevBtn" ${active===0?'disabled':''}>← prev</button>
+      <span class="pos">${active+1} of ${P.length}</span>
+      <button id="nextBtn" ${active===P.length-1?'disabled':''}>next →</button>
+    </div></div>`;
+  main.scrollTop=0;
+  const nb=main.querySelector('#notesBtn'), nw=main.querySelector('#notesWrap');
+  nb.onclick=()=>{const show=nw.style.display==='none';nw.style.display=show?'':'none';nb.textContent=show?'📝 hide notes':'📝 show notes';nb.classList.toggle('done',show);};
+  const vb=main.querySelector('#varBtn'), vw=main.querySelector('#varWrap');
+  vb.onclick=()=>{const show=vw.style.display==='none';vw.style.display=show?'':'none';vb.textContent=show?'🔀 hide variations':'🔀 variations';vb.classList.toggle('done',show);};
+  main.querySelectorAll('.varcopy').forEach(b=>b.onclick=()=>{const v=(VARS[p.label]||[])[+b.dataset.vi];navigator.clipboard.writeText(v.code);b.textContent='✓';setTimeout(()=>b.textContent='copy',1200);});
+  const cbtn=main.querySelector('#codeBtn'), split=main.querySelector('#split');
+  cbtn.onclick=()=>{const hid=!split.classList.contains('nocode');split.classList.toggle('nocode',hid);cbtn.textContent=hid?'⌨ show code':'⌨ hide code';cbtn.classList.toggle('done',hid);};
+  main.querySelector('#copyBtn').onclick=e=>{navigator.clipboard.writeText(p.code);e.target.textContent='✓ copied';e.target.classList.add('done');setTimeout(()=>{e.target.textContent='copy code';e.target.classList.remove('done');},1500);};
+  main.querySelector('#prevBtn').onclick=()=>{if(active>0){active--;render();}};
+  main.querySelector('#nextBtn').onclick=()=>{if(active<P.length-1){active++;render();}};
+  main.querySelectorAll('.cl.has-cm').forEach(el=>el.onclick=()=>el.classList.toggle('reveal'));
+  const ra=main.querySelector('#revealAll');
+  ra.onclick=()=>{const ls=[...main.querySelector('.cb').querySelectorAll('.cl.has-cm')];const on=ls.some(l=>l.classList.contains('reveal'));ls.forEach(l=>l.classList.toggle('reveal',!on));ra.classList.toggle('on',!on);ra.textContent=on?'💬 reveal all':'🙈 hide all';};
+  mountStepper(p);
+  buildSidebar();
+}
+
+function mountStepper(p){
+  const frames=p.gen();
+  const stage=main.querySelector('#stage'), vmsg=main.querySelector('#vmsg'),
+        vtables=main.querySelector('#vtables'), vpos=main.querySelector('#vpos'),
+        traceEl=main.querySelector('#trace'), playBtn=main.querySelector('#play'),
+        spd=main.querySelector('#spd'), spdlbl=main.querySelector('#spdlbl');
+  const tEls=[]; p.trace.forEach(ln=>{const x=document.createElement('span');x.className='tln';x.innerHTML=hl(ln)||'&nbsp;';traceEl.appendChild(x);tEls.push(x);});
+  let idx=0;
+  function draw(){
+    const f=frames[idx];
+    stage.innerHTML=svgArray(f.arr,f);
+    vmsg.classList.remove('flash');void vmsg.offsetWidth;vmsg.classList.add('flash');
+    vmsg.innerHTML=`<span class="stepchip">STEP ${idx+1}</span>${f.msg}`;
+    const sp=arraySide(f);
+    vtables.innerHTML=(sp.heap?`<div style="flex:1;min-width:100%">${sp.heap}</div>`:'')+sp.tables;
+    tEls.forEach((e,i)=>e.classList.toggle('hot',i===f.line));
+    vpos.textContent=`${idx+1} / ${frames.length}`;
+  }
+  function stop(){if(stepTimer){clearInterval(stepTimer);stepTimer=null;}playBtn.textContent='▶ play';}
+  function play(){ if(stepTimer){stop();return;} if(idx>=frames.length-1)idx=0; playBtn.textContent='❚❚ pause';
+    stepTimer=setInterval(()=>{ if(idx>=frames.length-1){stop();return;} idx++;draw(); }, +spd.value); }
+  const setspd=()=>{spdlbl.textContent=(spd.value/1000).toFixed(2)+'s'; if(stepTimer){clearInterval(stepTimer);stepTimer=setInterval(()=>{if(idx>=frames.length-1){stop();return;}idx++;draw();},+spd.value);}};
+  spd.oninput=setspd; setspd();
+  playBtn.onclick=play;
+  main.querySelector('#stepBtn').onclick=()=>{stop();if(idx<frames.length-1){idx++;draw();}};
+  main.querySelector('#resetBtn').onclick=()=>{stop();idx=0;draw();};
+  draw();
+}
+
+render();
+</script>
+</body>
+</html>
