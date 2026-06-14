@@ -177,6 +177,13 @@
   .vtbl td.kk{color:#ffd60a;}
   .vtbl td.kcol{background:#0f1c25;}
   .vtbl td.cellhot{background:#241d04;color:#ffd60a;font-weight:700;border-color:#ffd60a;}
+  /* variation templates */
+  .varWrap{margin-bottom:16px;animation:fade .3s ease;}
+  .varhead{font-size:10px;letter-spacing:1.6px;color:#ffd479;font-weight:700;font-family:'JetBrains Mono',monospace;margin:2px 0 12px;}
+  .varcb{margin-bottom:12px;}
+  .vtag{font-size:8.5px;font-weight:700;letter-spacing:1px;padding:2px 8px;border-radius:3px;background:#3a2e0a;border:1px solid #6b5212;color:#ffd479;}
+  .varwhen{font-size:12px;line-height:1.55;color:var(--txt2);padding:9px 14px 0;}
+  .varwhen b{color:var(--head);} .varwhen code{background:#1c2530;color:#ffd479;padding:0 4px;border-radius:3px;font-size:11px;}
 
   .menuToggle{display:none;}
   @media(max-width:860px){
@@ -819,6 +826,173 @@ function buildSidebar(){
   side.querySelectorAll('.navitem').forEach(el=>el.onclick=()=>{active=+el.dataset.i;render();if(window.innerWidth<=860)side.classList.remove('open');});
 }
 
+/* ════════════════ VARIATION TEMPLATES (same skeleton, small twists) ════════════════ */
+const VARS={
+'Dijkstra (min-heap)':[
+  {name:'Dijkstra on a grid (4-directional)',when:'Cells are nodes, edge weight = entering cost. Used in <b>Swim in Rising Water</b>.',code:
+`priority_queue<tuple<int,int,int>,
+  vector<tuple<int,int,int>>, greater<>> pq; // {dist,r,c}
+dist[0][0]=grid[0][0]; pq.push({grid[0][0],0,0});
+while(!pq.empty()){
+  auto [d,r,c]=pq.top(); pq.pop();
+  if(d>dist[r][c]) continue;
+  for(auto [dr,dc]:dirs){
+    int nr=r+dr,nc=c+dc;
+    if(in(nr,nc) && d+grid[nr][nc]<dist[nr][nc]){
+      dist[nr][nc]=d+grid[nr][nc];
+      pq.push({dist[nr][nc],nr,nc});
+    }}}`},
+  {name:'Reconstruct the actual path (parent[])',when:'Remember where each node was relaxed from, then walk back from the target.',code:
+`vector<int> par(V,-1);
+if(dist[u]+w<dist[v]){              // inside relaxation
+  dist[v]=dist[u]+w; par[v]=u;
+  pq.push({dist[v],v});
+}
+vector<int> path;                  // rebuild
+for(int x=dst; x!=-1; x=par[x]) path.push_back(x);
+reverse(path.begin(), path.end());`},
+  {name:'Minimax path — Path With Minimum Effort',when:'Path cost = its <b>largest</b> edge, not the sum. Swap <code>+</code> for <code>max</code>.',code:
+`if(max(eff[u], w) < eff[v]){       // max instead of +
+   eff[v]=max(eff[u], w);
+   pq.push({eff[v], v});
+}`}
+],
+'Shortest Path in a DAG':[
+  {name:'Longest path in a DAG',when:'Same topo sweep, but maximize — init to −∞ and flip the test.',code:
+`vector<int> dist(V,INT_MIN); dist[src]=0;
+for(int u:topo) if(dist[u]!=INT_MIN)
+  for(auto [v,w]:adj[u])
+    if(dist[u]+w>dist[v]) dist[v]=dist[u]+w;`},
+  {name:'DFS-based topological order',when:'Alternative to Kahn: push a node <i>after</i> all its children (post-order), then reverse.',code:
+`void dfs(int u){
+  vis[u]=1;
+  for(auto [v,w]:adj[u]) if(!vis[v]) dfs(v);
+  st.push(u);                      // post-order = reverse topo
+}`}
+],
+'Bellman-Ford (negative edges)':[
+  {name:'Cheapest Flights Within K Stops',when:'At most K+1 edges — relax on a fresh <b>copy</b> each round so one round = one extra hop.',code:
+`vector<int> dist(n,1e9); dist[src]=0;
+for(int i=0;i<=K;i++){
+  auto tmp=dist;                   // snapshot bounds the hops
+  for(auto [u,v,w]:flights)
+    if(dist[u]!=1e9 && dist[u]+w<tmp[v])
+      tmp[v]=dist[u]+w;
+  dist=tmp;
+}
+return dist[dst]==1e9?-1:dist[dst];`},
+  {name:'Mark negative-cycle-affected nodes',when:'Anything still relaxable after V−1 rounds can reach −∞.',code:
+`for(int i=0;i<n;i++)              // one more sweep
+  for(auto [u,v,w]:edges)
+    if(dist[u]!=1e9 && dist[u]+w<dist[v])
+      dist[v]=-1e9;               // on/after a neg cycle`}
+],
+'Floyd-Warshall (all-pairs)':[
+  {name:'Find the City (threshold distance)',when:'Run FW, then per city count reachable ≤ threshold; tie → larger index.',code:
+`floydWarshall(d);
+int best=-1, fewest=INT_MAX;
+for(int i=0;i<n;i++){
+  int cnt=0;
+  for(int j=0;j<n;j++) if(i!=j && d[i][j]<=threshold) cnt++;
+  if(cnt<=fewest){ fewest=cnt; best=i; }
+}
+return best;`},
+  {name:'Transitive closure (reachability)',when:'Swap min-plus for OR-AND to get who-can-reach-whom.',code:
+`for(int k=0;k<n;k++)
+ for(int i=0;i<n;i++)
+  for(int j=0;j<n;j++)
+   reach[i][j] = reach[i][j] || (reach[i][k] && reach[k][j]);`},
+  {name:'Negative cycle check',when:'After FW, any <code>d[i][i] &lt; 0</code> sits on a negative cycle.',code:
+`for(int i=0;i<n;i++) if(d[i][i]<0) return true;`}
+],
+'Number of Ways (Dijkstra + count)':[
+  {name:'Count paths in a DAG (memo DFS)',when:'Unweighted DAG — number of distinct s→t paths via memoization.',code:
+`long dfs(int u){
+  if(u==dst) return 1;
+  if(memo[u]!=-1) return memo[u];
+  long c=0;
+  for(int v:adj[u]) c=(c+dfs(v))%MOD;
+  return memo[u]=c;
+}`},
+  {name:'Track BOTH dist and min-edges',when:'Tie-break shortest paths by fewest edges — carry a second array.',code:
+`if(d+w<dist[v]){ dist[v]=d+w; cnt[v]=cnt[u]+1; }
+else if(d+w==dist[v]) cnt[v]=min(cnt[v],cnt[u]+1);`}
+],
+"Kahn's Topological Sort (BFS)":[
+  {name:'Course Schedule I (can finish?)',when:'A full order exists ⇔ no cycle.',code:
+`return topoSort(V,adj).size()==V;   // false ⇒ cycle`},
+  {name:'Course Schedule II (return order)',when:'Return the Kahn order, or empty if impossible.',code:
+`auto order=topoSort(V,adj);
+return order.size()==V ? order : vector<int>{};`},
+  {name:'Alien Dictionary',when:'Build edges from each adjacent word pair&rsquo;s first differing char, then topo-sort the letters.',code:
+`for(int i=0;i+1<words.size();i++){
+  string&a=words[i],&b=words[i+1];
+  int len=min(a.size(),b.size()), j=0;
+  for(;j<len;j++) if(a[j]!=b[j]){
+    adj[a[j]-'a'].push_back(b[j]-'a');
+    indeg[b[j]-'a']++; break;
+  }
+  if(j==len && a.size()>b.size()) return ""; // invalid
+}
+// Kahn over present letters → alien order`}
+],
+'Disjoint Set Union':[
+  {name:'Union by size (+ component sizes)',when:'Track set size instead of rank — answers "largest component" queries.',code:
+`int find(int x){ return par[x]==x?x:par[x]=find(par[x]); }
+void unite(int a,int b){
+  a=find(a); b=find(b); if(a==b) return;
+  if(sz[a]<sz[b]) swap(a,b);
+  par[b]=a; sz[a]+=sz[b];
+}`},
+  {name:'Connected components / provinces',when:'Union every edge, then count distinct roots.',code:
+`for(auto [u,v]:edges) dsu.unite(u,v);
+int comps=0;
+for(int i=0;i<n;i++) if(dsu.find(i)==i) comps++;`},
+  {name:'Detect a cycle in an undirected graph',when:'If both endpoints already share a root, this edge closes a cycle.',code:
+`for(auto [u,v]:edges){
+  if(dsu.find(u)==dsu.find(v)) return true;
+  dsu.unite(u,v);
+}
+return false;`}
+],
+"Kruskal's MST (edges + DSU)":[
+  {name:'Min Cost to Connect All Points',when:'Build a complete graph with Manhattan-distance edges, then Kruskal.',code:
+`for(int i=0;i<n;i++)
+ for(int j=i+1;j<n;j++)
+  edges.push_back({abs(pts[i][0]-pts[j][0])
+                  +abs(pts[i][1]-pts[j][1]), i, j});
+sort(edges.begin(), edges.end());   // → run Kruskal`},
+  {name:'Make Network Connected (extra cables)',when:'Need components−1 cables; possible only if spare cables ≥ that.',code:
+`if(connections.size() < n-1) return -1;
+for(auto&c:connections) dsu.unite(c[0],c[1]);
+int comps=0; for(int i=0;i<n;i++) if(dsu.find(i)==i) comps++;
+return comps-1;`}
+],
+"Prim's MST (min-heap)":[
+  {name:'Dense Prim with key[] — O(V²)',when:'For dense graphs / adjacency matrix, scan for the min instead of a heap.',code:
+`vector<int> key(V,1e9),inMST(V,0); key[0]=0;
+for(int c=0;c<V;c++){
+  int u=-1;
+  for(int v=0;v<V;v++)
+    if(!inMST[v] && (u<0||key[v]<key[u])) u=v;
+  inMST[u]=1;
+  for(int v=0;v<V;v++)
+    if(g[u][v] && !inMST[v] && g[u][v]<key[v]) key[v]=g[u][v];
+}`}
+]
+};
+
+function varPanel(p){
+  const vs=VARS[p.label]||[];
+  if(!vs.length) return '';
+  return `<div class="varhead">🔀 VARIATION TEMPLATES — same skeleton, small twists</div>`+
+    vs.map((v,i)=>`<div class="cb varcb">
+      <div class="cbbar"><span class="vtag">VARIATION ${i+1}</span><span class="cbtitle">${v.name}</span><button class="cbtoggle varcopy" data-vi="${i}">copy</button></div>
+      <div class="varwhen">${v.when}</div>
+      <pre>${hl(v.code)}</pre>
+    </div>`).join('');
+}
+
 function render(){
   if(stepTimer){clearInterval(stepTimer);stepTimer=null;}
   const p=P[active], col=CAT[p.cat].c;
@@ -848,11 +1022,13 @@ function render(){
       </div>
       <div class="pheadbtns">
         <button class="copy" id="notesBtn">📝 show notes</button>
+        <button class="copy" id="varBtn">🔀 variations</button>
         <button class="copy" id="codeBtn">⌨ hide code</button>
         <button class="copy" id="copyBtn">copy code</button>
       </div>
     </div>
     <div class="notesWrap" id="notesWrap" style="display:none">${notes}</div>
+    <div class="varWrap" id="varWrap" style="display:none">${varPanel(p)}</div>
     <div class="split" id="split">
       <div class="demo">
         <div class="h">◈ STEP-BY-STEP — ${p.label.toUpperCase()}</div>
@@ -880,6 +1056,9 @@ function render(){
   // notes / code toggles
   const nb=main.querySelector('#notesBtn'), nw=main.querySelector('#notesWrap');
   nb.onclick=()=>{const show=nw.style.display==='none';nw.style.display=show?'':'none';nb.textContent=show?'📝 hide notes':'📝 show notes';nb.classList.toggle('done',show);};
+  const vb=main.querySelector('#varBtn'), vw=main.querySelector('#varWrap');
+  vb.onclick=()=>{const show=vw.style.display==='none';vw.style.display=show?'':'none';vb.textContent=show?'🔀 hide variations':'🔀 variations';vb.classList.toggle('done',show);};
+  main.querySelectorAll('.varcopy').forEach(b=>b.onclick=()=>{const v=(VARS[p.label]||[])[+b.dataset.vi];navigator.clipboard.writeText(v.code);b.textContent='✓';setTimeout(()=>b.textContent='copy',1200);});
   const cbtn=main.querySelector('#codeBtn'), split=main.querySelector('#split');
   cbtn.onclick=()=>{const hid=!split.classList.contains('nocode');split.classList.toggle('nocode',hid);cbtn.textContent=hid?'⌨ show code':'⌨ hide code';cbtn.classList.toggle('done',hid);};
   main.querySelector('#copyBtn').onclick=e=>{navigator.clipboard.writeText(p.code);e.target.textContent='✓ copied';e.target.classList.add('done');setTimeout(()=>{e.target.textContent='copy code';e.target.classList.remove('done');},1500);};

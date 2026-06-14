@@ -97,6 +97,7 @@
       <a class="logo" href="/"><span class="dot"></span> visualise</a>
       <nav class="links">
         <a href="/graphs/">Graphs</a>
+        <a href="/trees/">Trees</a>
         <a href="https://github.com/mightbeanshuu" target="_blank" rel="noopener">GitHub</a>
       </nav>
     </div>
@@ -106,13 +107,13 @@
     <section class="wrap hero">
       <span class="eyebrow"><span class="pulse"></span> Interactive DSA Roadmap</span>
       <h1>DSA,<br>visualised.</h1>
-      <p class="sub">Pick a topic. Get the intuition, watch it run, and read full <b style="color:var(--text)">LeetCode-style code</b> with click-to-reveal comments. More topics are on the way — <b style="color:var(--text)">Graphs</b> is live now.</p>
+      <p class="sub">Pick a topic. Get the intuition, watch it run, and read full <b style="color:var(--text)">LeetCode-style code</b> with click-to-reveal comments. More topics are on the way — <b style="color:var(--text)">Graphs</b> and <b style="color:var(--text)">Trees</b> are live now.</p>
     </section>
 
     <section class="wrap">
       <div class="sectionhead">
         <h2>Topics</h2>
-        <span class="note">1 live · more coming soon</span>
+        <span class="note">2 live · more coming soon</span>
       </div>
       <div class="topics">
 
@@ -131,7 +132,13 @@
         <div class="topic soon"><div class="ticon">🥞</div><span class="pill">Soon</span><h3>Stack &amp; Queue</h3><p>Monotonic stack, next-greater, deque tricks.</p></div>
         <div class="topic soon"><div class="ticon">🔍</div><span class="pill">Soon</span><h3>Binary Search</h3><p>On answer, on arrays, boundary conditions.</p></div>
         <div class="topic soon"><div class="ticon">🔗</div><span class="pill">Soon</span><h3>Linked List</h3><p>Reversal, cycle detection, merging.</p></div>
-        <div class="topic soon"><div class="ticon">🌳</div><span class="pill">Soon</span><h3>Trees</h3><p>Traversals, BST, LCA, recursion patterns.</p></div>
+        <a class="topic live" href="/trees/" style="border-color:#1f7a3a;background:linear-gradient(180deg,rgba(105,255,71,.07),rgba(10,13,18,.85))">
+          <div class="ticon" style="border-color:#1f7a3a;background:rgba(105,255,71,.1)">🌳</div>
+          <span class="pill">Live</span>
+          <h3>Trees</h3>
+          <p>Traversals, level-order, height/diameter, path sum, LCA, validate BST — animated, with variation templates.</p>
+          <span class="open" style="color:var(--green)">Open <span class="arr">→</span></span>
+        </a>
 
         <div class="topic soon"><div class="ticon">🔤</div><span class="pill">Soon</span><h3>Tries</h3><p>Prefix trees, word search, autocomplete.</p></div>
         <div class="topic soon"><div class="ticon">⛰️</div><span class="pill">Soon</span><h3>Heap / PQ</h3><p>Top-K, merge K, scheduling, median.</p></div>
@@ -150,7 +157,7 @@
   <footer>
     <div class="wrap">
       <span>Interactive DSA roadmap · hand-coded, deployed on Vercel</span>
-      <span><a href="/graphs/">Graphs hub</a> · <a href="https://github.com/mightbeanshuu" target="_blank" rel="noopener">GitHub</a></span>
+      <span><a href="/graphs/">Graphs hub</a> · <a href="/trees/">Trees hub</a> · <a href="https://github.com/mightbeanshuu" target="_blank" rel="noopener">GitHub</a></span>
     </div>
   </footer>
 <script>document.querySelectorAll(".topic").forEach((t,i)=>t.style.setProperty("--i",i));</script>
