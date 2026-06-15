@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stacks &amp; Queues — Monotonic Stack · Deque</title>
+<meta name="description" content="Step-by-step animated hub for stack & queue patterns: valid parentheses, min stack, RPN, monotonic stack (next greater, daily temperatures, largest rectangle), queue via stacks, sliding window maximum. Striver + NeetCode code, LeetCode problems, variation templates.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0d0f14; --bg2:#0a0c11; --panel:#141920; --border:#1e2a38;
+    --text:#c9d1d9; --txt2:#8b949e; --muted:#586069; --faint:#444d56; --head:#e6edf3;
+    --acc:#00e5ff; --warn:#ffd60a; --bad:#ff6b6b;
+  }
+  *{box-sizing:border-box;} html,body{margin:0;padding:0;}
+  body{font-family:'IBM Plex Sans',ui-sans-serif,system-ui,-apple-system,sans-serif;
+    background:radial-gradient(1200px 820px at 72% -12%, #102a3c 0%, #0d0f14 56%) fixed;
+    color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;}
+  code,kbd,samp{font-family:'JetBrains Mono','Fira Code',ui-monospace,Menlo,monospace;}
+  ::-webkit-scrollbar{width:9px;height:9px;}::-webkit-scrollbar-thumb{background:#26303d;border-radius:5px;}::-webkit-scrollbar-track{background:transparent;}
+  .top{border-bottom:1px solid var(--border);padding:18px 26px 14px;backdrop-filter:blur(10px);background:rgba(12,16,22,.72);}
+  .top .row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+  .badge{background:#00e5ff22;border:1px solid #00e5ff55;color:var(--acc);font-size:10px;font-weight:700;letter-spacing:2px;padding:3px 10px;border-radius:3px;}
+  .backbtn{text-decoration:none;color:var(--txt2);border:1px solid var(--border);background:rgba(255,255,255,.02);font-size:12px;font-weight:600;padding:5px 12px;border-radius:7px;transition:.15s;white-space:nowrap;}
+  .backbtn:hover{border-color:#475569;color:var(--head);background:rgba(255,255,255,.05);}
+  h1{margin:0;font-size:18px;font-weight:700;letter-spacing:-.3px;background:linear-gradient(90deg,#00e5ff,#ff9f0a 55%,#69ff47);-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .top .meta{color:var(--faint);font-size:12px;} .top p{margin:6px 0 0;font-size:11px;color:var(--muted);letter-spacing:.3px;}
+  .shell{display:flex;min-height:calc(100vh - 84px);}
+  .side{width:258px;min-width:258px;border-right:1px solid var(--border);overflow-y:auto;padding:10px 0 30px;backdrop-filter:blur(10px);background:rgba(9,11,16,.66);}
+  .catlabel{font-size:9px;letter-spacing:1.5px;padding:13px 16px 8px;font-weight:700;font-family:'JetBrains Mono',monospace;display:flex;align-items:center;gap:7px;}
+  .catlabel .catn{margin-left:auto;font-size:9px;color:var(--faint);background:#0e151d;border:1px solid var(--border);border-radius:10px;padding:1px 7px;}
+  .navitem{padding:9px 16px;cursor:pointer;border-left:3px solid transparent;transition:background .15s,border-color .15s;}
+  .navitem:hover{background:#10151c;} .navitem.on{background:var(--panel);}
+  .navitem .tag{font-size:8.5px;font-weight:700;letter-spacing:1.3px;opacity:.65;} .navitem.on .tag{opacity:1;}
+  .navitem .nm{font-size:12.5px;color:var(--txt2);margin-top:2px;line-height:1.3;} .navitem.on .nm{color:var(--head);font-weight:600;}
+  .main{flex:1;overflow-y:auto;padding:24px 30px 60px;max-width:1040px;}
+  .fade{animation:fade .35s ease;} @keyframes fade{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+  .phead{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:18px;}
+  .ptag{font-size:9px;font-weight:700;letter-spacing:2px;padding:3px 10px;border-radius:3px;}
+  .pcount{color:var(--faint);font-size:11px;margin-left:8px;}
+  .phead h2{margin:8px 0 0;font-size:23px;font-weight:700;color:var(--head);letter-spacing:-.5px;}
+  .srcline{margin-top:5px;font-size:11px;color:var(--muted);} .srcline b{color:var(--txt2);}
+  .copy{background:var(--panel);border:1px solid #30363d;color:var(--txt2);padding:8px 15px;border-radius:6px;cursor:pointer;font-size:11px;font-family:inherit;letter-spacing:.5px;white-space:nowrap;transition:.2s;}
+  .copy:hover{border-color:#475569;color:var(--head);} .copy.done{background:#1a3a1a;border-color:#69ff47;color:#69ff47;}
+  .pheadbtns{display:flex;gap:8px;flex-wrap:wrap;}
+  .cards{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;}
+  .ic{background:rgba(10,12,17,.62);border:1px solid var(--border);border-radius:12px;padding:16px 18px;backdrop-filter:blur(6px);box-shadow:0 8px 30px rgba(0,0,0,.28);}
+  .ic .h{font-size:9.5px;letter-spacing:1.6px;margin-bottom:8px;color:var(--muted);font-weight:700;font-family:'JetBrains Mono',monospace;}
+  .ic p{margin:0;font-size:13.5px;line-height:1.72;color:var(--text);}
+  .ic.analogy{grid-column:1/3;} .ic.bugs{grid-column:1/3;border-color:#ff6b6b33;} .ic.bugs .h{color:var(--bad);}
+  .ic.bugs ul{margin:0;padding-left:18px;} .ic.bugs li{font-size:13px;line-height:1.8;color:var(--text);margin-bottom:3px;}
+  .ic.bugs code{background:#1c2530;color:#ffd479;padding:0 4px;border-radius:3px;font-size:11px;} .ic b{color:var(--head);}
+  .probs{background:rgba(10,12,17,.6);border:1px solid var(--border);border-radius:8px;padding:11px 15px;margin-bottom:16px;}
+  .probs .h{font-size:9px;letter-spacing:1.5px;color:var(--muted);margin-bottom:8px;font-weight:700;}
+  .chip{display:inline-block;background:var(--panel);border:1px solid #30363d;color:var(--txt2);font-size:11px;padding:4px 10px;border-radius:4px;margin:0 6px 6px 0;}
+  .split{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:16px;align-items:start;margin-bottom:14px;}
+  .split.nocode{grid-template-columns:1fr;} .split.nocode .codeCol{display:none;}
+  @media(max-width:1080px){ .split{grid-template-columns:1fr;} }
+  .cb{background:rgba(7,10,14,.82);border:1px solid var(--border);border-radius:8px;overflow:hidden;backdrop-filter:blur(6px);box-shadow:0 8px 30px rgba(0,0,0,.28);}
+  .cbbar{background:var(--panel);border-bottom:1px solid var(--border);padding:9px 14px;display:flex;align-items:center;gap:8px;}
+  .dots{display:flex;gap:6px;} .dots i{width:10px;height:10px;border-radius:50%;display:inline-block;}
+  .cbtitle{font-size:11px;color:var(--muted);margin-left:6px;}
+  pre{margin:0;padding:16px 12px;font-size:12.5px;line-height:1.8;overflow-x:auto;white-space:pre;font-family:'JetBrains Mono','Fira Code',ui-monospace,Menlo,monospace;}
+  .kw{color:#ff7b72;} .nm{color:#79c0ff;} .cm{color:#586069;font-style:italic;} .star{color:#ffd60a;font-weight:700;} .str{color:#a5d6ff;}
+  .cl{display:block;padding:0 8px;border-radius:5px;border-left:2px solid transparent;transition:background .14s,border-color .14s;}
+  .cmdot{display:inline-block;width:9px;margin-right:8px;font-size:7px;color:#2c3540;vertical-align:middle;transition:color .14s,transform .14s;}
+  .cl:not(.has-cm) .cmdot{visibility:hidden;} .cl.has-cm{cursor:pointer;}
+  .cl.has-cm:hover{background:#0f1c25;border-left-color:#2a4452;} .cl.has-cm:hover .cmdot{color:var(--warn);}
+  .cl .cm{display:none;} .cl.reveal .cm{display:inline;animation:cmin .2s ease;}
+  .cl.reveal .cmdot{color:#69ff47;transform:scale(1.25);} .cl.reveal{background:#0c1a14;border-left-color:#1f7a3a;}
+  @keyframes cmin{from{opacity:0;}to{opacity:1;}}
+  .cbtoggle{margin-left:auto;background:transparent;border:1px solid #30363d;color:var(--txt2);font-family:inherit;font-size:10px;letter-spacing:.5px;padding:4px 10px;border-radius:5px;cursor:pointer;transition:.15s;}
+  .cbtoggle:hover{border-color:#475569;color:var(--head);} .cbtoggle.on{background:#0c1a14;border-color:#1f7a3a;color:#69ff47;}
+  .cbnote{font-size:10px;color:var(--faint);padding:6px 16px 10px;letter-spacing:.3px;}
+  .varWrap{margin-bottom:16px;animation:fade .3s ease;}
+  .varhead{font-size:10px;letter-spacing:1.6px;color:#ffd479;font-weight:700;font-family:'JetBrains Mono',monospace;margin:2px 0 12px;}
+  .varcb{margin-bottom:12px;}
+  .vtag{font-size:8.5px;font-weight:700;letter-spacing:1px;padding:2px 8px;border-radius:3px;background:#3a2e0a;border:1px solid #6b5212;color:#ffd479;}
+  .varwhen{font-size:12px;line-height:1.55;color:var(--txt2);padding:9px 14px 0;}
+  .varwhen b{color:var(--head);} .varwhen code{background:#1c2530;color:#ffd479;padding:0 4px;border-radius:3px;font-size:11px;}
+  .demo{background:rgba(10,12,17,.6);border:1px solid var(--border);border-radius:10px;padding:14px;backdrop-filter:blur(6px);box-shadow:0 8px 30px rgba(0,0,0,.28);}
+  .demo .h{font-size:9px;letter-spacing:1.5px;color:var(--acc);margin-bottom:11px;font-weight:700;}
+  .stage{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:10px;}
+  .stage svg{width:100%;height:auto;display:block;}
+  .stepchip{display:inline-block;margin-right:9px;font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:1.2px;font-weight:700;color:var(--acc);background:#0a1f2a;border:1px solid #14424f;border-radius:20px;padding:2px 9px;vertical-align:1px;}
+  .vmsg{margin-top:11px;font-size:13.5px;line-height:1.6;color:var(--text);background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--acc);border-radius:7px;padding:11px 13px;min-height:22px;}
+  .vmsg b{color:var(--head);} .vmsg .ok{color:#69ff47;font-weight:700;} .vmsg .bad{color:#ff6b6b;font-weight:700;}
+  .vmsg.flash{animation:stepin .35s ease;} @keyframes stepin{from{opacity:.3;transform:translateY(3px);}to{opacity:1;transform:none;}}
+  .vctrl{display:flex;gap:7px;align-items:center;margin-top:11px;flex-wrap:wrap;}
+  .vctrl button{background:var(--panel);border:1px solid #30363d;color:var(--text);padding:6px 13px;border-radius:6px;cursor:pointer;font-size:13px;font-family:inherit;font-weight:600;transition:.15s;}
+  .vctrl button:hover:not(:disabled){background:#1c2530;} .vctrl button:disabled{opacity:.4;cursor:not-allowed;}
+  .vctrl button.play{background:var(--acc);border-color:var(--acc);color:#06223f;}
+  .spd{display:inline-flex;align-items:center;gap:7px;margin-left:auto;} .spd input{width:104px;accent-color:var(--acc);cursor:pointer;}
+  .spd b{font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace;} .vpos{font-size:11px;color:var(--faint);font-family:'JetBrains Mono',monospace;}
+  .vtables{margin-top:11px;display:flex;gap:14px;flex-wrap:wrap;}
+  .vtbl{font-family:'JetBrains Mono',monospace;font-size:11px;background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:10px 11px;}
+  .vtbl .cap{color:var(--muted);margin-bottom:7px;letter-spacing:1px;font-weight:700;}
+  .qrow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-height:26px;margin-bottom:6px;}
+  .qlabel{font-size:10px;color:var(--muted);letter-spacing:1.2px;font-weight:700;min-width:128px;}
+  .qp{background:#0a5f7a;border:1px solid #14a8d0;color:#d6f4ff;font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:13px;font-family:'JetBrains Mono',monospace;animation:qin .28s ease;}
+  .qp.empty{background:transparent;border:1px dashed #2a3340;color:var(--faint);font-weight:400;font-style:italic;}
+  .qp.top{background:#0a7a4a;border-color:#1fd081;color:#d6ffe8;box-shadow:0 0 0 2px #1fd08133;}
+  @keyframes qin{from{opacity:0;transform:translateY(5px) scale(.85);}to{opacity:1;transform:none;}}
+  .cost{margin-top:4px;font-size:13px;font-weight:700;color:var(--acc);font-family:'JetBrains Mono',monospace;}
+  .trace{margin-top:13px;background:#070a0e;border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+  .trace .th{background:var(--panel);border-bottom:1px solid var(--border);padding:7px 13px;font-size:10px;letter-spacing:1px;color:var(--muted);font-weight:700;} .trace .th b{color:var(--acc);}
+  .trace pre{padding:11px 8px;font-size:11.5px;line-height:1.7;}
+  .tln{display:block;padding:1px 12px;border-left:3px solid transparent;white-space:pre;color:#7d8895;transition:background .2s,color .2s,border-color .2s;}
+  .tln.hot{background:#0f2a33;border-left-color:var(--acc);color:#dff6ff;font-weight:700;}
+  .pnav{display:flex;justify-content:space-between;align-items:center;margin-top:18px;padding-top:16px;border-top:1px solid var(--border);}
+  .pnav button{background:transparent;border:1px solid #30363d;color:var(--txt2);padding:8px 18px;border-radius:6px;cursor:pointer;font-size:12px;font-family:inherit;transition:.15s;}
+  .pnav button:hover:not(:disabled){border-color:#475569;color:var(--head);} .pnav button:disabled{color:#2a323d;cursor:not-allowed;} .pnav .pos{font-size:11px;color:var(--faint);}
+  svg .acell{transition:fill .3s,stroke .3s;}
+  svg .aval{fill:#e6edf3;font:700 15px 'JetBrains Mono',monospace;text-anchor:middle;dominant-baseline:central;}
+  svg .aptr{fill:#ffd60a;font:700 11px 'JetBrains Mono',monospace;text-anchor:middle;}
+  svg .aidx{fill:#5b6675;font:600 10px 'JetBrains Mono',monospace;text-anchor:middle;}
+  .menuToggle{display:none;}
+  @media(max-width:860px){
+    .shell{flex-direction:column;}
+    .side{width:100%;min-width:0;border-right:none;border-bottom:1px solid var(--border);max-height:0;overflow:hidden;padding:0;transition:max-height .3s ease;}
+    .side.open{max-height:1500px;padding:10px 0 20px;} .menuToggle{display:inline-block;}
+    .cards{grid-template-columns:1fr;} .ic.analogy,.ic.bugs{grid-column:auto;} .main{padding:18px 16px 50px;}
+    .qlabel{min-width:0;}
+  }
+</style>
+</head>
+<body>
+  <div class="top">
+    <div class="row">
+      <a class="backbtn" href="/" title="Topics">← Topics</a>
+      <span class="badge">STACK · QUEUE</span>
+      <h1>Stacks &amp; Queues</h1>
+      <span class="meta">8 patterns · C++ · Anshu</span>
+      <button class="copy menuToggle" id="menuToggle" style="margin-left:auto">☰ patterns</button>
+    </div>
+    <p>AlgoMaster notes + <b>Striver + NeetCode</b> C++, with the input row and the live <b>stack / deque</b> animating <b>line by line</b> as items push and pop. Real LeetCode questions + variation templates.</p>
+  </div>
+
+  <div class="shell">
+    <div class="side" id="side"></div>
+    <div class="main" id="main"></div>
+  </div>
+
+<script>
+/* ════════════════ STACK / QUEUE ENGINE ════════════════ */
+function svgSeq(f){
+  const seq=f.seq||[], n=seq.length, bars=f.mode==='bars';
+  const cw=44, gap=10, pad=20, top=46, barMax=120;
+  const xOf=i=>pad+i*(cw+gap);
+  const maxH=bars?Math.max(1,...seq):1;
+  const baseY=bars?top+barMax+6:top+44;
+  const W=Math.max(xOf(n)-gap+pad, 160), H=baseY+26;
+  let s=`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet">`;
+  const ptr=f.ptr||{}, byIdx={};
+  Object.entries(ptr).forEach(([nm,idx])=>{ if(idx==null||idx<0||idx>=n)return; (byIdx[idx]=byIdx[idx]||[]).push(nm); });
+  Object.entries(byIdx).forEach(([k,names])=>{ const cx=xOf(+k)+cw/2;
+    s+=`<text class="aptr" x="${cx}" y="${top-22}">${names.join(' ')}</text><text class="aptr" x="${cx}" y="${top-8}">▼</text>`; });
+  seq.forEach((v,i)=>{ const st=(f.cells&&f.cells[i])||''; const x=xOf(i);
+    let stroke='#3a4658',fill='#10161e';
+    if(st==='win'){stroke='#00e5ff';fill='#06222b';}
+    if(st==='check'){stroke='#ffd60a';fill='#241d04';}
+    if(st==='found'){stroke='#69ff47';fill='#123a1f';}
+    if(st==='dead'){stroke='#ff6b6b';fill='#2a0e0e';}
+    if(st==='pop'){stroke='#bf5af2';fill='#1e0f2a';}
+    if(bars){ const h=Math.max(6, v/maxH*barMax);
+      s+=`<rect class="acell" x="${x}" y="${baseY-h}" width="${cw}" height="${h}" rx="5" fill="${fill}" stroke="${stroke}" stroke-width="2"/>`;
+      s+=`<text class="aval" x="${x+cw/2}" y="${baseY-h-10}">${v}</text>`;
+    } else {
+      s+=`<rect class="acell" x="${x}" y="${top+2}" width="${cw}" height="40" rx="9" fill="${fill}" stroke="${stroke}" stroke-width="2"/>`;
+      s+=`<text class="aval" x="${x+cw/2}" y="${top+22}">${v}</text>`;
+    }
+    s+=`<text class="aidx" x="${x+cw/2}" y="${baseY+16}">${i}</text>`;
+  });
+  return s+'</svg>';
+}
+function qpills(label,arr){let h=`<div class="qrow"><span class="qlabel">${label}</span>`;if(!arr.length)h+=`<span class="qp empty">empty</span>`;else arr.forEach(t=>h+=`<span class="qp">${t}</span>`);return h+`</div>`;}
+function stackPills(label,arr){let h=`<div class="qrow"><span class="qlabel">${label}</span>`;if(!arr.length)h+=`<span class="qp empty">empty</span>`;else arr.forEach((t,i)=>h+=`<span class="qp${i===arr.length-1?' top':''}">${t}</span>`);return h+`</div>`;}
+function seqSide(f){
+  let tables='',heap='';
+  if(f.stack!==undefined) heap+=stackPills(f.s1lbl||'STACK (top →)',f.stack);
+  if(f.stack2!==undefined) heap+=stackPills(f.s2lbl||'MIN (top →)',f.stack2);
+  if(f.queue!==undefined) heap+=qpills(f.qlbl||'DEQUE (front → back)',f.queue);
+  if(f.result!==undefined) heap+=qpills(f.rlbl||'OUTPUT →',f.result);
+  if(f.stats) f.stats.forEach(([k,v])=>heap+=`<div class="cost">${k} = ${v}</div>`);
+  return {tables,heap};
+}
+
+/* ════════════════ FRAME GENERATORS ════════════════ */
+function genValidParens(){
+  const seq=['{','[','(',')',']','}'],F=[];
+  const open={'(':')','[':']','{':'}'}, close={')':'(',']':'[','}':'{'};
+  let st=[];
+  F.push({seq,cells:{},ptr:{},stack:[],msg:`Scan left → right. Push every opening bracket; each closing must match the most-recent open (the top).`,line:0});
+  for(let i=0;i<seq.length;i++){
+    const c=seq[i];
+    if(open[c]){ st.push(c); F.push({seq,cells:{[i]:'check'},ptr:{c:i},stack:st.slice(),msg:`<b>${c}</b> is opening → push onto the stack.`,line:1}); }
+    else {
+      if(!st.length || st[st.length-1]!==close[c]){ F.push({seq,cells:{[i]:'dead'},ptr:{c:i},stack:st.slice(),msg:`<span class="bad">${c} doesn't match the top → invalid.</span>`,line:2}); return F; }
+      const t=st.pop();
+      F.push({seq,cells:{[i]:'win'},ptr:{c:i},stack:st.slice(),msg:`<b>${c}</b> closes <b>${t}</b> on top → pop it.`,line:3});
+    }
+  }
+  F.push({seq,cells:Object.fromEntries(seq.map((_,i)=>[i,'found'])),ptr:{},stack:st.slice(),msg:`<span class="ok">Stack empty at the end → every bracket matched. Valid!</span>`,line:5});
+  return F;
+}
+function genMinStack(){
+  const seq=[5,2,7,1],F=[];
+  let st=[],mn=[];
+  F.push({seq,cells:{},ptr:{},stack:[],stack2:[],msg:`A Min Stack keeps a parallel "min so far" stack, so getMin() is O(1).`,line:0});
+  for(let i=0;i<seq.length;i++){
+    const x=seq[i]; st.push(x);
+    const m=mn.length?Math.min(x,mn[mn.length-1]):x; mn.push(m);
+    F.push({seq,cells:{[i]:'check'},ptr:{push:i},stack:st.slice(),stack2:mn.slice(),msg:`push(${x}) → also push min(${x}, prevMin) = <b>${m}</b> to the min stack.`,line:2});
+  }
+  F.push({seq,cells:{},ptr:{},stack:st.slice(),stack2:mn.slice(),stats:[['getMin()',mn[mn.length-1]]],msg:`getMin() → just read the min-stack top = <b>${mn[mn.length-1]}</b>. No scan.`,line:4});
+  st.pop();mn.pop();
+  F.push({seq,cells:{[seq.length-1]:'pop'},ptr:{},stack:st.slice(),stack2:mn.slice(),stats:[['getMin()',mn[mn.length-1]]],msg:`pop() removes the top of <b>both</b> stacks → getMin now = <b>${mn[mn.length-1]}</b>.`,line:3});
+  F.push({seq,cells:{},ptr:{},stack:st.slice(),stack2:mn.slice(),stats:[['getMin()',mn[mn.length-1]]],msg:`<span class="ok">Min is always the min-stack top — O(1) push / pop / getMin.</span>`,line:4});
+  return F;
+}
+function genRPN(){
+  const seq=['2','1','+','3','*'],F=[];
+  const isNum=t=>/^-?\d+$/.test(t);
+  const ap=(a,o,b)=>o==='+'?a+b:o==='-'?a-b:o==='*'?a*b:Math.trunc(a/b);
+  let st=[];
+  F.push({seq,cells:{},ptr:{},stack:[],msg:`Reverse Polish Notation: a number is pushed; an operator pops the top two operands.`,line:0});
+  for(let i=0;i<seq.length;i++){
+    const t=seq[i];
+    if(isNum(t)){ st.push(+t); F.push({seq,cells:{[i]:'check'},ptr:{t:i},stack:st.slice(),msg:`<b>${t}</b> is a number → push.`,line:1}); }
+    else { const b=st.pop(), a=st.pop(), r=ap(a,t,b); st.push(r);
+      F.push({seq,cells:{[i]:'win'},ptr:{t:i},stack:st.slice(),msg:`Operator <b>${t}</b> → pop ${b} & ${a}, push ${a} ${t} ${b} = <b>${r}</b>.`,line:5}); }
+  }
+  F.push({seq,cells:Object.fromEntries(seq.map((_,i)=>[i,'found'])),ptr:{},stack:st.slice(),stats:[['result',st[0]]],msg:`<span class="ok">One value left = the answer = ${st[0]}.</span>`,line:7});
+  return F;
+}
+function genNGE(){
+  const seq=[2,1,2,4,3],n=seq.length,F=[];
+  let st=[],res=Array(n).fill(-1);
+  const pills=()=>st.map(i=>seq[i]);
+  F.push({seq,cells:{},ptr:{},stack:[],result:res.slice(),msg:`Decreasing stack of indices. Each element waits for the first greater element to its right.`,line:0});
+  for(let i=0;i<n;i++){
+    F.push({seq,cells:{[i]:'check'},ptr:{i},stack:pills(),result:res.slice(),msg:`Look at ${seq[i]} (index ${i}).`,line:1});
+    while(st.length && seq[st[st.length-1]]<seq[i]){
+      const t=st.pop(); res[t]=seq[i];
+      F.push({seq,cells:{[i]:'win',[t]:'pop'},ptr:{i},stack:pills(),result:res.slice(),msg:`${seq[i]} > ${seq[t]} → next-greater of ${seq[t]} is <b>${seq[i]}</b>. Pop.`,line:2});
+    }
+    st.push(i);
+    F.push({seq,cells:{[i]:'check'},ptr:{i},stack:pills(),result:res.slice(),msg:`Push ${seq[i]} — now it waits for its own next-greater.`,line:4});
+  }
+  F.push({seq,cells:{},ptr:{},stack:pills(),result:res.slice(),msg:`<span class="ok">Indices still on the stack have no greater element → −1.</span>`,line:6});
+  return F;
+}
+function genDailyTemps(){
+  const seq=[73,74,75,71,69,72,76,73],n=seq.length,F=[];
+  let st=[],res=Array(n).fill(0);
+  const pills=()=>st.map(i=>seq[i]);
+  F.push({seq,cells:{},ptr:{},stack:[],result:res.slice(),msg:`Stack of "waiting" days. Pop a day the moment a warmer day arrives.`,line:0});
+  for(let i=0;i<n;i++){
+    F.push({seq,cells:{[i]:'check'},ptr:{i},stack:pills(),result:res.slice(),msg:`Day ${i}: ${seq[i]}°.`,line:1});
+    while(st.length && seq[i]>seq[st[st.length-1]]){
+      const j=st.pop(); res[j]=i-j;
+      F.push({seq,cells:{[i]:'win',[j]:'pop'},ptr:{i},stack:pills(),result:res.slice(),msg:`${seq[i]}° > ${seq[j]}° → day ${j} waited ${i-j} day(s).`,line:3});
+    }
+    st.push(i);
+    F.push({seq,cells:{[i]:'check'},ptr:{i},stack:pills(),result:res.slice(),msg:`No warmer day yet → push day ${i}.`,line:4});
+  }
+  F.push({seq,cells:{},ptr:{},stack:pills(),result:res.slice(),msg:`<span class="ok">Days still on the stack never warmed up → 0.</span>`,line:6});
+  return F;
+}
+function genLargestRect(){
+  const base=[2,1,5,6,2,3], seq=base.concat(0), n=base.length,F=[];
+  let st=[],best=0;
+  const pills=()=>st.map(i=>seq[i]);
+  F.push({seq,mode:'bars',cells:{[n]:'check'},ptr:{},stack:[],stats:[['best',0]],msg:`Increasing stack of bar indices. A 0-height sentinel (last bar) flushes everything at the end.`,line:0});
+  for(let i=0;i<=n;i++){
+    F.push({seq,mode:'bars',cells:{[i]:'check'},ptr:{i},stack:pills(),stats:[['best',best]],msg:`At bar ${i} (height ${seq[i]}).`,line:1});
+    while(st.length && seq[i]<seq[st[st.length-1]]){
+      const H=seq[st.pop()];
+      const W=st.length? i-st[st.length-1]-1 : i;
+      const area=H*W; const isBest=area>best; if(isBest)best=area;
+      F.push({seq,mode:'bars',cells:{[i]:'win'},ptr:{i},stack:pills(),stats:[['area',`${H}×${W}=${area}`],['best',best]],msg:`Pop height ${H}: it stretches over width ${W} → area ${area}.${isBest?' <b>new best!</b>':''}`,line:5});
+    }
+    st.push(i);
+    F.push({seq,mode:'bars',cells:{[i]:'check'},ptr:{i},stack:pills(),stats:[['best',best]],msg:`Push bar ${i}.`,line:6});
+  }
+  F.push({seq,mode:'bars',cells:{},ptr:{},stack:[],stats:[['answer',best]],msg:`<span class="ok">Largest rectangle area = ${best}.</span>`,line:-1});
+  return F;
+}
+function genQueueStacks(){
+  const seq=[1,2,3,4],F=[];
+  let inS=[],outS=[];
+  const push=(o)=>{o.s1lbl='IN (top →)';o.s2lbl='OUT (top → = front)';return o;};
+  F.push(push({seq,cells:{},ptr:{},stack:[],stack2:[],msg:`Two stacks fake a queue. New items go to <b>in</b>; we pour into <b>out</b> only when out is empty.`,line:0}));
+  for(let i=0;i<3;i++){ inS.push(seq[i]); F.push(push({seq,cells:{[i]:'check'},ptr:{push:i},stack:inS.slice(),stack2:outS.slice(),msg:`push(${seq[i]}) → onto the <b>in</b> stack.`,line:0})); }
+  F.push(push({seq,cells:{},ptr:{},stack:inS.slice(),stack2:outS.slice(),msg:`pop(): out is empty → pour in → out, which reverses the order.`,line:3}));
+  while(inS.length){ outS.push(inS.pop()); F.push(push({seq,cells:{},ptr:{},stack:inS.slice(),stack2:outS.slice(),msg:`Move ${outS[outS.length-1]} from in → out.`,line:3})); }
+  let x=outS.pop();
+  F.push(push({seq,cells:{},ptr:{},stack:inS.slice(),stack2:outS.slice(),stats:[['returned',x]],msg:`out's top = <b>${x}</b> = the oldest element → correct FIFO front.`,line:4}));
+  inS.push(seq[3]);
+  F.push(push({seq,cells:{[3]:'check'},ptr:{push:3},stack:inS.slice(),stack2:outS.slice(),msg:`push(4) → goes to <b>in</b>; out keeps serving first.`,line:0}));
+  x=outS.pop();
+  F.push(push({seq,cells:{},ptr:{},stack:inS.slice(),stack2:outS.slice(),stats:[['returned',x]],msg:`<span class="ok">pop() → out still has items → return ${x}. No re-pour needed (amortized O(1)).</span>`,line:4}));
+  return F;
+}
+function genSlidingMax(){
+  const seq=[1,3,-1,-3,5,3,6,7],k=3,n=seq.length,F=[];
+  let dq=[],res=[];
+  const pills=()=>dq.map(i=>seq[i]);
+  const win=i=>{const o={};for(let j=Math.max(0,i-k+1);j<=i;j++)o[j]='win';return o;};
+  F.push({seq,cells:{},ptr:{},queue:[],result:[],rlbl:`MAX of each window →`,msg:`Deque holds indices whose values could still be a window max — kept decreasing.`,line:0});
+  for(let i=0;i<n;i++){
+    if(dq.length && dq[0]<=i-k){ const g=dq.shift(); F.push({seq,cells:win(i),ptr:{i},queue:pills(),result:res.slice(),rlbl:`MAX of each window →`,msg:`Index ${g} fell out of the window → pop_front.`,line:1}); }
+    while(dq.length && seq[dq[dq.length-1]]<=seq[i]){ const b=dq.pop(); F.push({seq,cells:win(i),ptr:{i},queue:pills(),result:res.slice(),rlbl:`MAX of each window →`,msg:`${seq[i]} ≥ ${seq[b]} → ${seq[b]} can never be max again, pop_back.`,line:3}); }
+    dq.push(i);
+    F.push({seq,cells:win(i),ptr:{i},queue:pills(),result:res.slice(),rlbl:`MAX of each window →`,msg:`Push index ${i} (value ${seq[i]}).`,line:4});
+    if(i>=k-1){ res.push(seq[dq[0]]); F.push({seq,cells:win(i),ptr:{i},queue:pills(),result:res.slice(),rlbl:`MAX of each window →`,msg:`Window full → front of deque = <b>${seq[dq[0]]}</b> is this window's max.`,line:5}); }
+  }
+  F.push({seq,cells:{},ptr:{},queue:pills(),result:res.slice(),rlbl:`MAX of each window →`,msg:`<span class="ok">Window maxima = [${res.join(', ')}].</span>`,line:-1});
+  return F;
+}
+
+/* ════════════════ PATTERN DATA ════════════════ */
+const CAT={ STK:{c:'#00e5ff',label:'STACK BASICS'}, MONO:{c:'#ff9f0a',label:'MONOTONIC STACK'}, QUE:{c:'#69ff47',label:'QUEUE / DEQUE'} };
+const SRC='Pattern framing · <b>AlgoMaster</b> &nbsp;|&nbsp; Code · <b>Striver + NeetCode</b>';
+
+const P=[
+{ cat:'STK', label:'Valid Parentheses', gen:genValidParens, src:SRC,
+  when:'Match nested / paired symbols — brackets, tags, scopes. The "hello world" of stacks: the most recent open must close first (LIFO).',
+  insight:'Push every opening bracket. On a closing bracket, the stack top <b>must</b> be its partner — pop if so, fail otherwise. Valid ⇔ stack ends empty.',
+  analogy:'A stack of plates: you can only take off the plate you put on last. The last bracket opened is the first that must close.',
+  bugs:['Forgetting to check the stack is non-empty before peeking → crash on a leading <code>)</code>.','Returning true without checking the stack is empty at the end (e.g. <code>"((("</code>).','Comparing against the wrong partner map.'],
+  problems:['LC 20 · Valid Parentheses','LC 921 · Min Add to Make Valid','LC 1249 · Min Remove to Make Valid','LC 32 · Longest Valid Parentheses'],
+  code:`// Striver / NeetCode — Valid Parentheses
+bool isValid(string s){
+    stack<char> st;
+    for(char c : s){
+        if(c=='('||c=='['||c=='{') st.push(c);            // open → push
+        else{
+            if(st.empty()) return false;                  // ★ nothing to match
+            char t = st.top(); st.pop();
+            if((c==')'&&t!='(')||(c==']'&&t!='[')||(c=='}'&&t!='{'))
+                return false;                             // wrong partner
+        }
+    }
+    return st.empty();                                    // ★ must end empty
+}`,
+  trace:['for(char c : s){','  if(isOpen(c)) st.push(c);','  else if(st.empty()||!match) return false;','  else st.pop();','}','return st.empty();']
+},
+{ cat:'STK', label:'Min Stack', gen:genMinStack, src:SRC,
+  when:'Support push / pop / top AND getMin all in O(1). The trick: store auxiliary state alongside each element.',
+  insight:'Keep a second stack of "minimum so far". On push, push <code>min(x, minStack.top())</code>. getMin is just the min-stack top — every pop stays in sync.',
+  analogy:'Sticky notes on each plate recording the smallest plate at or below it — glance at the top note to know the current min instantly.',
+  bugs:['Pushing to the main stack but forgetting the min stack (they desync).','Pushing only when a new min appears → pop logic breaks. Push every time.','Calling getMin on an empty stack.'],
+  problems:['LC 155 · Min Stack','LC 716 · Max Stack','LC 1381 · Design a Stack w/ Increment','LC 895 · Maximum Frequency Stack'],
+  code:`// Striver / NeetCode — Min Stack (two stacks)
+class MinStack{
+    stack<int> st, mn;                       // value stack + min stack
+public:
+    void push(int x){
+        st.push(x);
+        mn.push(mn.empty()? x : min(x, mn.top()));  // ★ min so far
+    }
+    void pop(){ st.pop(); mn.pop(); }        // pop BOTH
+    int top(){ return st.top(); }
+    int getMin(){ return mn.top(); }         // ★ O(1)
+};`,
+  trace:['push(x):','  st.push(x);','  mn.push(min(x, mn.top()));','pop(): st.pop(); mn.pop();','getMin(): return mn.top();']
+},
+{ cat:'STK', label:'Evaluate RPN', gen:genRPN, src:SRC,
+  when:'Evaluate a postfix expression, or any "fold two operands with an operator" problem. Stacks are how calculators and compilers evaluate expressions.',
+  insight:'Walk the tokens: push numbers; on an operator pop the top two (mind the order — second pop is the left operand), apply, push the result back.',
+  analogy:'An assembly line: parts (numbers) pile up; when a machine (operator) fires, it grabs the last two parts, combines them, and drops the product back.',
+  bugs:['Operand order: for <code>-</code> and <code>/</code> the first pop is the right operand.','Treating negative numbers like <code>-3</code> as the operator <code>-</code>.','Integer division truncation toward zero.'],
+  problems:['LC 150 · Evaluate RPN','LC 224 · Basic Calculator','LC 227 · Basic Calculator II','LC 772 · Basic Calculator III'],
+  code:`// Striver / NeetCode — Evaluate Reverse Polish Notation
+int evalRPN(vector<string>& tok){
+    stack<int> st;
+    for(auto& t : tok){
+        if(t=="+"||t=="-"||t=="*"||t=="/"){
+            int b=st.top();st.pop();          // ★ right operand
+            int a=st.top();st.pop();          // left operand
+            st.push(t=="+"?a+b : t=="-"?a-b : t=="*"?a*b : a/b);
+        } else st.push(stoi(t));              // number → push
+    }
+    return st.top();                          // ★ final value
+}`,
+  trace:['for(string t : tokens){','  if(isNumber(t)) st.push(stoi(t));','  else {','    int b=st.top();st.pop();','    int a=st.top();st.pop();','    st.push(apply(a,t,b)); }','}','return st.top();']
+},
+{ cat:'MONO', label:'Next Greater Element', gen:genNGE, src:SRC,
+  when:'For each element, find the nearest greater element to its right (or left). The canonical monotonic-stack problem — O(n) instead of O(n²).',
+  insight:'Keep a stack of indices with <b>decreasing</b> values. When a bigger value arrives, it is the "next greater" for every smaller index on top — pop them all and record it.',
+  analogy:'People in a queue looking right for someone taller. A tall person arriving instantly answers everyone still waiting who is shorter than them.',
+  bugs:['Storing values instead of indices when you need the position / distance.','Using <code>&lt;</code> vs <code>&lt;=</code> wrong when duplicates matter.','Forgetting leftover indices have no answer (−1).'],
+  problems:['LC 496 · Next Greater Element I','LC 503 · Next Greater Element II','LC 739 · Daily Temperatures','LC 901 · Online Stock Span'],
+  code:`// Striver / NeetCode — Next Greater Element (to the right)
+vector<int> nextGreater(vector<int>& a){
+    int n=a.size(); vector<int> res(n,-1);
+    stack<int> st;                          // indices, decreasing values
+    for(int i=0;i<n;i++){
+        while(!st.empty() && a[st.top()]<a[i]){ // ★ i is their next-greater
+            res[st.top()] = a[i];
+            st.pop();
+        }
+        st.push(i);
+    }
+    return res;                             // leftover indices stay -1
+}`,
+  trace:['for(int i=0;i<n;i++){','  while(!st.empty() && a[st.top()]<a[i]){','    res[st.top()] = a[i]; st.pop(); }','','  st.push(i);','}','return res;']
+},
+{ cat:'MONO', label:'Daily Temperatures', gen:genDailyTemps, src:SRC,
+  when:'Find how many steps until a strictly greater value appears — "wait time" / span problems. Next-greater, but you want the distance, not the value.',
+  insight:'Same decreasing stack of indices. When today is warmer than the stack-top day, that day waited <code>i − j</code> days — pop and fill. Each index is pushed/popped once → O(n).',
+  analogy:'A line of people holding "warmer day?" signs. A hot day walks in and hands the answer to everyone still holding a sign for a colder day.',
+  bugs:['Storing temperatures instead of indices (you need the gap).','Using <code>&gt;=</code> when only strictly warmer counts.','Leaving the default as something other than 0 for days that never warm up.'],
+  problems:['LC 739 · Daily Temperatures','LC 496 · Next Greater Element','LC 901 · Online Stock Span','LC 1019 · Next Greater Node in List'],
+  code:`// Striver / NeetCode — Daily Temperatures
+vector<int> dailyTemperatures(vector<int>& T){
+    int n=T.size(); vector<int> res(n,0);
+    stack<int> st;                          // indices of cooler days
+    for(int i=0;i<n;i++){
+        while(!st.empty() && T[i]>T[st.top()]){ // ★ warmer than stack top
+            int j=st.top(); st.pop();
+            res[j] = i - j;                 // days waited
+        }
+        st.push(i);
+    }
+    return res;
+}`,
+  trace:['for(int i=0;i<n;i++){','  while(!st.empty() && T[i]>T[st.top()]){','    int j=st.top(); st.pop();','    res[j] = i - j; }','  st.push(i);','}','return res;']
+},
+{ cat:'MONO', label:'Largest Rectangle in Histogram', gen:genLargestRect, src:SRC,
+  when:'Maximum-area rectangle under a histogram — and the engine behind Maximal Rectangle in a binary matrix. The hardest classic monotonic-stack problem.',
+  insight:'Keep an <b>increasing</b> stack of bar indices. When a shorter bar arrives, the popped bar can no longer extend right; its width spans from the new bar back to the element below it on the stack. A trailing 0 flushes the rest.',
+  analogy:'Water pillars: as long as bars keep rising you postpone measuring. The first dip tells you exactly how wide each taller-than-it pillar could spread.',
+  bugs:['Width formula: <code>i − st.top() − 1</code> after popping (not <code>i − popped</code>).','Forgetting the sentinel 0 → bars left on the stack never measured.','When the stack empties after a pop, width is the full <code>i</code>.'],
+  problems:['LC 84 · Largest Rectangle in Histogram','LC 85 · Maximal Rectangle','LC 42 · Trapping Rain Water','LC 1762 · Buildings With Ocean View'],
+  code:`// Striver / NeetCode — Largest Rectangle in Histogram
+int largestRectangleArea(vector<int> h){
+    h.push_back(0);                          // ★ sentinel flushes the stack
+    stack<int> st; int best=0;
+    for(int i=0;i<(int)h.size();i++){
+        while(!st.empty() && h[i]<h[st.top()]){
+            int H = h[st.top()]; st.pop();
+            int W = st.empty()? i : i - st.top() - 1;  // ★ width span
+            best = max(best, H*W);
+        }
+        st.push(i);
+    }
+    return best;
+}`,
+  trace:['heights.push_back(0);   // sentinel','for(int i=0;i<=n;i++){','  while(!st.empty() && h[i]<h[st.top()]){','    int H=h[st.top()]; st.pop();','    int W=st.empty()?i:i-st.top()-1;','    best=max(best,H*W); }','  st.push(i);','}']
+},
+{ cat:'QUE', label:'Implement Queue using Stacks', gen:genQueueStacks, src:SRC,
+  when:'Build FIFO behaviour from LIFO stacks — a classic design question that teaches amortized analysis.',
+  insight:'Use two stacks: <b>in</b> for pushes, <b>out</b> for pops. When out is empty, pour all of in into out — this reverses order, turning LIFO into FIFO. Each element moves at most once → amortized O(1).',
+  analogy:'Pouring a tube of tennis balls into a second tube: the first ball you dropped in ends up on top of the second tube, ready to come out first.',
+  bugs:['Re-pouring on every pop instead of only when out is empty → O(n) per op.','Popping from the wrong stack.','Forgetting peek() must also trigger the transfer.'],
+  problems:['LC 232 · Implement Queue using Stacks','LC 225 · Implement Stack using Queues','LC 1429 · First Unique Number','LC 622 · Design Circular Queue'],
+  code:`// Striver / NeetCode — Queue using two stacks
+class MyQueue{
+    stack<int> in, out;
+    void shift(){ if(out.empty())            // ★ only when out is empty
+        while(!in.empty()){ out.push(in.top()); in.pop(); } }
+public:
+    void push(int x){ in.push(x); }          // always to 'in'
+    int pop(){ shift(); int x=out.top(); out.pop(); return x; }
+    int peek(){ shift(); return out.top(); }
+    bool empty(){ return in.empty() && out.empty(); }
+};`,
+  trace:['push(x): in.push(x);','pop():','  if(out.empty())','    while(!in.empty()){ out.push(in.top()); in.pop(); }','  int x=out.top(); out.pop(); return x;']
+},
+{ cat:'QUE', label:'Sliding Window Maximum', gen:genSlidingMax, src:SRC,
+  when:'Max (or min) of every length-k window in O(n). The monotonic <b>deque</b> pattern — pops from both ends.',
+  insight:'Keep a deque of indices with decreasing values. Before adding i, pop smaller values from the back (they\'re dominated) and drop the front if it left the window. The front is always the current window\'s max.',
+  analogy:'A bouncer queue where a stronger newcomer kicks out everyone weaker behind them, and anyone past their time at the front is shown the door.',
+  bugs:['Storing values not indices → can\'t tell when the front expires.','Forgetting to evict the front when <code>dq.front() ≤ i − k</code>.','Recording the answer before the first full window (<code>i ≥ k−1</code>).'],
+  problems:['LC 239 · Sliding Window Maximum','LC 862 · Shortest Subarray Sum ≥ K','LC 1438 · Longest Subarray w/ Abs Diff','LC 1696 · Jump Game VI'],
+  code:`// Striver / NeetCode — Sliding Window Maximum (monotonic deque)
+vector<int> maxSlidingWindow(vector<int>& a, int k){
+    deque<int> dq; vector<int> res;          // dq holds indices, decreasing
+    for(int i=0;i<(int)a.size();i++){
+        if(!dq.empty() && dq.front()<=i-k) dq.pop_front();  // ★ expire front
+        while(!dq.empty() && a[dq.back()]<=a[i]) dq.pop_back(); // drop weaker
+        dq.push_back(i);
+        if(i>=k-1) res.push_back(a[dq.front()]);  // ★ front = window max
+    }
+    return res;
+}`,
+  trace:['for(int i=0;i<n;i++){','  if(dq.front()<=i-k) dq.pop_front();','  while(!dq.empty() && a[dq.back()]<=a[i])','    dq.pop_back();','  dq.push_back(i);','  if(i>=k-1) res.push_back(a[dq.front()]);','}']
+}
+];
+
+/* ════════════════ VARIATION TEMPLATES ════════════════ */
+const VARS={
+'Valid Parentheses':[
+  {name:'Min add to make valid (LC 921)',when:'Count unmatched brackets instead of just yes/no.',code:
+`int minAddToMakeValid(string s){
+  int open=0, add=0;
+  for(char c:s){
+    if(c=='(') open++;
+    else if(open) open--;     // matches an open
+    else add++;               // unmatched ')'
+  }
+  return add + open;          // leftovers need closing
+}`},
+  {name:'Min remove to make valid (LC 1249)',when:'Record indices to delete; stack stores positions of unmatched "(".',code:
+`stack<int> st; set<int> rm;
+for(int i=0;i<s.size();i++){
+  if(s[i]=='(') st.push(i);
+  else if(s[i]==')'){
+    if(st.empty()) rm.insert(i);   // unmatched ')'
+    else st.pop();
+  }
+}
+while(!st.empty()){ rm.insert(st.top()); st.pop(); }
+// rebuild string skipping rm`}
+],
+'Min Stack':[
+  {name:'Single stack of pairs',when:'Store {value, minSoFar} together — no second stack.',code:
+`stack<pair<int,int>> st;     // {val, curMin}
+void push(int x){
+  int m = st.empty()? x : min(x, st.top().second);
+  st.push({x, m});
+}
+int getMin(){ return st.top().second; }`},
+  {name:'Max Stack (LC 716)',when:'Mirror the trick with max instead of min.',code:
+`stack<int> st, mx;
+void push(int x){
+  st.push(x);
+  mx.push(mx.empty()? x : max(x, mx.top()));
+}
+int getMax(){ return mx.top(); }`}
+],
+'Evaluate RPN':[
+  {name:'Basic Calculator II (LC 227)',when:'Infix "3+2*2": push terms, apply * / immediately, sum at end.',code:
+`stack<int> st; int num=0; char op='+';
+for(int i=0;i<s.size();i++){
+  if(isdigit(s[i])) num=num*10+(s[i]-'0');
+  if((!isdigit(s[i])&&s[i]!=' ')||i==s.size()-1){
+    if(op=='+') st.push(num);
+    else if(op=='-') st.push(-num);
+    else if(op=='*'){int t=st.top();st.pop();st.push(t*num);}
+    else {int t=st.top();st.pop();st.push(t/num);}
+    op=s[i]; num=0;
+  }
+}
+// answer = sum of stack`},
+  {name:'Basic Calculator with parens (LC 224)',when:'Stack saves (result, sign) on "(" and restores on ")".',code:
+`stack<int> st; int res=0,sign=1,num=0;
+for(char c:s){
+  if(isdigit(c)) num=num*10+(c-'0');
+  else if(c=='+'){res+=sign*num;num=0;sign=1;}
+  else if(c=='-'){res+=sign*num;num=0;sign=-1;}
+  else if(c=='('){st.push(res);st.push(sign);res=0;sign=1;}
+  else if(c==')'){res+=sign*num;num=0;
+    res*=st.top();st.pop(); res+=st.top();st.pop();}
+}
+return res+sign*num;`}
+],
+'Next Greater Element':[
+  {name:'Circular array (LC 503)',when:'Wrap around: iterate 2n times, index modulo n.',code:
+`vector<int> res(n,-1); stack<int> st;
+for(int i=0;i<2*n;i++){
+  int cur=a[i%n];
+  while(!st.empty() && a[st.top()]<cur){
+    res[st.top()]=cur; st.pop();
+  }
+  if(i<n) st.push(i);     // only push first pass
+}`},
+  {name:'Next SMALLER element',when:'Flip the comparison to an increasing stack.',code:
+`for(int i=0;i<n;i++){
+  while(!st.empty() && a[st.top()]>a[i]){  // > not <
+    res[st.top()]=a[i]; st.pop();
+  }
+  st.push(i);
+}`}
+],
+'Daily Temperatures':[
+  {name:'Online Stock Span (LC 901)',when:'Stack of {price, span}; pop while top price ≤ current.',code:
+`stack<pair<int,int>> st;     // {price, span}
+int next(int price){
+  int span=1;
+  while(!st.empty() && st.top().first<=price){
+    span += st.top().second; st.pop();
+  }
+  st.push({price, span});
+  return span;
+}`},
+  {name:'Next greater node in linked list (LC 1019)',when:'Push values into a vector first, then run the same stack sweep.',code:
+`vector<int> v;            // copy list to array
+for(auto n=head;n;n=n->next) v.push_back(n->val);
+vector<int> res(v.size(),0); stack<int> st;
+for(int i=0;i<v.size();i++){
+  while(!st.empty() && v[st.top()]<v[i]){
+    res[st.top()]=v[i]; st.pop();
+  }
+  st.push(i);
+}`}
+],
+'Largest Rectangle in Histogram':[
+  {name:'Maximal Rectangle in matrix (LC 85)',when:'Build a histogram per row, run largestRectangleArea each row.',code:
+`int maxRectangle(vector<vector<char>>& m){
+  int best=0; vector<int> h(m[0].size(),0);
+  for(auto& row:m){
+    for(int j=0;j<row.size();j++)
+      h[j] = row[j]=='1'? h[j]+1 : 0;   // grow / reset column
+    best = max(best, largestRectangleArea(h));
+  }
+  return best;
+}`},
+  {name:'Trapping Rain Water (LC 42)',when:'Monotonic decreasing stack; water fills between bars on pop.',code:
+`stack<int> st; int water=0;
+for(int i=0;i<h.size();i++){
+  while(!st.empty() && h[i]>h[st.top()]){
+    int bot=h[st.top()]; st.pop();
+    if(st.empty()) break;
+    int w=i-st.top()-1;
+    int ht=min(h[i],h[st.top()])-bot;
+    water += w*ht;
+  }
+  st.push(i);
+}`}
+],
+'Implement Queue using Stacks':[
+  {name:'Stack using Queues (LC 225)',when:'Reverse: after each push, rotate the queue so newest is at front.',code:
+`queue<int> q;
+void push(int x){
+  q.push(x);
+  for(int i=1;i<q.size();i++){    // rotate
+    q.push(q.front()); q.pop();
+  }
+}
+int pop(){ int x=q.front(); q.pop(); return x; }`},
+  {name:'Circular Queue (LC 622)',when:'Fixed array + head/tail indices, no stacks needed.',code:
+`vector<int> a; int head=0,cnt=0,cap;
+bool enQueue(int x){
+  if(cnt==cap) return false;
+  a[(head+cnt)%cap]=x; cnt++; return true;
+}
+bool deQueue(){
+  if(!cnt) return false;
+  head=(head+1)%cap; cnt--; return true;
+}`}
+],
+'Sliding Window Maximum':[
+  {name:'Sliding Window Minimum',when:'Flip the back-pop comparison to keep an increasing deque.',code:
+`deque<int> dq; vector<int> res;
+for(int i=0;i<n;i++){
+  if(dq.front()<=i-k) dq.pop_front();
+  while(!dq.empty() && a[dq.back()]>=a[i]) // >= for min
+    dq.pop_back();
+  dq.push_back(i);
+  if(i>=k-1) res.push_back(a[dq.front()]);
+}`},
+  {name:'Shortest Subarray Sum ≥ K (LC 862)',when:'Monotonic deque over prefix sums; pop front when a valid window found.',code:
+`vector<long> pre(n+1,0);
+for(int i=0;i<n;i++) pre[i+1]=pre[i]+a[i];
+deque<int> dq; int best=INT_MAX;
+for(int i=0;i<=n;i++){
+  while(!dq.empty() && pre[i]-pre[dq.front()]>=K){
+    best=min(best,i-dq.front()); dq.pop_front();
+  }
+  while(!dq.empty() && pre[dq.back()]>=pre[i]) dq.pop_back();
+  dq.push_back(i);
+}`}
+]
+};
+
+/* ════════════════ SYNTAX HIGHLIGHT ════════════════ */
+function hl(code){
+  const esc=t=>t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return code.split('\n').map(line=>{
+    const ci=line.indexOf('//');
+    const codePart=ci>=0?line.slice(0,ci):line, comPart=ci>=0?line.slice(ci):'';
+    let h=esc(codePart)
+      .replace(/\b(stack|queue|deque|priority_queue|class|struct|public|private|int|long|void|bool|auto|char|string|vector|pair|set|map|return|while|for|do|if|else|true|false|const|nullptr|NULL|new|max|min|push|pop|top|front|back|empty|size|push_back|pop_back|push_front|pop_front|stoi|isdigit|INT_MAX)\b/g,'<span class="kw">$1</span>')
+      .replace(/('[^']*')/g,'<span class="str">$1</span>')
+      .replace(/&quot;[^&]*&quot;/g,m=>'<span class="str">'+m+'</span>')
+      .replace(/\b(\d+)\b/g,'<span class="nm">$1</span>');
+    let cls='cl';
+    if(comPart){ cls+=' has-cm'; h+='<span class="cm">'+esc(comPart).replace(/(★[^<]*)/g,'<span class="star">$1</span>')+'</span>'; }
+    return `<span class="${cls}"><span class="cmdot">●</span>${h===''?'&nbsp;':h}</span>`;
+  }).join('');
+}
+function varPanel(p){
+  const vs=VARS[p.label]||[];
+  if(!vs.length) return '';
+  return `<div class="varhead">🔀 VARIATION TEMPLATES — same skeleton, small twists</div>`+
+    vs.map((v,i)=>`<div class="cb varcb">
+      <div class="cbbar"><span class="vtag">VARIATION ${i+1}</span><span class="cbtitle">${v.name}</span><button class="cbtoggle varcopy" data-vi="${i}">copy</button></div>
+      <div class="varwhen">${v.when}</div>
+      <pre>${hl(v.code)}</pre>
+    </div>`).join('');
+}
+
+/* ════════════════ RENDER ════════════════ */
+const side=document.getElementById('side'), main=document.getElementById('main');
+let active=0, stepTimer=null;
+document.getElementById('menuToggle').onclick=()=>side.classList.toggle('open');
+
+function buildSidebar(){
+  const groups=[]; let cur=null;
+  P.forEach((p,i)=>{ if(!cur||cur.cat!==p.cat){cur={cat:p.cat,items:[]};groups.push(cur);} cur.items.push({p,i}); });
+  let html='';
+  groups.forEach(g=>{ const c=CAT[g.cat].c;
+    html+=`<div class="catlabel" style="color:${c}">${CAT[g.cat].label}<span class="catn">${g.items.length}</span></div>`+
+    g.items.map(({p,i})=>`<div class="navitem ${i===active?'on':''}" data-i="${i}" style="${i===active?'border-left-color:'+c:''}">
+        <div class="tag" style="color:${c}">${CAT[p.cat].label}</div><div class="nm">${p.label}</div></div>`).join('');
+  });
+  side.innerHTML=html;
+  side.querySelectorAll('.navitem').forEach(el=>el.onclick=()=>{active=+el.dataset.i;render();if(window.innerWidth<=860)side.classList.remove('open');});
+}
+
+function render(){
+  if(stepTimer){clearInterval(stepTimer);stepTimer=null;}
+  const p=P[active], col=CAT[p.cat].c;
+  const notes=`<div class="cards">
+      <div class="ic"><div class="h">WHEN TO USE</div><p>${p.when}</p></div>
+      <div class="ic" style="border-color:${col}33"><div class="h" style="color:${col}">★ KEY INSIGHT</div><p>${p.insight}</p></div>
+      <div class="ic analogy"><div class="h" style="color:${col}">◈ ANALOGY / MENTAL MODEL</div><p>${p.analogy}</p></div>
+      <div class="ic bugs"><div class="h">⚠ BUGS YOU ACTUALLY HIT</div><ul>${p.bugs.map(b=>`<li>${b}</li>`).join('')}</ul></div>
+    </div>
+    <div class="probs"><div class="h">LEETCODE PROBLEMS</div>${p.problems.map(n=>`<span class="chip">${n}</span>`).join('')}</div>`;
+  const codeHtml=`<div class="cb">
+      <div class="cbbar"><span class="dots"><i style="background:#ff5f56"></i><i style="background:#ffbd2e"></i><i style="background:#27c93f"></i></span>
+        <span class="cbtitle">${p.label.toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'')}.cpp</span>
+        <button class="cbtoggle" id="revealAll">💬 reveal all</button></div>
+      <pre>${hl(p.code)}</pre>
+      <div class="cbnote">● = this line hides a note — click to reveal, click again to hide.</div>
+    </div>`;
+  main.innerHTML=`<div class="fade">
+    <div class="phead">
+      <div>
+        <span class="ptag" style="background:${col}22;border:1px solid ${col}55;color:${col}">${CAT[p.cat].label}</span>
+        <span class="pcount">Pattern ${active+1} / ${P.length}</span>
+        <h2>${p.label}</h2>
+        <div class="srcline">${p.src}</div>
+      </div>
+      <div class="pheadbtns">
+        <button class="copy" id="notesBtn">📝 show notes</button>
+        <button class="copy" id="varBtn">🔀 variations</button>
+        <button class="copy" id="codeBtn">⌨ hide code</button>
+        <button class="copy" id="copyBtn">copy code</button>
+      </div>
+    </div>
+    <div class="notesWrap" id="notesWrap" style="display:none">${notes}</div>
+    <div class="varWrap" id="varWrap" style="display:none">${varPanel(p)}</div>
+    <div class="split" id="split">
+      <div class="demo">
+        <div class="h">◈ STEP-BY-STEP — ${p.label.toUpperCase()}</div>
+        <div class="stage" id="stage"></div>
+        <div class="vmsg" id="vmsg"></div>
+        <div class="vtables" id="vtables"></div>
+        <div class="vctrl">
+          <button class="play" id="play">▶ play</button>
+          <button id="stepBtn">step ›</button>
+          <button id="resetBtn">⟲ reset</button>
+          <span class="vpos" id="vpos"></span>
+          <span class="spd">speed <input type="range" id="spd" min="280" max="1700" value="950"><b id="spdlbl"></b></span>
+        </div>
+        <div class="trace"><div class="th">CODE BEING TRACED — <b>active line highlights live</b></div><pre id="trace"></pre></div>
+      </div>
+      <div class="codeCol">${codeHtml}</div>
+    </div>
+    <div class="pnav">
+      <button id="prevBtn" ${active===0?'disabled':''}>← prev</button>
+      <span class="pos">${active+1} of ${P.length}</span>
+      <button id="nextBtn" ${active===P.length-1?'disabled':''}>next →</button>
+    </div></div>`;
+  main.scrollTop=0;
+  const nb=main.querySelector('#notesBtn'), nw=main.querySelector('#notesWrap');
+  nb.onclick=()=>{const show=nw.style.display==='none';nw.style.display=show?'':'none';nb.textContent=show?'📝 hide notes':'📝 show notes';nb.classList.toggle('done',show);};
+  const vb=main.querySelector('#varBtn'), vw=main.querySelector('#varWrap');
+  vb.onclick=()=>{const show=vw.style.display==='none';vw.style.display=show?'':'none';vb.textContent=show?'🔀 hide variations':'🔀 variations';vb.classList.toggle('done',show);};
+  main.querySelectorAll('.varcopy').forEach(b=>b.onclick=()=>{const v=(VARS[p.label]||[])[+b.dataset.vi];navigator.clipboard.writeText(v.code);b.textContent='✓';setTimeout(()=>b.textContent='copy',1200);});
+  const cbtn=main.querySelector('#codeBtn'), split=main.querySelector('#split');
+  cbtn.onclick=()=>{const hid=!split.classList.contains('nocode');split.classList.toggle('nocode',hid);cbtn.textContent=hid?'⌨ show code':'⌨ hide code';cbtn.classList.toggle('done',hid);};
+  main.querySelector('#copyBtn').onclick=e=>{navigator.clipboard.writeText(p.code);e.target.textContent='✓ copied';e.target.classList.add('done');setTimeout(()=>{e.target.textContent='copy code';e.target.classList.remove('done');},1500);};
+  main.querySelector('#prevBtn').onclick=()=>{if(active>0){active--;render();}};
+  main.querySelector('#nextBtn').onclick=()=>{if(active<P.length-1){active++;render();}};
+  main.querySelectorAll('.cl.has-cm').forEach(el=>el.onclick=()=>el.classList.toggle('reveal'));
+  const ra=main.querySelector('#revealAll');
+  ra.onclick=()=>{const ls=[...main.querySelector('.cb').querySelectorAll('.cl.has-cm')];const on=ls.some(l=>l.classList.contains('reveal'));ls.forEach(l=>l.classList.toggle('reveal',!on));ra.classList.toggle('on',!on);ra.textContent=on?'💬 reveal all':'🙈 hide all';};
+  mountStepper(p);
+  buildSidebar();
+}
+
+function mountStepper(p){
+  const frames=p.gen();
+  const stage=main.querySelector('#stage'), vmsg=main.querySelector('#vmsg'),
+        vtables=main.querySelector('#vtables'), vpos=main.querySelector('#vpos'),
+        traceEl=main.querySelector('#trace'), playBtn=main.querySelector('#play'),
+        spd=main.querySelector('#spd'), spdlbl=main.querySelector('#spdlbl');
+  const tEls=[]; p.trace.forEach(ln=>{const x=document.createElement('span');x.className='tln';x.innerHTML=hl(ln)||'&nbsp;';traceEl.appendChild(x);tEls.push(x);});
+  let idx=0;
+  function draw(){
+    const f=frames[idx];
+    stage.innerHTML=svgSeq(f);
+    vmsg.classList.remove('flash');void vmsg.offsetWidth;vmsg.classList.add('flash');
+    vmsg.innerHTML=`<span class="stepchip">STEP ${idx+1}</span>${f.msg}`;
+    const sp=seqSide(f);
+    vtables.innerHTML=(sp.heap?`<div style="flex:1;min-width:100%">${sp.heap}</div>`:'')+sp.tables;
+    tEls.forEach((e,i)=>e.classList.toggle('hot',i===f.line));
+    vpos.textContent=`${idx+1} / ${frames.length}`;
+  }
+  function stop(){if(stepTimer){clearInterval(stepTimer);stepTimer=null;}playBtn.textContent='▶ play';}
+  function play(){ if(stepTimer){stop();return;} if(idx>=frames.length-1)idx=0; playBtn.textContent='❚❚ pause';
+    stepTimer=setInterval(()=>{ if(idx>=frames.length-1){stop();return;} idx++;draw(); }, +spd.value); }
+  const setspd=()=>{spdlbl.textContent=(spd.value/1000).toFixed(2)+'s'; if(stepTimer){clearInterval(stepTimer);stepTimer=setInterval(()=>{if(idx>=frames.length-1){stop();return;}idx++;draw();},+spd.value);}};
+  spd.oninput=setspd; setspd();
+  playBtn.onclick=play;
+  main.querySelector('#stepBtn').onclick=()=>{stop();if(idx<frames.length-1){idx++;draw();}};
+  main.querySelector('#resetBtn').onclick=()=>{stop();idx=0;draw();};
+  draw();
+}
+
+render();
+</script>
+</body>
+</html>
