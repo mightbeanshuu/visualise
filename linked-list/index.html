@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Linked Lists — Reversal · Fast/Slow · In-place Edits</title>
+<meta name="description" content="Step-by-step animated hub for linked-list patterns: reversal, Floyd's cycle, fast/slow middle, remove-nth, dedup, palindrome. Striver + NeetCode code, LeetCode problems, variation templates.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0d0f14; --bg2:#0a0c11; --panel:#141920; --border:#1e2a38;
+    --text:#c9d1d9; --txt2:#8b949e; --muted:#586069; --faint:#444d56; --head:#e6edf3;
+    --acc:#00e5ff; --warn:#ffd60a; --bad:#ff6b6b;
+  }
+  *{box-sizing:border-box;} html,body{margin:0;padding:0;}
+  body{font-family:'IBM Plex Sans',ui-sans-serif,system-ui,-apple-system,sans-serif;
+    background:radial-gradient(1200px 820px at 72% -12%, #102a3c 0%, #0d0f14 56%) fixed;
+    color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;}
+  code,kbd,samp{font-family:'JetBrains Mono','Fira Code',ui-monospace,Menlo,monospace;}
+  ::-webkit-scrollbar{width:9px;height:9px;}::-webkit-scrollbar-thumb{background:#26303d;border-radius:5px;}::-webkit-scrollbar-track{background:transparent;}
+  .top{border-bottom:1px solid var(--border);padding:18px 26px 14px;backdrop-filter:blur(10px);background:rgba(12,16,22,.72);}
+  .top .row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+  .badge{background:#00e5ff22;border:1px solid #00e5ff55;color:var(--acc);font-size:10px;font-weight:700;letter-spacing:2px;padding:3px 10px;border-radius:3px;}
+  .backbtn{text-decoration:none;color:var(--txt2);border:1px solid var(--border);background:rgba(255,255,255,.02);font-size:12px;font-weight:600;padding:5px 12px;border-radius:7px;transition:.15s;white-space:nowrap;}
+  .backbtn:hover{border-color:#475569;color:var(--head);background:rgba(255,255,255,.05);}
+  h1{margin:0;font-size:18px;font-weight:700;letter-spacing:-.3px;background:linear-gradient(90deg,#00e5ff,#ff9f0a 55%,#69ff47);-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .top .meta{color:var(--faint);font-size:12px;} .top p{margin:6px 0 0;font-size:11px;color:var(--muted);letter-spacing:.3px;}
+  .shell{display:flex;min-height:calc(100vh - 84px);}
+  .side{width:258px;min-width:258px;border-right:1px solid var(--border);overflow-y:auto;padding:10px 0 30px;backdrop-filter:blur(10px);background:rgba(9,11,16,.66);}
+  .catlabel{font-size:9px;letter-spacing:1.5px;padding:13px 16px 8px;font-weight:700;font-family:'JetBrains Mono',monospace;display:flex;align-items:center;gap:7px;}
+  .catlabel .catn{margin-left:auto;font-size:9px;color:var(--faint);background:#0e151d;border:1px solid var(--border);border-radius:10px;padding:1px 7px;}
+  .navitem{padding:9px 16px;cursor:pointer;border-left:3px solid transparent;transition:background .15s,border-color .15s;}
+  .navitem:hover{background:#10151c;} .navitem.on{background:var(--panel);}
+  .navitem .tag{font-size:8.5px;font-weight:700;letter-spacing:1.3px;opacity:.65;} .navitem.on .tag{opacity:1;}
+  .navitem .nm{font-size:12.5px;color:var(--txt2);margin-top:2px;line-height:1.3;} .navitem.on .nm{color:var(--head);font-weight:600;}
+  .main{flex:1;overflow-y:auto;padding:24px 30px 60px;max-width:1040px;}
+  .fade{animation:fade .35s ease;} @keyframes fade{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+  .phead{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:18px;}
+  .ptag{font-size:9px;font-weight:700;letter-spacing:2px;padding:3px 10px;border-radius:3px;}
+  .pcount{color:var(--faint);font-size:11px;margin-left:8px;}
+  .phead h2{margin:8px 0 0;font-size:23px;font-weight:700;color:var(--head);letter-spacing:-.5px;}
+  .srcline{margin-top:5px;font-size:11px;color:var(--muted);} .srcline b{color:var(--txt2);}
+  .copy{background:var(--panel);border:1px solid #30363d;color:var(--txt2);padding:8px 15px;border-radius:6px;cursor:pointer;font-size:11px;font-family:inherit;letter-spacing:.5px;white-space:nowrap;transition:.2s;}
+  .copy:hover{border-color:#475569;color:var(--head);} .copy.done{background:#1a3a1a;border-color:#69ff47;color:#69ff47;}
+  .pheadbtns{display:flex;gap:8px;flex-wrap:wrap;}
+  .cards{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;}
+  .ic{background:rgba(10,12,17,.62);border:1px solid var(--border);border-radius:12px;padding:16px 18px;backdrop-filter:blur(6px);box-shadow:0 8px 30px rgba(0,0,0,.28);}
+  .ic .h{font-size:9.5px;letter-spacing:1.6px;margin-bottom:8px;color:var(--muted);font-weight:700;font-family:'JetBrains Mono',monospace;}
+  .ic p{margin:0;font-size:13.5px;line-height:1.72;color:var(--text);}
+  .ic.analogy{grid-column:1/3;} .ic.bugs{grid-column:1/3;border-color:#ff6b6b33;} .ic.bugs .h{color:var(--bad);}
+  .ic.bugs ul{margin:0;padding-left:18px;} .ic.bugs li{font-size:13px;line-height:1.8;color:var(--text);margin-bottom:3px;}
+  .ic.bugs code{background:#1c2530;color:#ffd479;padding:0 4px;border-radius:3px;font-size:11px;} .ic b{color:var(--head);}
+  .probs{background:rgba(10,12,17,.6);border:1px solid var(--border);border-radius:8px;padding:11px 15px;margin-bottom:16px;}
+  .probs .h{font-size:9px;letter-spacing:1.5px;color:var(--muted);margin-bottom:8px;font-weight:700;}
+  .chip{display:inline-block;background:var(--panel);border:1px solid #30363d;color:var(--txt2);font-size:11px;padding:4px 10px;border-radius:4px;margin:0 6px 6px 0;}
+  .split{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:16px;align-items:start;margin-bottom:14px;}
+  .split.nocode{grid-template-columns:1fr;} .split.nocode .codeCol{display:none;}
+  @media(max-width:1080px){ .split{grid-template-columns:1fr;} }
+  .cb{background:rgba(7,10,14,.82);border:1px solid var(--border);border-radius:8px;overflow:hidden;backdrop-filter:blur(6px);box-shadow:0 8px 30px rgba(0,0,0,.28);}
+  .cbbar{background:var(--panel);border-bottom:1px solid var(--border);padding:9px 14px;display:flex;align-items:center;gap:8px;}
+  .dots{display:flex;gap:6px;} .dots i{width:10px;height:10px;border-radius:50%;display:inline-block;}
+  .cbtitle{font-size:11px;color:var(--muted);margin-left:6px;}
+  pre{margin:0;padding:16px 12px;font-size:12.5px;line-height:1.8;overflow-x:auto;white-space:pre;font-family:'JetBrains Mono','Fira Code',ui-monospace,Menlo,monospace;}
+  .kw{color:#ff7b72;} .nm{color:#79c0ff;} .cm{color:#586069;font-style:italic;} .star{color:#ffd60a;font-weight:700;} .str{color:#a5d6ff;}
+  .cl{display:block;padding:0 8px;border-radius:5px;border-left:2px solid transparent;transition:background .14s,border-color .14s;}
+  .cmdot{display:inline-block;width:9px;margin-right:8px;font-size:7px;color:#2c3540;vertical-align:middle;transition:color .14s,transform .14s;}
+  .cl:not(.has-cm) .cmdot{visibility:hidden;} .cl.has-cm{cursor:pointer;}
+  .cl.has-cm:hover{background:#0f1c25;border-left-color:#2a4452;} .cl.has-cm:hover .cmdot{color:var(--warn);}
+  .cl .cm{display:none;} .cl.reveal .cm{display:inline;animation:cmin .2s ease;}
+  .cl.reveal .cmdot{color:#69ff47;transform:scale(1.25);} .cl.reveal{background:#0c1a14;border-left-color:#1f7a3a;}
+  @keyframes cmin{from{opacity:0;}to{opacity:1;}}
+  .cbtoggle{margin-left:auto;background:transparent;border:1px solid #30363d;color:var(--txt2);font-family:inherit;font-size:10px;letter-spacing:.5px;padding:4px 10px;border-radius:5px;cursor:pointer;transition:.15s;}
+  .cbtoggle:hover{border-color:#475569;color:var(--head);} .cbtoggle.on{background:#0c1a14;border-color:#1f7a3a;color:#69ff47;}
+  .cbnote{font-size:10px;color:var(--faint);padding:6px 16px 10px;letter-spacing:.3px;}
+  .varWrap{margin-bottom:16px;animation:fade .3s ease;}
+  .varhead{font-size:10px;letter-spacing:1.6px;color:#ffd479;font-weight:700;font-family:'JetBrains Mono',monospace;margin:2px 0 12px;}
+  .varcb{margin-bottom:12px;}
+  .vtag{font-size:8.5px;font-weight:700;letter-spacing:1px;padding:2px 8px;border-radius:3px;background:#3a2e0a;border:1px solid #6b5212;color:#ffd479;}
+  .varwhen{font-size:12px;line-height:1.55;color:var(--txt2);padding:9px 14px 0;}
+  .varwhen b{color:var(--head);} .varwhen code{background:#1c2530;color:#ffd479;padding:0 4px;border-radius:3px;font-size:11px;}
+  .demo{background:rgba(10,12,17,.6);border:1px solid var(--border);border-radius:10px;padding:14px;backdrop-filter:blur(6px);box-shadow:0 8px 30px rgba(0,0,0,.28);}
+  .demo .h{font-size:9px;letter-spacing:1.5px;color:var(--acc);margin-bottom:11px;font-weight:700;}
+  .stage{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:10px;}
+  .stage svg{width:100%;height:auto;display:block;}
+  .stepchip{display:inline-block;margin-right:9px;font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:1.2px;font-weight:700;color:var(--acc);background:#0a1f2a;border:1px solid #14424f;border-radius:20px;padding:2px 9px;vertical-align:1px;}
+  .vmsg{margin-top:11px;font-size:13.5px;line-height:1.6;color:var(--text);background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--acc);border-radius:7px;padding:11px 13px;min-height:22px;}
+  .vmsg b{color:var(--head);} .vmsg .ok{color:#69ff47;font-weight:700;} .vmsg .bad{color:#ff6b6b;font-weight:700;}
+  .vmsg.flash{animation:stepin .35s ease;} @keyframes stepin{from{opacity:.3;transform:translateY(3px);}to{opacity:1;transform:none;}}
+  .vctrl{display:flex;gap:7px;align-items:center;margin-top:11px;flex-wrap:wrap;}
+  .vctrl button{background:var(--panel);border:1px solid #30363d;color:var(--text);padding:6px 13px;border-radius:6px;cursor:pointer;font-size:13px;font-family:inherit;font-weight:600;transition:.15s;}
+  .vctrl button:hover:not(:disabled){background:#1c2530;} .vctrl button:disabled{opacity:.4;cursor:not-allowed;}
+  .vctrl button.play{background:var(--acc);border-color:var(--acc);color:#06223f;}
+  .spd{display:inline-flex;align-items:center;gap:7px;margin-left:auto;} .spd input{width:104px;accent-color:var(--acc);cursor:pointer;}
+  .spd b{font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace;} .vpos{font-size:11px;color:var(--faint);font-family:'JetBrains Mono',monospace;}
+  .vtables{margin-top:11px;display:flex;gap:14px;flex-wrap:wrap;}
+  .vtbl{font-family:'JetBrains Mono',monospace;font-size:11px;background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:10px 11px;}
+  .vtbl .cap{color:var(--muted);margin-bottom:7px;letter-spacing:1px;font-weight:700;}
+  .qrow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-height:26px;}
+  .qlabel{font-size:10px;color:var(--muted);letter-spacing:1.2px;font-weight:700;}
+  .qp{background:#0a5f7a;border:1px solid #14a8d0;color:#d6f4ff;font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:13px;font-family:'JetBrains Mono',monospace;animation:qin .28s ease;}
+  .qp.empty{background:transparent;border:1px dashed #2a3340;color:var(--faint);font-weight:400;font-style:italic;}
+  @keyframes qin{from{opacity:0;transform:translateY(5px) scale(.85);}to{opacity:1;transform:none;}}
+  .cost{margin-top:9px;font-size:13px;font-weight:700;color:var(--acc);font-family:'JetBrains Mono',monospace;}
+  .trace{margin-top:13px;background:#070a0e;border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+  .trace .th{background:var(--panel);border-bottom:1px solid var(--border);padding:7px 13px;font-size:10px;letter-spacing:1px;color:var(--muted);font-weight:700;} .trace .th b{color:var(--acc);}
+  .trace pre{padding:11px 8px;font-size:11.5px;line-height:1.7;}
+  .tln{display:block;padding:1px 12px;border-left:3px solid transparent;white-space:pre;color:#7d8895;transition:background .2s,color .2s,border-color .2s;}
+  .tln.hot{background:#0f2a33;border-left-color:var(--acc);color:#dff6ff;font-weight:700;}
+  .pnav{display:flex;justify-content:space-between;align-items:center;margin-top:18px;padding-top:16px;border-top:1px solid var(--border);}
+  .pnav button{background:transparent;border:1px solid #30363d;color:var(--txt2);padding:8px 18px;border-radius:6px;cursor:pointer;font-size:12px;font-family:inherit;transition:.15s;}
+  .pnav button:hover:not(:disabled){border-color:#475569;color:var(--head);} .pnav button:disabled{color:#2a323d;cursor:not-allowed;} .pnav .pos{font-size:11px;color:var(--faint);}
+  svg .acell{transition:fill .3s,stroke .3s;}
+  svg .aval{fill:#e6edf3;font:700 15px 'JetBrains Mono',monospace;text-anchor:middle;dominant-baseline:central;}
+  svg .aptr{fill:#ffd60a;font:700 11px 'JetBrains Mono',monospace;text-anchor:middle;}
+  svg .larr{stroke:#7d8895;stroke-width:2;} svg .larr.back{stroke:#bf5af2;stroke-width:2;}
+  svg .lnull{fill:#5b6675;font:700 15px 'JetBrains Mono',monospace;text-anchor:middle;dominant-baseline:central;}
+  .menuToggle{display:none;}
+  @media(max-width:860px){
+    .shell{flex-direction:column;}
+    .side{width:100%;min-width:0;border-right:none;border-bottom:1px solid var(--border);max-height:0;overflow:hidden;padding:0;transition:max-height .3s ease;}
+    .side.open{max-height:1500px;padding:10px 0 20px;} .menuToggle{display:inline-block;}
+    .cards{grid-template-columns:1fr;} .ic.analogy,.ic.bugs{grid-column:auto;} .main{padding:18px 16px 50px;}
+  }
+</style>
+</head>
+<body>
+  <div class="top">
+    <div class="row">
+      <a class="backbtn" href="/" title="Topics">← Topics</a>
+      <span class="badge">LINKED LISTS</span>
+      <h1>Linked Lists</h1>
+      <span class="meta">6 patterns · C++ · Anshu</span>
+      <button class="copy menuToggle" id="menuToggle" style="margin-left:auto">☰ patterns</button>
+    </div>
+    <p>AlgoMaster notes + <b>Striver + NeetCode</b> C++, with the nodes, arrows and pointers animating <b>line by line</b> as each one moves. Real LeetCode questions + variation templates.</p>
+  </div>
+
+  <div class="shell">
+    <div class="side" id="side"></div>
+    <div class="main" id="main"></div>
+  </div>
+
+<script>
+/* ════════════════ LINKED-LIST ENGINE ════════════════ */
+function svgList(f){
+  const nodes=f.nodes||[], n=nodes.length, cw=46, gap=36, pad=20, top=58;
+  const xOf=i=>pad+i*(cw+gap), nullX=xOf(n), W=nullX+40, H=top+74;
+  let s=`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet"><defs>
+    <marker id="la" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#7d8895"/></marker>
+    <marker id="lab" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#bf5af2"/></marker></defs>`;
+  const arrows=f.arrows||nodes.map((_,i)=>[i,i+1<n?i+1:-1]);
+  arrows.forEach(([a,b])=>{ const ax=xOf(a)+cw, ay=top+22;
+    if(b===-1) s+=`<line class="larr" x1="${ax}" y1="${ay}" x2="${nullX-6}" y2="${ay}" marker-end="url(#la)"/>`;
+    else if(b>a) s+=`<line class="larr" x1="${ax}" y1="${ay}" x2="${xOf(b)-6}" y2="${ay}" marker-end="url(#la)"/>`;
+    else { const sx=xOf(a)+cw/2, bx=xOf(b)+cw/2;
+      s+=`<path class="larr back" d="M${sx},${top+44} Q${(sx+bx)/2},${top+92} ${bx},${top+44}" fill="none" marker-end="url(#lab)"/>`; }
+  });
+  s+=`<rect x="${nullX}" y="${top+6}" width="34" height="30" rx="5" fill="#0b0f15" stroke="#2c3a4c"/><text class="lnull" x="${nullX+17}" y="${top+22}">∅</text>`;
+  const ptr=f.ptr||{}, byIdx={};
+  Object.entries(ptr).forEach(([nm,idx])=>{ const key=(idx===-1||idx==null)?'NULL':idx; (byIdx[key]=byIdx[key]||[]).push(nm); });
+  Object.entries(byIdx).forEach(([k,names])=>{ const cx=k==='NULL'?nullX+17:xOf(+k)+cw/2;
+    s+=`<text class="aptr" x="${cx}" y="${top-26}">${names.join(' ')}</text><text class="aptr" x="${cx}" y="${top-12}">▼</text>`; });
+  nodes.forEach((v,i)=>{ const st=(f.cells&&f.cells[i])||''; const x=xOf(i);
+    let stroke='#3a4658',fill='#10161e';
+    if(st==='win'){stroke='#00e5ff';fill='#06222b';}
+    if(st==='check'){stroke='#ffd60a';fill='#241d04';}
+    if(st==='found'){stroke='#69ff47';fill='#123a1f';}
+    if(st==='dead'){stroke='#ff6b6b';fill='#2a0e0e';}
+    s+=`<rect class="acell" x="${x}" y="${top+2}" width="${cw}" height="40" rx="9" fill="${fill}" stroke="${stroke}" stroke-width="2"/><text class="aval" x="${x+cw/2}" y="${top+22}">${v}</text>`; });
+  return s+'</svg>';
+}
+function qpills(label,arr){let h=`<div class="qrow"><span class="qlabel">${label}</span>`;if(!arr.length)h+=`<span class="qp empty">empty</span>`;else arr.forEach(t=>h+=`<span class="qp">${t}</span>`);return h+`</div>`;}
+function listSide(f){
+  let tables='',heap='';
+  if(f.result) heap+=qpills('VALUES →',f.result);
+  if(f.stats) f.stats.forEach(([k,v])=>heap+=`<div class="cost">${k} = ${v}</div>`);
+  return {tables,heap};
+}
+
+/* ════════════════ FRAME GENERATORS ════════════════ */
+function genReverse(){
+  const nodes=[1,2,3,4,5],F=[]; const nxt={0:1,1:2,2:3,3:4,4:-1};
+  const A=()=>Object.entries(nxt).map(([a,b])=>[+a,b]);
+  let prev=-1,cur=0;
+  const P=()=>{const o={prev,cur};return o;};
+  F.push({nodes,arrows:A(),ptr:{prev:-1,cur},cells:{},msg:`prev = NULL, cur = head (1). We flip each arrow to point backwards.`,line:0});
+  while(cur!==-1){
+    const sv=nxt[cur];
+    F.push({nodes,arrows:A(),ptr:{prev,cur,nxt:sv},cells:{[cur]:'check'},msg:`Save nxt = ${sv===-1?'NULL':nodes[sv]} before we overwrite ${nodes[cur]}.next.`,line:2});
+    nxt[cur]=prev;
+    F.push({nodes,arrows:A(),ptr:{prev,cur,nxt:sv},cells:{[cur]:'win'},msg:`cur.next = prev → ${nodes[cur]} now points ${prev===-1?'to NULL':'back to '+nodes[prev]}.`,line:3});
+    prev=cur; cur=sv;
+    F.push({nodes,arrows:A(),ptr:{prev,cur},cells:{},msg:`Advance: prev = ${nodes[prev]}, cur = ${cur===-1?'NULL':nodes[cur]}.`,line:4});
+  }
+  F.push({nodes,arrows:A(),ptr:{prev},cells:Object.fromEntries(nodes.map((_,i)=>[i,'found'])),msg:`<span class="ok">Done — new head = ${nodes[prev]}. List reversed.</span>`,line:5});
+  return F;
+}
+function genCycle(){
+  const nodes=[3,2,0,-4],F=[]; const nxt={0:1,1:2,2:3,3:1};
+  const A=Object.entries(nxt).map(([a,b])=>[+a,b]);
+  let slow=0,fast=0;
+  F.push({nodes,arrows:A,ptr:{slow,fast},cells:{[0]:'win'},msg:`slow & fast both start at the head.`,line:0});
+  while(true){
+    slow=nxt[slow]; fast=nxt[nxt[fast]];
+    F.push({nodes,arrows:A,ptr:{slow,fast},cells:{[slow]:'win',[fast]:'check'},msg:`slow → ${nodes[slow]} (1 step), fast → ${nodes[fast]} (2 steps).`,line:3});
+    if(slow===fast){F.push({nodes,arrows:A,ptr:{slow,fast},cells:{[slow]:'found'},msg:`<span class="ok">slow == fast → the list has a cycle!</span>`,line:4});break;}
+  }
+  return F;
+}
+function genMiddle(){
+  const nodes=[1,2,3,4,5],F=[]; const nxt={0:1,1:2,2:3,3:4,4:-1};
+  const A=Object.entries(nxt).map(([a,b])=>[+a,b]);
+  let slow=0,fast=0;
+  F.push({nodes,arrows:A,ptr:{slow,fast},cells:{[0]:'win'},msg:`slow & fast at head. Fast moves twice as fast.`,line:0});
+  while(fast!==-1 && nxt[fast]!==-1){
+    slow=nxt[slow]; fast=nxt[nxt[fast]];
+    F.push({nodes,arrows:A,ptr:{slow,fast},cells:{[slow]:'win',[fast>=0?fast:slow]:'check'},msg:`slow → ${nodes[slow]}, fast → ${fast===-1?'NULL':nodes[fast]}.`,line:2});
+  }
+  F.push({nodes,arrows:A,ptr:{slow},cells:{[slow]:'found'},msg:`<span class="ok">fast reached the end → slow (${nodes[slow]}) is the middle.</span>`,line:3});
+  return F;
+}
+function genRemoveNth(){
+  const nodes=[1,2,3,4,5],n=2,F=[]; const nxt={0:1,1:2,2:3,3:4,4:-1};
+  const A=()=>Object.entries(nxt).map(([a,b])=>[+a,b]);
+  let fast=0,slow=0;
+  F.push({nodes,arrows:A(),ptr:{slow,fast},cells:{},msg:`Goal: remove the ${n}nd node from the end. First send <b>fast</b> ${n} steps ahead.`,line:0});
+  for(let i=0;i<n;i++){ fast=nxt[fast]; F.push({nodes,arrows:A(),ptr:{slow,fast},cells:{[fast]:'check'},msg:`fast advances → now at ${nodes[fast]} (gap = ${i+1}).`,line:1}); }
+  while(nxt[fast]!==-1){ fast=nxt[fast]; slow=nxt[slow]; F.push({nodes,arrows:A(),ptr:{slow,fast},cells:{[slow]:'win',[fast]:'check'},msg:`Move both until fast is last. slow → ${nodes[slow]}, fast → ${nodes[fast]}.`,line:3}); }
+  const tgt=nxt[slow];
+  F.push({nodes,arrows:A(),ptr:{slow},cells:{[tgt]:'dead'},msg:`fast is last → slow.next (${nodes[tgt]}) is the node to drop.`,line:4});
+  nxt[slow]=nxt[tgt];
+  F.push({nodes,arrows:A(),ptr:{slow},cells:{[tgt]:'dead'},msg:`<span class="ok">slow.next = slow.next.next → ${nodes[tgt]} unlinked.</span>`,line:4});
+  return F;
+}
+function genRemoveDup(){
+  const nodes=[1,1,2,3,3],F=[]; const nxt={0:1,1:2,2:3,3:4,4:-1};
+  const A=()=>Object.entries(nxt).map(([a,b])=>[+a,b]);
+  let cur=0;
+  F.push({nodes,arrows:A(),ptr:{cur},cells:{},msg:`Sorted list → duplicates are adjacent. Walk with cur.`,line:0});
+  while(nxt[cur]!==-1){
+    const nx=nxt[cur];
+    if(nodes[nx]===nodes[cur]){ nxt[cur]=nxt[nx]; F.push({nodes,arrows:A(),ptr:{cur},cells:{[nx]:'dead',[cur]:'win'},msg:`${nodes[nx]} == ${nodes[cur]} → skip it: cur.next = cur.next.next.`,line:3}); }
+    else { cur=nx; F.push({nodes,arrows:A(),ptr:{cur},cells:{[cur]:'check'},msg:`${nodes[cur]} differs → advance cur.`,line:4}); }
+  }
+  F.push({nodes,arrows:A(),ptr:{},cells:{0:'found',2:'found',3:'found'},msg:`<span class="ok">Done — each value appears once.</span>`,line:-1});
+  return F;
+}
+function genPalindrome(){
+  const nodes=[1,2,3,2,1],F=[],vals=[]; const A=nodes.map((_,i)=>[i,i+1<nodes.length?i+1:-1]);
+  for(let i=0;i<nodes.length;i++){ vals.push(nodes[i]); F.push({nodes,arrows:A,ptr:{cur:i},cells:{[i]:'check'},result:vals.slice(),msg:`Copy values out (or use fast/slow): read ${nodes[i]}.`,line:1}); }
+  let l=0,r=nodes.length-1;
+  while(l<r){
+    if(nodes[l]!==nodes[r]){ F.push({nodes,arrows:A,ptr:{L:l,R:r},cells:{[l]:'dead',[r]:'dead'},result:vals.slice(),msg:`<span class="bad">${nodes[l]} ≠ ${nodes[r]} → not a palindrome.</span>`,line:4}); return F; }
+    F.push({nodes,arrows:A,ptr:{L:l,R:r},cells:{[l]:'win',[r]:'win'},result:vals.slice(),msg:`${nodes[l]} == ${nodes[r]} ✓ — move both inward.`,line:4});
+    l++; r--;
+  }
+  F.push({nodes,arrows:A,ptr:{},cells:Object.fromEntries(nodes.map((_,i)=>[i,'found'])),result:vals.slice(),msg:`<span class="ok">All mirror pairs match → palindrome!</span>`,line:5});
+  return F;
+}
+
+/* ════════════════ PATTERN DATA ════════════════ */
+const CAT={ REV:{c:'#00e5ff',label:'REVERSAL'}, FS:{c:'#ff9f0a',label:'FAST & SLOW POINTERS'}, EDIT:{c:'#69ff47',label:'IN-PLACE EDITS'} };
+const SRC='Pattern framing · <b>AlgoMaster</b> &nbsp;|&nbsp; Code · <b>Striver + NeetCode</b>';
+
+const P=[
+{ cat:'REV', label:'Reverse a Linked List', gen:genReverse, src:SRC,
+  when:'Flip the direction of pointers — the single most reused linked-list skill (sublists, k-groups, palindrome all build on it).',
+  insight:'Keep three pointers: <b>prev, cur, nxt</b>. Save nxt, point cur back to prev, then march all three forward. prev ends on the new head.',
+  analogy:'Reversing a line of people holding hands: before each person lets go of the one ahead, they first note who that was, then turn to clasp the one behind.',
+  bugs:['Not saving <code>nxt</code> before overwriting <code>cur->next</code> → you lose the rest of the list.','Returning <code>cur</code> (NULL) instead of <code>prev</code>.','Forgetting the old head’s next becomes NULL.'],
+  problems:['LC 206 · Reverse Linked List','LC 92 · Reverse Linked List II','LC 25 · Reverse Nodes in k-Group','LC 234 · Palindrome List'],
+  code:`// Striver / NeetCode — Reverse a linked list (iterative)
+ListNode* reverse(ListNode* head){
+    ListNode* prev = nullptr;
+    ListNode* cur  = head;
+    while(cur){
+        ListNode* nxt = cur->next;   // ★ save the rest first
+        cur->next = prev;            // flip the arrow
+        prev = cur; cur = nxt;       // march forward
+    }
+    return prev;                     // new head
+}`,
+  trace:['prev=NULL; cur=head;','while(cur){','  nxt = cur->next;','  cur->next = prev;','  prev=cur; cur=nxt; }','return prev;']
+},
+{ cat:'FS', label:"Detect Cycle (Floyd's)", gen:genCycle, src:SRC,
+  when:'Decide whether a linked list loops — in O(1) extra space (no hash set).',
+  insight:'Move slow by 1 and fast by 2. If there’s a loop, fast laps slow and they collide; if fast hits NULL, there’s no cycle. (To find the cycle start, reset one pointer to head and step both by 1.)',
+  analogy:'Two runners on a track: on a circular track the faster always laps the slower; on a straight track the fast one simply reaches the end.',
+  bugs:['Checking <code>fast && fast->next</code> wrong → null deref on <code>fast->next->next</code>.','Starting slow and fast at different nodes.','Confusing detection with finding the cycle’s entry node.'],
+  problems:['LC 141 · Linked List Cycle','LC 142 · Cycle II (find start)','LC 287 · Find the Duplicate Number','LC 202 · Happy Number'],
+  code:`// Striver / NeetCode — Floyd's cycle detection
+bool hasCycle(ListNode* head){
+    ListNode *slow = head, *fast = head;
+    while(fast && fast->next){
+        slow = slow->next;          // +1
+        fast = fast->next->next;    // ★ +2
+        if(slow == fast) return true;
+    }
+    return false;
+}`,
+  trace:['slow=fast=head;','while(fast && fast->next){','  slow=slow->next;','  fast=fast->next->next;','  if(slow==fast) return true; }','return false;']
+},
+{ cat:'FS', label:'Find the Middle Node', gen:genMiddle, src:SRC,
+  when:'Locate the midpoint in one pass — the split step of merge sort on lists, and the setup for palindrome checks.',
+  insight:'When fast (×2) reaches the end, slow (×1) is exactly halfway. Loop condition <code>fast && fast->next</code> returns the <b>second</b> middle for even length.',
+  analogy:'Two cars leaving together, one at double speed — when the fast car finishes the route, the slow car is precisely at the halfway marker.',
+  bugs:['Wrong loop condition changes which middle you get (first vs second).','Off-by-one when the list has even length.','Returning fast instead of slow.'],
+  problems:['LC 876 · Middle of the Linked List','LC 234 · Palindrome List','LC 143 · Reorder List','LC 148 · Sort List'],
+  code:`// Striver / NeetCode — Middle of the linked list
+ListNode* middleNode(ListNode* head){
+    ListNode *slow = head, *fast = head;
+    while(fast && fast->next){
+        slow = slow->next;          // +1
+        fast = fast->next->next;    // +2
+    }
+    return slow;                    // ★ halfway when fast ends
+}`,
+  trace:['slow=fast=head;','while(fast && fast->next){','  slow=slow->next;','  fast=fast->next->next; }','return slow;']
+},
+{ cat:'EDIT', label:'Remove Nth Node From End', gen:genRemoveNth, src:SRC,
+  when:'Delete a node counted from the end in one pass — the gap / two-pointer deletion pattern.',
+  insight:'Advance <b>fast</b> n nodes first, then move <b>slow</b> and fast together until fast is last. Now slow sits right before the target. A dummy node cleanly handles deleting the head.',
+  analogy:'Two people n steps apart on a walkway: when the front one steps off the end, the back one is standing exactly at the node to remove.',
+  bugs:['Off-by-one: stop when <code>fast->next</code> is null vs fast is null.','Not using a dummy → crashes when removing the head.','Advancing fast n+1 instead of n.'],
+  problems:['LC 19 · Remove Nth Node From End','LC 2095 · Delete the Middle Node','LC 203 · Remove Linked List Elements','LC 237 · Delete Node'],
+  code:`// Striver / NeetCode — Remove n-th node from end
+ListNode* removeNthFromEnd(ListNode* head, int n){
+    ListNode dummy(0, head), *fast=&dummy, *slow=&dummy;
+    for(int i=0;i<n;i++) fast=fast->next;   // gap of n
+    while(fast->next){                       // ★ until fast is last
+        fast=fast->next; slow=slow->next;
+    }
+    slow->next = slow->next->next;           // unlink target
+    return dummy.next;
+}`,
+  trace:['fast=slow=dummy;','for(i=0;i<n;i++) fast=fast->next;','while(fast->next){','  fast=fast->next; slow=slow->next; }','slow->next = slow->next->next;']
+},
+{ cat:'EDIT', label:'Remove Duplicates (sorted)', gen:genRemoveDup, src:SRC,
+  when:'Collapse adjacent equal values in a sorted list — the simplest in-place pointer edit.',
+  insight:'Because it’s sorted, duplicates are neighbours. If <code>cur->val == cur->next->val</code>, splice the next out (<code>cur->next = cur->next->next</code>); otherwise advance cur.',
+  analogy:'Skimming a sorted guest list and crossing out repeats — identical names always sit next to each other.',
+  bugs:['Advancing cur even after deleting (you may miss a triple).','Null deref when checking <code>cur->next->val</code> at the tail.','Confusing it with LC 82 (remove ALL copies).'],
+  problems:['LC 83 · Remove Duplicates from Sorted List','LC 82 · Remove Duplicates II','LC 26 · Remove Dup from Array','LC 1836 · Remove from Unsorted'],
+  code:`// Striver / NeetCode — Remove duplicates from sorted list
+ListNode* deleteDuplicates(ListNode* head){
+    ListNode* cur = head;
+    while(cur && cur->next){
+        if(cur->next->val == cur->val)
+            cur->next = cur->next->next;    // ★ skip the dup
+        else
+            cur = cur->next;                // only advance if unique
+    }
+    return head;
+}`,
+  trace:['cur=head;','while(cur && cur->next){','  if(cur->next->val==cur->val)','    cur->next = cur->next->next;','  else cur=cur->next; }','return head;']
+},
+{ cat:'FS', label:'Palindrome Linked List', gen:genPalindrome, src:SRC,
+  when:'Check if a list reads the same both ways — combines middle-finding, reversal and two-pointer compare.',
+  insight:'The O(1)-space way: find the middle (fast/slow), reverse the second half, then compare halves node by node. (Shown here via the simpler copy-to-array + two-pointer first.)',
+  analogy:'Folding a strip of paper in half and checking the printed letters line up — you mirror the back half onto the front.',
+  bugs:['Comparing the whole list against its full reverse uses O(n) extra space unnecessarily.','Off-by-one on the middle for odd vs even length.','Forgetting to restore the list after reversing (if required).'],
+  problems:['LC 234 · Palindrome Linked List','LC 143 · Reorder List','LC 206 · Reverse List','LC 2130 · Max Twin Sum'],
+  code:`// Striver / NeetCode — Palindrome (O(1): mid + reverse half)
+bool isPalindrome(ListNode* head){
+    ListNode *slow=head, *fast=head;
+    while(fast && fast->next){ slow=slow->next; fast=fast->next->next; }
+    ListNode* second = reverse(slow);     // reverse 2nd half
+    ListNode* p1=head, *p2=second;
+    while(p2){                            // ★ compare halves
+        if(p1->val != p2->val) return false;
+        p1=p1->next; p2=p2->next;
+    }
+    return true;
+}`,
+  trace:['vector<int> v;','for(n=head;n;n=n->next) v.push(n->val);','int l=0, r=v.size()-1;','while(l<r)','  if(v[l++] != v[r--]) return false;','return true;']
+}
+];
+
+/* ════════════════ VARIATION TEMPLATES ════════════════ */
+const VARS={
+'Reverse a Linked List':[
+  {name:'Reverse between positions m..n (LC 92)',when:'Reverse only a sublist: walk to m−1, then head-insert n−m times.',code:
+`ListNode dummy(0,head), *pre=&dummy;
+for(int i=1;i<m;i++) pre=pre->next;
+ListNode* cur=pre->next;
+for(int i=0;i<n-m;i++){
+  ListNode* mv=cur->next;
+  cur->next=mv->next;
+  mv->next=pre->next; pre->next=mv;   // splice to front
+}`},
+  {name:'Reverse in k-groups (LC 25)',when:'Reverse each block of k; leave a remainder shorter than k as-is.',code:
+`ListNode* reverseKGroup(ListNode* head,int k){
+  ListNode* node=head;
+  for(int i=0;i<k;i++){ if(!node) return head; node=node->next; }
+  ListNode* prev=reverseKGroup(node,k);   // reverse the rest
+  for(int i=0;i<k;i++){ auto nxt=head->next; head->next=prev; prev=head; head=nxt; }
+  return prev;
+}`}
+],
+"Detect Cycle (Floyd's)":[
+  {name:'Find the cycle START (LC 142)',when:'After they meet, reset one pointer to head; step both by 1 to the entry.',code:
+`// slow==fast found
+ListNode* p=head;
+while(p!=slow){ p=p->next; slow=slow->next; }
+return p;   // cycle entry node`},
+  {name:'Find the Duplicate Number (LC 287)',when:'Treat a[i] as a "next" pointer → Floyd on the array.',code:
+`int slow=a[0], fast=a[0];
+do{ slow=a[slow]; fast=a[a[fast]]; }while(slow!=fast);
+slow=a[0];
+while(slow!=fast){ slow=a[slow]; fast=a[fast]; }
+return slow;`}
+],
+'Find the Middle Node':[
+  {name:'Split for merge sort',when:'Use slow/fast to cut the list into two halves, then merge-sort each.',code:
+`ListNode *slow=head,*fast=head->next;
+while(fast && fast->next){ slow=slow->next; fast=fast->next->next; }
+ListNode* mid=slow->next; slow->next=nullptr;   // cut here`},
+  {name:'First middle (even length)',when:'Start fast at head and stop on <code>fast->next->next</code> to get the first mid.',code:
+`while(fast->next && fast->next->next){
+  slow=slow->next; fast=fast->next->next;
+}
+return slow;  // first of the two middles`}
+],
+'Remove Nth Node From End':[
+  {name:'Delete the Middle Node (LC 2095)',when:'fast/slow with a dummy → slow lands just before the middle.',code:
+`ListNode dummy(0,head),*slow=&dummy,*fast=head;
+while(fast && fast->next){ fast=fast->next->next; slow=slow->next; }
+slow->next=slow->next->next;
+return dummy.next;`},
+  {name:'Remove all nodes with value (LC 203)',when:'Dummy + single pass, splice matches out.',code:
+`ListNode dummy(0,head),*cur=&dummy;
+while(cur->next){
+  if(cur->next->val==val) cur->next=cur->next->next;
+  else cur=cur->next;
+}
+return dummy.next;`}
+],
+'Remove Duplicates (sorted)':[
+  {name:'Remove ALL duplicates (LC 82)',when:'Use a dummy; when a run repeats, skip the entire run.',code:
+`ListNode dummy(0,head),*pre=&dummy,*cur=head;
+while(cur){
+  if(cur->next && cur->next->val==cur->val){
+    int v=cur->val;
+    while(cur && cur->val==v) cur=cur->next;
+    pre->next=cur;                 // drop the whole run
+  } else { pre=cur; cur=cur->next; }
+}
+return dummy.next;`},
+  {name:'Remove dups from UNSORTED list',when:'No sorting → track seen values in a hash set.',code:
+`unordered_set<int> seen;
+ListNode* cur=head; seen.insert(cur->val);
+while(cur->next){
+  if(seen.count(cur->next->val)) cur->next=cur->next->next;
+  else { seen.insert(cur->next->val); cur=cur->next; }
+}`}
+],
+'Palindrome Linked List':[
+  {name:'Reorder List (LC 143)',when:'Mid + reverse 2nd half + weave the two halves alternately.',code:
+`// find mid, second=reverse(mid->next), mid->next=null
+while(second){
+  auto t1=first->next, t2=second->next;
+  first->next=second; second->next=t1;
+  first=t1; second=t2;
+}`},
+  {name:'Maximum Twin Sum (LC 2130)',when:'Mid + reverse half, then sum paired twins.',code:
+`ListNode* second=reverse(slow);
+int best=0;
+for(ListNode* p1=head; second; p1=p1->next, second=second->next)
+  best=max(best, p1->val + second->val);`}
+]
+};
+
+/* ════════════════ SYNTAX HIGHLIGHT ════════════════ */
+function hl(code){
+  const esc=t=>t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return code.split('\n').map(line=>{
+    const ci=line.indexOf('//');
+    const codePart=ci>=0?line.slice(0,ci):line, comPart=ci>=0?line.slice(ci):'';
+    let h=esc(codePart)
+      .replace(/\b(ListNode|class|struct|int|long|void|bool|auto|vector|unordered_set|unordered_map|return|while|for|do|if|else|true|false|const|nullptr|NULL|new|max|min|swap|push|insert|count|next)\b/g,'<span class="kw">$1</span>')
+      .replace(/\b(\d+)\b/g,'<span class="nm">$1</span>');
+    let cls='cl';
+    if(comPart){ cls+=' has-cm'; h+='<span class="cm">'+esc(comPart).replace(/(★[^<]*)/g,'<span class="star">$1</span>')+'</span>'; }
+    return `<span class="${cls}"><span class="cmdot">●</span>${h===''?'&nbsp;':h}</span>`;
+  }).join('');
+}
+function varPanel(p){
+  const vs=VARS[p.label]||[];
+  if(!vs.length) return '';
+  return `<div class="varhead">🔀 VARIATION TEMPLATES — same skeleton, small twists</div>`+
+    vs.map((v,i)=>`<div class="cb varcb">
+      <div class="cbbar"><span class="vtag">VARIATION ${i+1}</span><span class="cbtitle">${v.name}</span><button class="cbtoggle varcopy" data-vi="${i}">copy</button></div>
+      <div class="varwhen">${v.when}</div>
+      <pre>${hl(v.code)}</pre>
+    </div>`).join('');
+}
+
+/* ════════════════ RENDER ════════════════ */
+const side=document.getElementById('side'), main=document.getElementById('main');
+let active=0, stepTimer=null;
+document.getElementById('menuToggle').onclick=()=>side.classList.toggle('open');
+
+function buildSidebar(){
+  const groups=[]; let cur=null;
+  P.forEach((p,i)=>{ if(!cur||cur.cat!==p.cat){cur={cat:p.cat,items:[]};groups.push(cur);} cur.items.push({p,i}); });
+  let html='';
+  groups.forEach(g=>{ const c=CAT[g.cat].c;
+    html+=`<div class="catlabel" style="color:${c}">${CAT[g.cat].label}<span class="catn">${g.items.length}</span></div>`+
+    g.items.map(({p,i})=>`<div class="navitem ${i===active?'on':''}" data-i="${i}" style="${i===active?'border-left-color:'+c:''}">
+        <div class="tag" style="color:${c}">${CAT[p.cat].label}</div><div class="nm">${p.label}</div></div>`).join('');
+  });
+  side.innerHTML=html;
+  side.querySelectorAll('.navitem').forEach(el=>el.onclick=()=>{active=+el.dataset.i;render();if(window.innerWidth<=860)side.classList.remove('open');});
+}
+
+function render(){
+  if(stepTimer){clearInterval(stepTimer);stepTimer=null;}
+  const p=P[active], col=CAT[p.cat].c;
+  const notes=`<div class="cards">
+      <div class="ic"><div class="h">WHEN TO USE</div><p>${p.when}</p></div>
+      <div class="ic" style="border-color:${col}33"><div class="h" style="color:${col}">★ KEY INSIGHT</div><p>${p.insight}</p></div>
+      <div class="ic analogy"><div class="h" style="color:${col}">◈ ANALOGY / MENTAL MODEL</div><p>${p.analogy}</p></div>
+      <div class="ic bugs"><div class="h">⚠ BUGS YOU ACTUALLY HIT</div><ul>${p.bugs.map(b=>`<li>${b}</li>`).join('')}</ul></div>
+    </div>
+    <div class="probs"><div class="h">LEETCODE PROBLEMS</div>${p.problems.map(n=>`<span class="chip">${n}</span>`).join('')}</div>`;
+  const codeHtml=`<div class="cb">
+      <div class="cbbar"><span class="dots"><i style="background:#ff5f56"></i><i style="background:#ffbd2e"></i><i style="background:#27c93f"></i></span>
+        <span class="cbtitle">${p.label.toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'')}.cpp</span>
+        <button class="cbtoggle" id="revealAll">💬 reveal all</button></div>
+      <pre>${hl(p.code)}</pre>
+      <div class="cbnote">● = this line hides a note — click to reveal, click again to hide.</div>
+    </div>`;
+  main.innerHTML=`<div class="fade">
+    <div class="phead">
+      <div>
+        <span class="ptag" style="background:${col}22;border:1px solid ${col}55;color:${col}">${CAT[p.cat].label}</span>
+        <span class="pcount">Pattern ${active+1} / ${P.length}</span>
+        <h2>${p.label}</h2>
+        <div class="srcline">${p.src}</div>
+      </div>
+      <div class="pheadbtns">
+        <button class="copy" id="notesBtn">📝 show notes</button>
+        <button class="copy" id="varBtn">🔀 variations</button>
+        <button class="copy" id="codeBtn">⌨ hide code</button>
+        <button class="copy" id="copyBtn">copy code</button>
+      </div>
+    </div>
+    <div class="notesWrap" id="notesWrap" style="display:none">${notes}</div>
+    <div class="varWrap" id="varWrap" style="display:none">${varPanel(p)}</div>
+    <div class="split" id="split">
+      <div class="demo">
+        <div class="h">◈ STEP-BY-STEP — ${p.label.toUpperCase()}</div>
+        <div class="stage" id="stage"></div>
+        <div class="vmsg" id="vmsg"></div>
+        <div class="vtables" id="vtables"></div>
+        <div class="vctrl">
+          <button class="play" id="play">▶ play</button>
+          <button id="stepBtn">step ›</button>
+          <button id="resetBtn">⟲ reset</button>
+          <span class="vpos" id="vpos"></span>
+          <span class="spd">speed <input type="range" id="spd" min="280" max="1700" value="950"><b id="spdlbl"></b></span>
+        </div>
+        <div class="trace"><div class="th">CODE BEING TRACED — <b>active line highlights live</b></div><pre id="trace"></pre></div>
+      </div>
+      <div class="codeCol">${codeHtml}</div>
+    </div>
+    <div class="pnav">
+      <button id="prevBtn" ${active===0?'disabled':''}>← prev</button>
+      <span class="pos">${active+1} of ${P.length}</span>
+      <button id="nextBtn" ${active===P.length-1?'disabled':''}>next →</button>
+    </div></div>`;
+  main.scrollTop=0;
+  const nb=main.querySelector('#notesBtn'), nw=main.querySelector('#notesWrap');
+  nb.onclick=()=>{const show=nw.style.display==='none';nw.style.display=show?'':'none';nb.textContent=show?'📝 hide notes':'📝 show notes';nb.classList.toggle('done',show);};
+  const vb=main.querySelector('#varBtn'), vw=main.querySelector('#varWrap');
+  vb.onclick=()=>{const show=vw.style.display==='none';vw.style.display=show?'':'none';vb.textContent=show?'🔀 hide variations':'🔀 variations';vb.classList.toggle('done',show);};
+  main.querySelectorAll('.varcopy').forEach(b=>b.onclick=()=>{const v=(VARS[p.label]||[])[+b.dataset.vi];navigator.clipboard.writeText(v.code);b.textContent='✓';setTimeout(()=>b.textContent='copy',1200);});
+  const cbtn=main.querySelector('#codeBtn'), split=main.querySelector('#split');
+  cbtn.onclick=()=>{const hid=!split.classList.contains('nocode');split.classList.toggle('nocode',hid);cbtn.textContent=hid?'⌨ show code':'⌨ hide code';cbtn.classList.toggle('done',hid);};
+  main.querySelector('#copyBtn').onclick=e=>{navigator.clipboard.writeText(p.code);e.target.textContent='✓ copied';e.target.classList.add('done');setTimeout(()=>{e.target.textContent='copy code';e.target.classList.remove('done');},1500);};
+  main.querySelector('#prevBtn').onclick=()=>{if(active>0){active--;render();}};
+  main.querySelector('#nextBtn').onclick=()=>{if(active<P.length-1){active++;render();}};
+  main.querySelectorAll('.cl.has-cm').forEach(el=>el.onclick=()=>el.classList.toggle('reveal'));
+  const ra=main.querySelector('#revealAll');
+  ra.onclick=()=>{const ls=[...main.querySelector('.cb').querySelectorAll('.cl.has-cm')];const on=ls.some(l=>l.classList.contains('reveal'));ls.forEach(l=>l.classList.toggle('reveal',!on));ra.classList.toggle('on',!on);ra.textContent=on?'💬 reveal all':'🙈 hide all';};
+  mountStepper(p);
+  buildSidebar();
+}
+
+function mountStepper(p){
+  const frames=p.gen();
+  const stage=main.querySelector('#stage'), vmsg=main.querySelector('#vmsg'),
+        vtables=main.querySelector('#vtables'), vpos=main.querySelector('#vpos'),
+        traceEl=main.querySelector('#trace'), playBtn=main.querySelector('#play'),
+        spd=main.querySelector('#spd'), spdlbl=main.querySelector('#spdlbl');
+  const tEls=[]; p.trace.forEach(ln=>{const x=document.createElement('span');x.className='tln';x.innerHTML=hl(ln)||'&nbsp;';traceEl.appendChild(x);tEls.push(x);});
+  let idx=0;
+  function draw(){
+    const f=frames[idx];
+    stage.innerHTML=svgList(f);
+    vmsg.classList.remove('flash');void vmsg.offsetWidth;vmsg.classList.add('flash');
+    vmsg.innerHTML=`<span class="stepchip">STEP ${idx+1}</span>${f.msg}`;
+    const sp=listSide(f);
+    vtables.innerHTML=(sp.heap?`<div style="flex:1;min-width:100%">${sp.heap}</div>`:'')+sp.tables;
+    tEls.forEach((e,i)=>e.classList.toggle('hot',i===f.line));
+    vpos.textContent=`${idx+1} / ${frames.length}`;
+  }
+  function stop(){if(stepTimer){clearInterval(stepTimer);stepTimer=null;}playBtn.textContent='▶ play';}
+  function play(){ if(stepTimer){stop();return;} if(idx>=frames.length-1)idx=0; playBtn.textContent='❚❚ pause';
+    stepTimer=setInterval(()=>{ if(idx>=frames.length-1){stop();return;} idx++;draw(); }, +spd.value); }
+  const setspd=()=>{spdlbl.textContent=(spd.value/1000).toFixed(2)+'s'; if(stepTimer){clearInterval(stepTimer);stepTimer=setInterval(()=>{if(idx>=frames.length-1){stop();return;}idx++;draw();},+spd.value);}};
+  spd.oninput=setspd; setspd();
+  playBtn.onclick=play;
+  main.querySelector('#stepBtn').onclick=()=>{stop();if(idx<frames.length-1){idx++;draw();}};
+  main.querySelector('#resetBtn').onclick=()=>{stop();idx=0;draw();};
+  draw();
+}
+
+render();
+</script>
+</body>
+</html>
