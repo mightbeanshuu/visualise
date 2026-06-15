@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Linked Lists — Reversal · Fast/Slow · In-place Edits</title>
-<meta name="description" content="Step-by-step animated hub for linked-list patterns: reversal, Floyd's cycle, fast/slow middle, remove-nth, dedup, palindrome. Striver + NeetCode code, LeetCode problems, variation templates.">
+<title>Dynamic Programming — 1-D · 2-D · Grid</title>
+<meta name="description" content="Step-by-step animated DP hub: climbing stairs, house robber, coin change, LCS, 0/1 knapsack, unique paths. Watch the table fill cell by cell. Striver + NeetCode code, LeetCode problems, variation templates.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -101,12 +101,13 @@
   .vtables{margin-top:11px;display:flex;gap:14px;flex-wrap:wrap;}
   .vtbl{font-family:'JetBrains Mono',monospace;font-size:11px;background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:10px 11px;}
   .vtbl .cap{color:var(--muted);margin-bottom:7px;letter-spacing:1px;font-weight:700;}
-  .qrow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-height:26px;}
-  .qlabel{font-size:10px;color:var(--muted);letter-spacing:1.2px;font-weight:700;}
+  .qrow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-height:26px;margin-bottom:6px;}
+  .qlabel{font-size:10px;color:var(--muted);letter-spacing:1.2px;font-weight:700;min-width:128px;}
   .qp{background:#0a5f7a;border:1px solid #14a8d0;color:#d6f4ff;font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:13px;font-family:'JetBrains Mono',monospace;animation:qin .28s ease;}
   .qp.empty{background:transparent;border:1px dashed #2a3340;color:var(--faint);font-weight:400;font-style:italic;}
+  .qp.top{background:#0a7a4a;border-color:#1fd081;color:#d6ffe8;box-shadow:0 0 0 2px #1fd08133;}
   @keyframes qin{from{opacity:0;transform:translateY(5px) scale(.85);}to{opacity:1;transform:none;}}
-  .cost{margin-top:9px;font-size:13px;font-weight:700;color:var(--acc);font-family:'JetBrains Mono',monospace;}
+  .cost{margin-top:4px;font-size:13px;font-weight:700;color:var(--acc);font-family:'JetBrains Mono',monospace;}
   .trace{margin-top:13px;background:#070a0e;border:1px solid var(--border);border-radius:8px;overflow:hidden;}
   .trace .th{background:var(--panel);border-bottom:1px solid var(--border);padding:7px 13px;font-size:10px;letter-spacing:1px;color:var(--muted);font-weight:700;} .trace .th b{color:var(--acc);}
   .trace pre{padding:11px 8px;font-size:11.5px;line-height:1.7;}
@@ -118,14 +119,14 @@
   svg .acell{transition:fill .3s,stroke .3s;}
   svg .aval{fill:#e6edf3;font:700 15px 'JetBrains Mono',monospace;text-anchor:middle;dominant-baseline:central;}
   svg .aptr{fill:#ffd60a;font:700 11px 'JetBrains Mono',monospace;text-anchor:middle;}
-  svg .larr{stroke:#7d8895;stroke-width:2;} svg .larr.back{stroke:#bf5af2;stroke-width:2;}
-  svg .lnull{fill:#5b6675;font:700 15px 'JetBrains Mono',monospace;text-anchor:middle;dominant-baseline:central;}
+  svg .aidx{fill:#5b6675;font:600 10px 'JetBrains Mono',monospace;text-anchor:middle;}
   .menuToggle{display:none;}
   @media(max-width:860px){
     .shell{flex-direction:column;}
     .side{width:100%;min-width:0;border-right:none;border-bottom:1px solid var(--border);max-height:0;overflow:hidden;padding:0;transition:max-height .3s ease;}
     .side.open{max-height:1500px;padding:10px 0 20px;} .menuToggle{display:inline-block;}
     .cards{grid-template-columns:1fr;} .ic.analogy,.ic.bugs{grid-column:auto;} .main{padding:18px 16px 50px;}
+    .qlabel{min-width:0;}
   }
 </style>
 </head>
@@ -133,12 +134,12 @@
   <div class="top">
     <div class="row">
       <a class="backbtn" href="/" title="Topics">← Topics</a>
-      <span class="badge">LINKED LISTS</span>
-      <h1>Linked Lists</h1>
+      <span class="badge">DYNAMIC PROGRAMMING</span>
+      <h1>Dynamic Programming</h1>
       <span class="meta">6 patterns · C++ · Anshu</span>
       <button class="copy menuToggle" id="menuToggle" style="margin-left:auto">☰ patterns</button>
     </div>
-    <p>AlgoMaster notes + <b>Striver + NeetCode</b> C++, with the nodes, arrows and pointers animating <b>line by line</b> as each one moves. Real LeetCode questions + variation templates.</p>
+    <p>AlgoMaster notes + <b>Striver + NeetCode</b> C++, with the DP table filling <b>cell by cell</b> — the current cell glows cyan, the cells it reads glow amber. Real LeetCode questions + variation templates.</p>
   </div>
 
   <div class="shell">
@@ -147,332 +148,334 @@
   </div>
 
 <script>
-/* ════════════════ LINKED-LIST ENGINE ════════════════ */
-function svgList(f){
-  const nodes=f.nodes||[], n=nodes.length, cw=46, gap=36, pad=20, top=58;
-  const xOf=i=>pad+i*(cw+gap), nullX=xOf(n), W=nullX+40, H=top+74;
-  let s=`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet"><defs>
-    <marker id="la" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#7d8895"/></marker>
-    <marker id="lab" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#bf5af2"/></marker></defs>`;
-  const arrows=f.arrows||nodes.map((_,i)=>[i,i+1<n?i+1:-1]);
-  arrows.forEach(([a,b])=>{ const ax=xOf(a)+cw, ay=top+22;
-    if(b===-1) s+=`<line class="larr" x1="${ax}" y1="${ay}" x2="${nullX-6}" y2="${ay}" marker-end="url(#la)"/>`;
-    else if(b>a) s+=`<line class="larr" x1="${ax}" y1="${ay}" x2="${xOf(b)-6}" y2="${ay}" marker-end="url(#la)"/>`;
-    else { const sx=xOf(a)+cw/2, bx=xOf(b)+cw/2;
-      s+=`<path class="larr back" d="M${sx},${top+44} Q${(sx+bx)/2},${top+92} ${bx},${top+44}" fill="none" marker-end="url(#lab)"/>`; }
-  });
-  s+=`<rect x="${nullX}" y="${top+6}" width="34" height="30" rx="5" fill="#0b0f15" stroke="#2c3a4c"/><text class="lnull" x="${nullX+17}" y="${top+22}">∅</text>`;
-  const ptr=f.ptr||{}, byIdx={};
-  Object.entries(ptr).forEach(([nm,idx])=>{ const key=(idx===-1||idx==null)?'NULL':idx; (byIdx[key]=byIdx[key]||[]).push(nm); });
-  Object.entries(byIdx).forEach(([k,names])=>{ const cx=k==='NULL'?nullX+17:xOf(+k)+cw/2;
-    s+=`<text class="aptr" x="${cx}" y="${top-26}">${names.join(' ')}</text><text class="aptr" x="${cx}" y="${top-12}">▼</text>`; });
-  nodes.forEach((v,i)=>{ const st=(f.cells&&f.cells[i])||''; const x=xOf(i);
-    let stroke='#3a4658',fill='#10161e';
-    if(st==='win'){stroke='#00e5ff';fill='#06222b';}
-    if(st==='check'){stroke='#ffd60a';fill='#241d04';}
-    if(st==='found'){stroke='#69ff47';fill='#123a1f';}
-    if(st==='dead'){stroke='#ff6b6b';fill='#2a0e0e';}
-    s+=`<rect class="acell" x="${x}" y="${top+2}" width="${cw}" height="40" rx="9" fill="${fill}" stroke="${stroke}" stroke-width="2"/><text class="aval" x="${x+cw/2}" y="${top+22}">${v}</text>`; });
+/* ════════════════ DP TABLE ENGINE ════════════════ */
+function svgFrame(f){
+  const g=f.dp||[[]], R=g.length, C=g[0].length;
+  const cw=46, ch=32, gap=4, padL=f.rowH?92:20, padT=f.colH?34:18;
+  const xOf=c=>padL+c*(cw+gap), yOf=r=>padT+r*(ch+gap);
+  const W=Math.max(xOf(C)-gap+14,200), H=yOf(R)-gap+14;
+  let s=`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet">`;
+  if(f.colH) f.colH.forEach((t,c)=>s+=`<text class="aidx" x="${xOf(c)+cw/2}" y="${padT-10}">${t}</text>`);
+  if(f.rowH) f.rowH.forEach((t,r)=>s+=`<text class="aidx" x="${padL-8}" y="${yOf(r)+ch/2}" style="text-anchor:end" dominant-baseline="central">${t}</text>`);
+  for(let r=0;r<R;r++)for(let c=0;c<C;c++){
+    const st=(f.cells&&f.cells[r+','+c])||''; const v=g[r][c];
+    let stroke='#222c38',fill='#0c1118';
+    if(v!==''&&v!=null){stroke='#3a4658';fill='#10161e';}
+    if(st==='from'){stroke='#ffd60a';fill='#241d04';}
+    if(st==='cur'){stroke='#00e5ff';fill='#06222b';}
+    if(st==='done'){stroke='#69ff47';fill='#123a1f';}
+    if(st==='path'){stroke='#bf5af2';fill='#1e0f2a';}
+    s+=`<rect class="acell" x="${xOf(c)}" y="${yOf(r)}" width="${cw}" height="${ch}" rx="6" fill="${fill}" stroke="${stroke}" stroke-width="2"/>`;
+    s+=`<text class="aval" x="${xOf(c)+cw/2}" y="${yOf(r)+ch/2}" style="font-size:13px">${v===''||v==null?'':v}</text>`;
+  }
   return s+'</svg>';
 }
-function qpills(label,arr){let h=`<div class="qrow"><span class="qlabel">${label}</span>`;if(!arr.length)h+=`<span class="qp empty">empty</span>`;else arr.forEach(t=>h+=`<span class="qp">${t}</span>`);return h+`</div>`;}
-function listSide(f){
-  let tables='',heap='';
-  if(f.result) heap+=qpills('VALUES →',f.result);
+function frameSide(f){
+  let heap='';
+  if(f.note) heap+=`<div style="font-size:12px;color:#8b949e;line-height:1.55;margin-bottom:6px">${f.note}</div>`;
   if(f.stats) f.stats.forEach(([k,v])=>heap+=`<div class="cost">${k} = ${v}</div>`);
-  return {tables,heap};
+  return {tables:'',heap};
 }
 
 /* ════════════════ FRAME GENERATORS ════════════════ */
-function genReverse(){
-  const nodes=[1,2,3,4,5],F=[]; const nxt={0:1,1:2,2:3,3:4,4:-1};
-  const A=()=>Object.entries(nxt).map(([a,b])=>[+a,b]);
-  let prev=-1,cur=0;
-  const P=()=>{const o={prev,cur};return o;};
-  F.push({nodes,arrows:A(),ptr:{prev:-1,cur},cells:{},msg:`prev = NULL, cur = head (1). We flip each arrow to point backwards.`,line:0});
-  while(cur!==-1){
-    const sv=nxt[cur];
-    F.push({nodes,arrows:A(),ptr:{prev,cur,nxt:sv},cells:{[cur]:'check'},msg:`Save nxt = ${sv===-1?'NULL':nodes[sv]} before we overwrite ${nodes[cur]}.next.`,line:2});
-    nxt[cur]=prev;
-    F.push({nodes,arrows:A(),ptr:{prev,cur,nxt:sv},cells:{[cur]:'win'},msg:`cur.next = prev → ${nodes[cur]} now points ${prev===-1?'to NULL':'back to '+nodes[prev]}.`,line:3});
-    prev=cur; cur=sv;
-    F.push({nodes,arrows:A(),ptr:{prev,cur},cells:{},msg:`Advance: prev = ${nodes[prev]}, cur = ${cur===-1?'NULL':nodes[cur]}.`,line:4});
+function genClimb(){
+  const n=6,F=[]; const dp=Array(n+1).fill('');
+  const colH=[...Array(n+1)].map((_,i)=>i);
+  const snap=(cells,msg,line,stats)=>F.push({dp:[dp.slice()],cells,colH,msg,line,stats});
+  dp[0]=1; snap({'0,0':'done'},`Base: 1 way to be at step 0 (stand still).`,1);
+  dp[1]=1; snap({'0,1':'done'},`Base: 1 way to reach step 1.`,1);
+  for(let i=2;i<=n;i++){
+    snap({['0,'+i]:'cur',['0,'+(i-1)]:'from',['0,'+(i-2)]:'from'},`dp[${i}] = dp[${i-1}] + dp[${i-2}] = ${dp[i-1]} + ${dp[i-2]}.`,3);
+    dp[i]=dp[i-1]+dp[i-2];
+    snap({['0,'+i]:'done'},`dp[${i}] = <b>${dp[i]}</b> ways to reach step ${i}.`,3,[['dp['+i+']',dp[i]]]);
   }
-  F.push({nodes,arrows:A(),ptr:{prev},cells:Object.fromEntries(nodes.map((_,i)=>[i,'found'])),msg:`<span class="ok">Done — new head = ${nodes[prev]}. List reversed.</span>`,line:5});
+  snap(Object.fromEntries([...Array(n+1)].map((_,i)=>['0,'+i,'done'])),`<span class="ok">Answer = dp[${n}] = ${dp[n]} ways.</span>`,4,[['answer',dp[n]]]);
   return F;
 }
-function genCycle(){
-  const nodes=[3,2,0,-4],F=[]; const nxt={0:1,1:2,2:3,3:1};
-  const A=Object.entries(nxt).map(([a,b])=>[+a,b]);
-  let slow=0,fast=0;
-  F.push({nodes,arrows:A,ptr:{slow,fast},cells:{[0]:'win'},msg:`slow & fast both start at the head.`,line:0});
-  while(true){
-    slow=nxt[slow]; fast=nxt[nxt[fast]];
-    F.push({nodes,arrows:A,ptr:{slow,fast},cells:{[slow]:'win',[fast]:'check'},msg:`slow → ${nodes[slow]} (1 step), fast → ${nodes[fast]} (2 steps).`,line:3});
-    if(slow===fast){F.push({nodes,arrows:A,ptr:{slow,fast},cells:{[slow]:'found'},msg:`<span class="ok">slow == fast → the list has a cycle!</span>`,line:4});break;}
+function genRob(){
+  const nums=[2,7,9,3,1],n=nums.length,F=[]; const dp=Array(n).fill('');
+  const grid=()=>[nums.slice(),dp.slice()];
+  const colH=nums.map((_,i)=>i), rowH=['nums','dp'];
+  const snap=(cells,msg,line,stats)=>F.push({dp:grid(),cells,colH,rowH,msg,line,stats});
+  dp[0]=nums[0]; snap({'1,0':'done'},`dp[0] = nums[0] = ${nums[0]} (rob the only house).`,1);
+  dp[1]=Math.max(nums[0],nums[1]); snap({'1,1':'done','0,0':'from','0,1':'from'},`dp[1] = max(nums[0], nums[1]) = ${dp[1]}.`,2);
+  for(let i=2;i<n;i++){
+    const skip=dp[i-1], take=dp[i-2]+nums[i];
+    snap({['1,'+i]:'cur',['1,'+(i-1)]:'from',['1,'+(i-2)]:'from',['0,'+i]:'from'},`dp[${i}] = max(skip dp[${i-1}]=${skip}, rob ${nums[i]}+dp[${i-2}]=${take}).`,4);
+    dp[i]=Math.max(skip,take);
+    snap({['1,'+i]:'done'},`dp[${i}] = <b>${dp[i]}</b>.`,4,[['dp['+i+']',dp[i]]]);
   }
+  snap(Object.fromEntries(dp.map((_,i)=>['1,'+i,'done'])),`<span class="ok">Max loot = dp[${n-1}] = ${dp[n-1]}.</span>`,5,[['answer',dp[n-1]]]);
   return F;
 }
-function genMiddle(){
-  const nodes=[1,2,3,4,5],F=[]; const nxt={0:1,1:2,2:3,3:4,4:-1};
-  const A=Object.entries(nxt).map(([a,b])=>[+a,b]);
-  let slow=0,fast=0;
-  F.push({nodes,arrows:A,ptr:{slow,fast},cells:{[0]:'win'},msg:`slow & fast at head. Fast moves twice as fast.`,line:0});
-  while(fast!==-1 && nxt[fast]!==-1){
-    slow=nxt[slow]; fast=nxt[nxt[fast]];
-    F.push({nodes,arrows:A,ptr:{slow,fast},cells:{[slow]:'win',[fast>=0?fast:slow]:'check'},msg:`slow → ${nodes[slow]}, fast → ${fast===-1?'NULL':nodes[fast]}.`,line:2});
+function genCoin(){
+  const coins=[1,2,5],amt=6,F=[]; const INF='∞';
+  const dp=Array(amt+1).fill(INF); dp[0]=0;
+  const colH=[...Array(amt+1)].map((_,i)=>i);
+  const snap=(cells,msg,line,stats)=>F.push({dp:[dp.slice()],cells,colH,msg,line,stats});
+  snap({'0,0':'done'},`dp[a] = fewest coins for amount a. dp[0]=0, rest = ∞. Coins {${coins.join(', ')}}.`,1);
+  for(let a=1;a<=amt;a++){
+    let best=Infinity;
+    for(const c of coins) if(a-c>=0 && dp[a-c]!==INF) best=Math.min(best, dp[a-c]+1);
+    const cells={['0,'+a]:'cur'}; coins.forEach(c=>{ if(a-c>=0) cells['0,'+(a-c)]='from'; });
+    snap(cells,`dp[${a}]: 1 + min(dp[${a}−c]) over c∈{${coins.filter(c=>a-c>=0).join(',')}}.`,4);
+    dp[a]=best===Infinity?INF:best;
+    snap({['0,'+a]:'done'},`dp[${a}] = <b>${dp[a]}</b>.`,4,[['dp['+a+']',dp[a]]]);
   }
-  F.push({nodes,arrows:A,ptr:{slow},cells:{[slow]:'found'},msg:`<span class="ok">fast reached the end → slow (${nodes[slow]}) is the middle.</span>`,line:3});
+  snap(Object.fromEntries([...Array(amt+1)].map((_,i)=>['0,'+i,'done'])),`<span class="ok">Min coins for ${amt} = dp[${amt}] = ${dp[amt]}.</span>`,5,[['answer',dp[amt]]]);
   return F;
 }
-function genRemoveNth(){
-  const nodes=[1,2,3,4,5],n=2,F=[]; const nxt={0:1,1:2,2:3,3:4,4:-1};
-  const A=()=>Object.entries(nxt).map(([a,b])=>[+a,b]);
-  let fast=0,slow=0;
-  F.push({nodes,arrows:A(),ptr:{slow,fast},cells:{},msg:`Goal: remove the ${n}nd node from the end. First send <b>fast</b> ${n} steps ahead.`,line:0});
-  for(let i=0;i<n;i++){ fast=nxt[fast]; F.push({nodes,arrows:A(),ptr:{slow,fast},cells:{[fast]:'check'},msg:`fast advances → now at ${nodes[fast]} (gap = ${i+1}).`,line:1}); }
-  while(nxt[fast]!==-1){ fast=nxt[fast]; slow=nxt[slow]; F.push({nodes,arrows:A(),ptr:{slow,fast},cells:{[slow]:'win',[fast]:'check'},msg:`Move both until fast is last. slow → ${nodes[slow]}, fast → ${nodes[fast]}.`,line:3}); }
-  const tgt=nxt[slow];
-  F.push({nodes,arrows:A(),ptr:{slow},cells:{[tgt]:'dead'},msg:`fast is last → slow.next (${nodes[tgt]}) is the node to drop.`,line:4});
-  nxt[slow]=nxt[tgt];
-  F.push({nodes,arrows:A(),ptr:{slow},cells:{[tgt]:'dead'},msg:`<span class="ok">slow.next = slow.next.next → ${nodes[tgt]} unlinked.</span>`,line:4});
+function genLCS(){
+  const A='abcde',B='ace',m=A.length,n=B.length,F=[];
+  const dp=[...Array(m+1)].map(()=>Array(n+1).fill(0));
+  const colH=['∅',...B.split('')], rowH=['∅',...A.split('')];
+  const snap=(cells,msg,line,stats)=>F.push({dp:dp.map(r=>r.slice()),cells,colH,rowH,msg,line,stats});
+  snap({},`LCS of "${A}" & "${B}". Row / col 0 = empty string → 0.`,1);
+  for(let i=1;i<=m;i++)for(let j=1;j<=n;j++){
+    const eq=A[i-1]===B[j-1];
+    if(eq){ snap({[i+','+j]:'cur',[(i-1)+','+(j-1)]:'from'},`'${A[i-1]}' == '${B[j-1]}' → 1 + diagonal ${dp[i-1][j-1]}.`,4); dp[i][j]=dp[i-1][j-1]+1; }
+    else { snap({[i+','+j]:'cur',[(i-1)+','+j]:'from',[i+','+(j-1)]:'from'},`'${A[i-1]}' ≠ '${B[j-1]}' → max(top ${dp[i-1][j]}, left ${dp[i][j-1]}).`,6); dp[i][j]=Math.max(dp[i-1][j],dp[i][j-1]); }
+    snap({[i+','+j]:'done'},`dp[${i}][${j}] = <b>${dp[i][j]}</b>.`,eq?4:6);
+  }
+  snap({[m+','+n]:'done'},`<span class="ok">LCS length = dp[${m}][${n}] = ${dp[m][n]} ("ace").</span>`,7,[['answer',dp[m][n]]]);
   return F;
 }
-function genRemoveDup(){
-  const nodes=[1,1,2,3,3],F=[]; const nxt={0:1,1:2,2:3,3:4,4:-1};
-  const A=()=>Object.entries(nxt).map(([a,b])=>[+a,b]);
-  let cur=0;
-  F.push({nodes,arrows:A(),ptr:{cur},cells:{},msg:`Sorted list → duplicates are adjacent. Walk with cur.`,line:0});
-  while(nxt[cur]!==-1){
-    const nx=nxt[cur];
-    if(nodes[nx]===nodes[cur]){ nxt[cur]=nxt[nx]; F.push({nodes,arrows:A(),ptr:{cur},cells:{[nx]:'dead',[cur]:'win'},msg:`${nodes[nx]} == ${nodes[cur]} → skip it: cur.next = cur.next.next.`,line:3}); }
-    else { cur=nx; F.push({nodes,arrows:A(),ptr:{cur},cells:{[cur]:'check'},msg:`${nodes[cur]} differs → advance cur.`,line:4}); }
+function genKnapsack(){
+  const wt=[1,3,4,5],val=[1,4,5,7],cap=7,n=wt.length,F=[];
+  const dp=[...Array(n+1)].map(()=>Array(cap+1).fill(0));
+  const colH=[...Array(cap+1)].map((_,i)=>i), rowH=['∅',...wt.map((w,i)=>`#${i+1} w${w} v${val[i]}`)];
+  const snap=(cells,msg,line,stats)=>F.push({dp:dp.map(r=>r.slice()),cells,colH,rowH,msg,line,stats});
+  snap({},`0/1 Knapsack: cap ${cap}, items (weight,value). Row 0 / col 0 = 0.`,1);
+  for(let i=1;i<=n;i++)for(let w=0;w<=cap;w++){
+    if(wt[i-1]<=w){ const take=val[i-1]+dp[i-1][w-wt[i-1]], skip=dp[i-1][w];
+      snap({[i+','+w]:'cur',[(i-1)+','+w]:'from',[(i-1)+','+(w-wt[i-1])]:'from'},`item #${i} fits in ${w} → max(skip ${skip}, take ${val[i-1]}+${dp[i-1][w-wt[i-1]]}=${take}).`,4);
+      dp[i][w]=Math.max(skip,take); }
+    else { snap({[i+','+w]:'cur',[(i-1)+','+w]:'from'},`item #${i} too heavy for ${w} → copy above ${dp[i-1][w]}.`,6); dp[i][w]=dp[i-1][w]; }
+    snap({[i+','+w]:'done'},`dp[${i}][${w}] = <b>${dp[i][w]}</b>.`,4);
   }
-  F.push({nodes,arrows:A(),ptr:{},cells:{0:'found',2:'found',3:'found'},msg:`<span class="ok">Done — each value appears once.</span>`,line:-1});
+  snap({[n+','+cap]:'done'},`<span class="ok">Best value = dp[${n}][${cap}] = ${dp[n][cap]}.</span>`,7,[['answer',dp[n][cap]]]);
   return F;
 }
-function genPalindrome(){
-  const nodes=[1,2,3,2,1],F=[],vals=[]; const A=nodes.map((_,i)=>[i,i+1<nodes.length?i+1:-1]);
-  for(let i=0;i<nodes.length;i++){ vals.push(nodes[i]); F.push({nodes,arrows:A,ptr:{cur:i},cells:{[i]:'check'},result:vals.slice(),msg:`Copy values out (or use fast/slow): read ${nodes[i]}.`,line:1}); }
-  let l=0,r=nodes.length-1;
-  while(l<r){
-    if(nodes[l]!==nodes[r]){ F.push({nodes,arrows:A,ptr:{L:l,R:r},cells:{[l]:'dead',[r]:'dead'},result:vals.slice(),msg:`<span class="bad">${nodes[l]} ≠ ${nodes[r]} → not a palindrome.</span>`,line:4}); return F; }
-    F.push({nodes,arrows:A,ptr:{L:l,R:r},cells:{[l]:'win',[r]:'win'},result:vals.slice(),msg:`${nodes[l]} == ${nodes[r]} ✓ — move both inward.`,line:4});
-    l++; r--;
+function genUniquePaths(){
+  const m=3,nn=4,F=[]; const dp=[...Array(m)].map(()=>Array(nn).fill(''));
+  const colH=[...Array(nn)].map((_,i)=>i), rowH=[...Array(m)].map((_,i)=>i);
+  const snap=(cells,msg,line,stats)=>F.push({dp:dp.map(r=>r.slice()),cells,colH,rowH,msg,line,stats});
+  for(let j=0;j<nn;j++) dp[0][j]=1;
+  for(let i=0;i<m;i++) dp[i][0]=1;
+  snap(Object.fromEntries([...Array(nn)].map((_,j)=>['0,'+j,'done']).concat([...Array(m)].map((_,i)=>[i+',0','done']))),`First row & column = 1 (a single straight path).`,2);
+  for(let i=1;i<m;i++)for(let j=1;j<nn;j++){
+    snap({[i+','+j]:'cur',[(i-1)+','+j]:'from',[i+','+(j-1)]:'from'},`dp[${i}][${j}] = dp[${i-1}][${j}] + dp[${i}][${j-1}] = ${dp[i-1][j]} + ${dp[i][j-1]}.`,4);
+    dp[i][j]=dp[i-1][j]+dp[i][j-1];
+    snap({[i+','+j]:'done'},`dp[${i}][${j}] = <b>${dp[i][j]}</b>.`,4);
   }
-  F.push({nodes,arrows:A,ptr:{},cells:Object.fromEntries(nodes.map((_,i)=>[i,'found'])),result:vals.slice(),msg:`<span class="ok">All mirror pairs match → palindrome!</span>`,line:5});
+  snap({[(m-1)+','+(nn-1)]:'done'},`<span class="ok">Unique paths = dp[${m-1}][${nn-1}] = ${dp[m-1][nn-1]}.</span>`,5,[['answer',dp[m-1][nn-1]]]);
   return F;
 }
 
 /* ════════════════ PATTERN DATA ════════════════ */
-const CAT={ REV:{c:'#00e5ff',label:'REVERSAL'}, FS:{c:'#ff9f0a',label:'FAST & SLOW POINTERS'}, EDIT:{c:'#69ff47',label:'IN-PLACE EDITS'} };
+const CAT={ ONE:{c:'#00e5ff',label:'1-D DP'}, TWO:{c:'#ff9f0a',label:'2-D / STRING DP'}, GRID:{c:'#69ff47',label:'GRID DP'} };
 const SRC='Pattern framing · <b>AlgoMaster</b> &nbsp;|&nbsp; Code · <b>Striver + NeetCode</b>';
 
 const P=[
-{ cat:'REV', label:'Reverse a Linked List', gen:genReverse, src:SRC,
-  when:'Flip the direction of pointers — the single most reused linked-list skill (sublists, k-groups, palindrome all build on it).',
-  insight:'Keep three pointers: <b>prev, cur, nxt</b>. Save nxt, point cur back to prev, then march all three forward. prev ends on the new head.',
-  analogy:'Reversing a line of people holding hands: before each person lets go of the one ahead, they first note who that was, then turn to clasp the one behind.',
-  bugs:['Not saving <code>nxt</code> before overwriting <code>cur->next</code> → you lose the rest of the list.','Returning <code>cur</code> (NULL) instead of <code>prev</code>.','Forgetting the old head’s next becomes NULL.'],
-  problems:['LC 206 · Reverse Linked List','LC 92 · Reverse Linked List II','LC 25 · Reverse Nodes in k-Group','LC 234 · Palindrome List'],
-  code:`// Striver / NeetCode — Reverse a linked list (iterative)
-ListNode* reverse(ListNode* head){
-    ListNode* prev = nullptr;
-    ListNode* cur  = head;
-    while(cur){
-        ListNode* nxt = cur->next;   // ★ save the rest first
-        cur->next = prev;            // flip the arrow
-        prev = cur; cur = nxt;       // march forward
-    }
-    return prev;                     // new head
+{ cat:'ONE', label:'Climbing Stairs (Fibonacci)', gen:genClimb, src:SRC,
+  when:'The "hello world" of DP. Any problem where the answer for n is a fixed combination of a few smaller answers — counting ways, tiling, decode ways.',
+  insight:'<b>dp[i] = dp[i−1] + dp[i−2]</b>: you reach step i either from one step below or two below. Two base cases seed everything.',
+  analogy:'Standing on a staircase looking back: the number of routes to this step is just the routes to the two steps you could have jumped from.',
+  bugs:['Wrong base cases (dp[0] should be 1, not 0).','Off-by-one in array size (need n+1).','Recomputing without memo → exponential.'],
+  problems:['LC 70 · Climbing Stairs','LC 509 · Fibonacci Number','LC 746 · Min Cost Climbing Stairs','LC 91 · Decode Ways'],
+  code:`// Striver / NeetCode — Climbing Stairs (bottom-up)
+int climbStairs(int n){
+    vector<int> dp(n+1);
+    dp[0]=dp[1]=1;                       // ★ base cases
+    for(int i=2;i<=n;i++)
+        dp[i]=dp[i-1]+dp[i-2];          // come from 1 or 2 below
+    return dp[n];
 }`,
-  trace:['prev=NULL; cur=head;','while(cur){','  nxt = cur->next;','  cur->next = prev;','  prev=cur; cur=nxt; }','return prev;']
+  trace:['int climbStairs(int n){','  dp[0]=dp[1]=1;','  for(int i=2;i<=n;i++)','    dp[i]=dp[i-1]+dp[i-2];','  return dp[n];','}']
 },
-{ cat:'FS', label:"Detect Cycle (Floyd's)", gen:genCycle, src:SRC,
-  when:'Decide whether a linked list loops — in O(1) extra space (no hash set).',
-  insight:'Move slow by 1 and fast by 2. If there’s a loop, fast laps slow and they collide; if fast hits NULL, there’s no cycle. (To find the cycle start, reset one pointer to head and step both by 1.)',
-  analogy:'Two runners on a track: on a circular track the faster always laps the slower; on a straight track the fast one simply reaches the end.',
-  bugs:['Checking <code>fast && fast->next</code> wrong → null deref on <code>fast->next->next</code>.','Starting slow and fast at different nodes.','Confusing detection with finding the cycle’s entry node.'],
-  problems:['LC 141 · Linked List Cycle','LC 142 · Cycle II (find start)','LC 287 · Find the Duplicate Number','LC 202 · Happy Number'],
-  code:`// Striver / NeetCode — Floyd's cycle detection
-bool hasCycle(ListNode* head){
-    ListNode *slow = head, *fast = head;
-    while(fast && fast->next){
-        slow = slow->next;          // +1
-        fast = fast->next->next;    // ★ +2
-        if(slow == fast) return true;
-    }
-    return false;
+{ cat:'ONE', label:'House Robber', gen:genRob, src:SRC,
+  when:'Pick a subset with no two adjacent elements to maximise (or minimise) a sum. The "take it or skip it" 1-D recurrence.',
+  insight:'<b>dp[i] = max(dp[i−1], dp[i−2] + nums[i])</b> — either skip house i (keep dp[i−1]) or rob it and add the best up to i−2.',
+  analogy:'A thief on a street with silent alarms between neighbours: robbing a house locks out its neighbour, so each choice forks the best plan two houses back.',
+  bugs:['Adding adjacent houses by reading dp[i−1] instead of dp[i−2].','Mishandling n=1 / n=2 base cases.','Forgetting it can be space-optimised to two variables.'],
+  problems:['LC 198 · House Robber','LC 213 · House Robber II','LC 337 · House Robber III','LC 740 · Delete and Earn'],
+  code:`// Striver / NeetCode — House Robber
+int rob(vector<int>& a){
+    int n=a.size();
+    vector<int> dp(n);
+    dp[0]=a[0];
+    dp[1]=max(a[0],a[1]);
+    for(int i=2;i<n;i++)
+        dp[i]=max(dp[i-1], dp[i-2]+a[i]);   // ★ skip vs rob
+    return dp[n-1];
 }`,
-  trace:['slow=fast=head;','while(fast && fast->next){','  slow=slow->next;','  fast=fast->next->next;','  if(slow==fast) return true; }','return false;']
+  trace:['int rob(vector<int>& a){','  dp[0]=a[0];','  dp[1]=max(a[0],a[1]);','  for(int i=2;i<n;i++)','    dp[i]=max(dp[i-1], dp[i-2]+a[i]);','  return dp[n-1];','}']
 },
-{ cat:'FS', label:'Find the Middle Node', gen:genMiddle, src:SRC,
-  when:'Locate the midpoint in one pass — the split step of merge sort on lists, and the setup for palindrome checks.',
-  insight:'When fast (×2) reaches the end, slow (×1) is exactly halfway. Loop condition <code>fast && fast->next</code> returns the <b>second</b> middle for even length.',
-  analogy:'Two cars leaving together, one at double speed — when the fast car finishes the route, the slow car is precisely at the halfway marker.',
-  bugs:['Wrong loop condition changes which middle you get (first vs second).','Off-by-one when the list has even length.','Returning fast instead of slow.'],
-  problems:['LC 876 · Middle of the Linked List','LC 234 · Palindrome List','LC 143 · Reorder List','LC 148 · Sort List'],
-  code:`// Striver / NeetCode — Middle of the linked list
-ListNode* middleNode(ListNode* head){
-    ListNode *slow = head, *fast = head;
-    while(fast && fast->next){
-        slow = slow->next;          // +1
-        fast = fast->next->next;    // +2
-    }
-    return slow;                    // ★ halfway when fast ends
+{ cat:'ONE', label:'Coin Change (min coins)', gen:genCoin, src:SRC,
+  when:'Fewest items to hit a target where each item is reusable — unbounded knapsack flavour. Build up every sub-amount from 0 to target.',
+  insight:'<b>dp[a] = min over coins c of dp[a−c] + 1</b>. dp[0]=0; unreachable amounts stay ∞ (return −1 if the target stays ∞).',
+  analogy:'Filling a jar to a mark with reusable weights: the cheapest way to reach a level is one weight on top of the cheapest way to reach the level below it.',
+  bugs:['Not guarding <code>dp[a−c]</code> against ∞ → overflow when you add 1.','Looping coins outside vs amount loop matters for counting variants.','Returning ∞ instead of −1 when unreachable.'],
+  problems:['LC 322 · Coin Change','LC 518 · Coin Change II','LC 279 · Perfect Squares','LC 377 · Combination Sum IV'],
+  code:`// Striver / NeetCode — Coin Change (fewest coins)
+int coinChange(vector<int>& coins,int amt){
+    vector<int> dp(amt+1, INT_MAX);
+    dp[0]=0;
+    for(int a=1;a<=amt;a++)
+        for(int c: coins)
+            if(a>=c && dp[a-c]!=INT_MAX)
+                dp[a]=min(dp[a], dp[a-c]+1);   // ★ one more coin
+    return dp[amt]==INT_MAX? -1 : dp[amt];
 }`,
-  trace:['slow=fast=head;','while(fast && fast->next){','  slow=slow->next;','  fast=fast->next->next; }','return slow;']
+  trace:['int coinChange(coins, amt){','  dp[0]=0; rest=INF;','  for(int a=1;a<=amt;a++)','    for(int c: coins)','      if(a>=c) dp[a]=min(dp[a],dp[a-c]+1);','  return dp[amt]==INF? -1 : dp[amt];','}']
 },
-{ cat:'EDIT', label:'Remove Nth Node From End', gen:genRemoveNth, src:SRC,
-  when:'Delete a node counted from the end in one pass — the gap / two-pointer deletion pattern.',
-  insight:'Advance <b>fast</b> n nodes first, then move <b>slow</b> and fast together until fast is last. Now slow sits right before the target. A dummy node cleanly handles deleting the head.',
-  analogy:'Two people n steps apart on a walkway: when the front one steps off the end, the back one is standing exactly at the node to remove.',
-  bugs:['Off-by-one: stop when <code>fast->next</code> is null vs fast is null.','Not using a dummy → crashes when removing the head.','Advancing fast n+1 instead of n.'],
-  problems:['LC 19 · Remove Nth Node From End','LC 2095 · Delete the Middle Node','LC 203 · Remove Linked List Elements','LC 237 · Delete Node'],
-  code:`// Striver / NeetCode — Remove n-th node from end
-ListNode* removeNthFromEnd(ListNode* head, int n){
-    ListNode dummy(0, head), *fast=&dummy, *slow=&dummy;
-    for(int i=0;i<n;i++) fast=fast->next;   // gap of n
-    while(fast->next){                       // ★ until fast is last
-        fast=fast->next; slow=slow->next;
-    }
-    slow->next = slow->next->next;           // unlink target
-    return dummy.next;
+{ cat:'TWO', label:'Longest Common Subsequence', gen:genLCS, src:SRC,
+  when:'Compare two sequences cell-by-cell — LCS, edit distance, shortest common supersequence all share this 2-D grid skeleton.',
+  insight:'If the characters match, extend the <b>diagonal</b>: dp[i][j]=1+dp[i−1][j−1]. Otherwise take the best of dropping one char: max(dp[i−1][j], dp[i][j−1]).',
+  analogy:'Aligning two strings on a grid: a matching letter lets you step diagonally (keep both), a mismatch forces you to drop a letter from one side.',
+  bugs:['Indexing strings with i instead of i−1 (the +1 offset row/col).','Confusing subsequence with substring (substring needs contiguity).','Forgetting the empty-string base row & column of 0s.'],
+  problems:['LC 1143 · Longest Common Subsequence','LC 72 · Edit Distance','LC 583 · Delete Operation','LC 516 · Longest Palindromic Subsequence'],
+  code:`// Striver / NeetCode — Longest Common Subsequence
+int lcs(string A,string B){
+    int m=A.size(), n=B.size();
+    vector<vector<int>> dp(m+1, vector<int>(n+1,0));
+    for(int i=1;i<=m;i++)
+        for(int j=1;j<=n;j++)
+            if(A[i-1]==B[j-1])
+                dp[i][j]=1+dp[i-1][j-1];          // ★ match → diagonal
+            else
+                dp[i][j]=max(dp[i-1][j], dp[i][j-1]);
+    return dp[m][n];
 }`,
-  trace:['fast=slow=dummy;','for(i=0;i<n;i++) fast=fast->next;','while(fast->next){','  fast=fast->next; slow=slow->next; }','slow->next = slow->next->next;']
+  trace:['int lcs(string A,string B){','  // dp[i][j]=LCS of A[0..i),B[0..j)','  for(i=1..m) for(j=1..n)','    if(A[i-1]==B[j-1])','      dp[i][j]=1+dp[i-1][j-1];','    else','      dp[i][j]=max(dp[i-1][j],dp[i][j-1]);','  return dp[m][n];','}']
 },
-{ cat:'EDIT', label:'Remove Duplicates (sorted)', gen:genRemoveDup, src:SRC,
-  when:'Collapse adjacent equal values in a sorted list — the simplest in-place pointer edit.',
-  insight:'Because it’s sorted, duplicates are neighbours. If <code>cur->val == cur->next->val</code>, splice the next out (<code>cur->next = cur->next->next</code>); otherwise advance cur.',
-  analogy:'Skimming a sorted guest list and crossing out repeats — identical names always sit next to each other.',
-  bugs:['Advancing cur even after deleting (you may miss a triple).','Null deref when checking <code>cur->next->val</code> at the tail.','Confusing it with LC 82 (remove ALL copies).'],
-  problems:['LC 83 · Remove Duplicates from Sorted List','LC 82 · Remove Duplicates II','LC 26 · Remove Dup from Array','LC 1836 · Remove from Unsorted'],
-  code:`// Striver / NeetCode — Remove duplicates from sorted list
-ListNode* deleteDuplicates(ListNode* head){
-    ListNode* cur = head;
-    while(cur && cur->next){
-        if(cur->next->val == cur->val)
-            cur->next = cur->next->next;    // ★ skip the dup
-        else
-            cur = cur->next;                // only advance if unique
-    }
-    return head;
+{ cat:'TWO', label:'0 / 1 Knapsack', gen:genKnapsack, src:SRC,
+  when:'Choose a subset under a capacity constraint to maximise value, each item used at most once. The parent of subset-sum, partition, target-sum.',
+  insight:'<b>dp[i][w] = max(skip dp[i−1][w], take val[i]+dp[i−1][w−wt[i]])</b>. Both options read the <i>previous</i> row → each item used once.',
+  analogy:'Packing a bag item by item: for every spare-capacity scenario you ask "is this item worth bumping out room for?" and keep the better bag.',
+  bugs:['Reading dp[i][...] instead of dp[i−1][...] → item reused (that\'s unbounded knapsack).','Only checking the take branch when the item fits.','1-D optimisation needs the weight loop to run backwards.'],
+  problems:['LC 416 · Partition Equal Subset Sum','LC 494 · Target Sum','LC 474 · Ones and Zeroes','LC 1049 · Last Stone Weight II'],
+  code:`// Striver / NeetCode — 0/1 Knapsack
+int knapsack(vector<int>& wt, vector<int>& val, int cap){
+    int n=wt.size();
+    vector<vector<int>> dp(n+1, vector<int>(cap+1,0));
+    for(int i=1;i<=n;i++)
+        for(int w=0;w<=cap;w++){
+            dp[i][w]=dp[i-1][w];                       // skip
+            if(wt[i-1]<=w)
+                dp[i][w]=max(dp[i][w], val[i-1]+dp[i-1][w-wt[i-1]]); // ★ take
+        }
+    return dp[n][cap];
 }`,
-  trace:['cur=head;','while(cur && cur->next){','  if(cur->next->val==cur->val)','    cur->next = cur->next->next;','  else cur=cur->next; }','return head;']
+  trace:['int knapsack(wt,val,cap){','  // dp[i][w]=best with first i items, cap w','  for(i=1..n) for(w=0..cap)','    if(wt[i-1]<=w)','      dp[i][w]=max(dp[i-1][w], val[i-1]+dp[i-1][w-wt[i-1]]);','    else','      dp[i][w]=dp[i-1][w];','  return dp[n][cap];','}']
 },
-{ cat:'FS', label:'Palindrome Linked List', gen:genPalindrome, src:SRC,
-  when:'Check if a list reads the same both ways — combines middle-finding, reversal and two-pointer compare.',
-  insight:'The O(1)-space way: find the middle (fast/slow), reverse the second half, then compare halves node by node. (Shown here via the simpler copy-to-array + two-pointer first.)',
-  analogy:'Folding a strip of paper in half and checking the printed letters line up — you mirror the back half onto the front.',
-  bugs:['Comparing the whole list against its full reverse uses O(n) extra space unnecessarily.','Off-by-one on the middle for odd vs even length.','Forgetting to restore the list after reversing (if required).'],
-  problems:['LC 234 · Palindrome Linked List','LC 143 · Reorder List','LC 206 · Reverse List','LC 2130 · Max Twin Sum'],
-  code:`// Striver / NeetCode — Palindrome (O(1): mid + reverse half)
-bool isPalindrome(ListNode* head){
-    ListNode *slow=head, *fast=head;
-    while(fast && fast->next){ slow=slow->next; fast=fast->next->next; }
-    ListNode* second = reverse(slow);     // reverse 2nd half
-    ListNode* p1=head, *p2=second;
-    while(p2){                            // ★ compare halves
-        if(p1->val != p2->val) return false;
-        p1=p1->next; p2=p2->next;
-    }
-    return true;
+{ cat:'GRID', label:'Unique Paths', gen:genUniquePaths, src:SRC,
+  when:'Count or optimise routes through a grid moving only right / down — path counting, min path sum, obstacle grids.',
+  insight:'<b>dp[i][j] = dp[i−1][j] + dp[i][j−1]</b>: every cell is reached from directly above or directly left. The first row & column are all 1 (single path).',
+  analogy:'Water trickling down-right through a pegboard: the flow into any peg is simply the flow arriving from the peg above plus the one to its left.',
+  bugs:['Forgetting to seed the first row/column to 1.','For min-path-sum, using + instead of min of the two predecessors.','Not zeroing cells blocked by obstacles.'],
+  problems:['LC 62 · Unique Paths','LC 63 · Unique Paths II','LC 64 · Minimum Path Sum','LC 120 · Triangle'],
+  code:`// Striver / NeetCode — Unique Paths
+int uniquePaths(int m,int n){
+    vector<vector<int>> dp(m, vector<int>(n,1));   // row0/col0 = 1
+    for(int i=1;i<m;i++)
+        for(int j=1;j<n;j++)
+            dp[i][j]=dp[i-1][j]+dp[i][j-1];        // ★ above + left
+    return dp[m-1][n-1];
 }`,
-  trace:['vector<int> v;','for(n=head;n;n=n->next) v.push(n->val);','int l=0, r=v.size()-1;','while(l<r)','  if(v[l++] != v[r--]) return false;','return true;']
+  trace:['int uniquePaths(int m,int n){','  // dp[i][j]=ways to reach (i,j)','  for(row0 & col0) dp=1;','  for(i=1..m) for(j=1..n)','    dp[i][j]=dp[i-1][j]+dp[i][j-1];','  return dp[m-1][n-1];','}']
 }
 ];
 
 /* ════════════════ VARIATION TEMPLATES ════════════════ */
 const VARS={
-'Reverse a Linked List':[
-  {name:'Reverse between positions m..n (LC 92)',when:'Reverse only a sublist: walk to m−1, then head-insert n−m times.',code:
-`ListNode dummy(0,head), *pre=&dummy;
-for(int i=1;i<m;i++) pre=pre->next;
-ListNode* cur=pre->next;
-for(int i=0;i<n-m;i++){
-  ListNode* mv=cur->next;
-  cur->next=mv->next;
-  mv->next=pre->next; pre->next=mv;   // splice to front
+'Climbing Stairs (Fibonacci)':[
+  {name:'Min Cost Climbing Stairs (LC 746)',when:'Pay a cost on each step; take the cheaper of the two ways in.',code:
+`int minCostClimbingStairs(vector<int>& c){
+  int n=c.size(); vector<int> dp(n+1,0);
+  for(int i=2;i<=n;i++)
+    dp[i]=min(dp[i-1]+c[i-1], dp[i-2]+c[i-2]);
+  return dp[n];
 }`},
-  {name:'Reverse in k-groups (LC 25)',when:'Reverse each block of k; leave a remainder shorter than k as-is.',code:
-`ListNode* reverseKGroup(ListNode* head,int k){
-  ListNode* node=head;
-  for(int i=0;i<k;i++){ if(!node) return head; node=node->next; }
-  ListNode* prev=reverseKGroup(node,k);   // reverse the rest
-  for(int i=0;i<k;i++){ auto nxt=head->next; head->next=prev; prev=head; head=nxt; }
-  return prev;
+  {name:'O(1) space',when:'Only the last two values matter — roll two variables.',code:
+`int climb(int n){
+  int a=1,b=1;
+  for(int i=2;i<=n;i++){ int c=a+b; a=b; b=c; }
+  return b;
 }`}
 ],
-"Detect Cycle (Floyd's)":[
-  {name:'Find the cycle START (LC 142)',when:'After they meet, reset one pointer to head; step both by 1 to the entry.',code:
-`// slow==fast found
-ListNode* p=head;
-while(p!=slow){ p=p->next; slow=slow->next; }
-return p;   // cycle entry node`},
-  {name:'Find the Duplicate Number (LC 287)',when:'Treat a[i] as a "next" pointer → Floyd on the array.',code:
-`int slow=a[0], fast=a[0];
-do{ slow=a[slow]; fast=a[a[fast]]; }while(slow!=fast);
-slow=a[0];
-while(slow!=fast){ slow=a[slow]; fast=a[fast]; }
-return slow;`}
-],
-'Find the Middle Node':[
-  {name:'Split for merge sort',when:'Use slow/fast to cut the list into two halves, then merge-sort each.',code:
-`ListNode *slow=head,*fast=head->next;
-while(fast && fast->next){ slow=slow->next; fast=fast->next->next; }
-ListNode* mid=slow->next; slow->next=nullptr;   // cut here`},
-  {name:'First middle (even length)',when:'Start fast at head and stop on <code>fast->next->next</code> to get the first mid.',code:
-`while(fast->next && fast->next->next){
-  slow=slow->next; fast=fast->next->next;
-}
-return slow;  // first of the two middles`}
-],
-'Remove Nth Node From End':[
-  {name:'Delete the Middle Node (LC 2095)',when:'fast/slow with a dummy → slow lands just before the middle.',code:
-`ListNode dummy(0,head),*slow=&dummy,*fast=head;
-while(fast && fast->next){ fast=fast->next->next; slow=slow->next; }
-slow->next=slow->next->next;
-return dummy.next;`},
-  {name:'Remove all nodes with value (LC 203)',when:'Dummy + single pass, splice matches out.',code:
-`ListNode dummy(0,head),*cur=&dummy;
-while(cur->next){
-  if(cur->next->val==val) cur->next=cur->next->next;
-  else cur=cur->next;
-}
-return dummy.next;`}
-],
-'Remove Duplicates (sorted)':[
-  {name:'Remove ALL duplicates (LC 82)',when:'Use a dummy; when a run repeats, skip the entire run.',code:
-`ListNode dummy(0,head),*pre=&dummy,*cur=head;
-while(cur){
-  if(cur->next && cur->next->val==cur->val){
-    int v=cur->val;
-    while(cur && cur->val==v) cur=cur->next;
-    pre->next=cur;                 // drop the whole run
-  } else { pre=cur; cur=cur->next; }
-}
-return dummy.next;`},
-  {name:'Remove dups from UNSORTED list',when:'No sorting → track seen values in a hash set.',code:
-`unordered_set<int> seen;
-ListNode* cur=head; seen.insert(cur->val);
-while(cur->next){
-  if(seen.count(cur->next->val)) cur->next=cur->next->next;
-  else { seen.insert(cur->next->val); cur=cur->next; }
+'House Robber':[
+  {name:'House Robber II — circular (LC 213)',when:'Houses in a circle: rob [0..n-2] or [1..n-1], take the max.',code:
+`int rob(vector<int>& a){
+  if(a.size()==1) return a[0];
+  return max(robLine(a,0,a.size()-2),
+             robLine(a,1,a.size()-1));
+}`},
+  {name:'O(1) space',when:'Track prev two best sums.',code:
+`int rob(vector<int>& a){
+  int take=0, skip=0;
+  for(int x: a){
+    int t=skip+x;
+    skip=max(skip,take);
+    take=t;
+  }
+  return max(take,skip);
 }`}
 ],
-'Palindrome Linked List':[
-  {name:'Reorder List (LC 143)',when:'Mid + reverse 2nd half + weave the two halves alternately.',code:
-`// find mid, second=reverse(mid->next), mid->next=null
-while(second){
-  auto t1=first->next, t2=second->next;
-  first->next=second; second->next=t1;
-  first=t1; second=t2;
+'Coin Change (min coins)':[
+  {name:'Coin Change II — count ways (LC 518)',when:'Count combinations: loop coins OUTSIDE the amount loop.',code:
+`vector<int> dp(amt+1,0); dp[0]=1;
+for(int c: coins)
+  for(int a=c;a<=amt;a++)
+    dp[a]+=dp[a-c];     // ways, order ignored
+return dp[amt];`},
+  {name:'Perfect Squares (LC 279)',when:'Coins are the square numbers ≤ n.',code:
+`vector<int> dp(n+1,INT_MAX); dp[0]=0;
+for(int a=1;a<=n;a++)
+  for(int s=1;s*s<=a;s++)
+    dp[a]=min(dp[a], dp[a-s*s]+1);
+return dp[n];`}
+],
+'Longest Common Subsequence':[
+  {name:'Edit Distance (LC 72)',when:'Insert / delete / replace — min ops to convert A→B.',code:
+`if(A[i-1]==B[j-1]) dp[i][j]=dp[i-1][j-1];
+else dp[i][j]=1+min({dp[i-1][j],     // delete
+                     dp[i][j-1],     // insert
+                     dp[i-1][j-1]}); // replace`},
+  {name:'Longest Palindromic Subsequence (LC 516)',when:'LCS of the string with its own reverse.',code:
+`string r=s; reverse(r.begin(),r.end());
+return lcs(s, r);`}
+],
+'0 / 1 Knapsack':[
+  {name:'1-D space optimisation',when:'Keep one row; iterate capacity backwards so each item is used once.',code:
+`vector<int> dp(cap+1,0);
+for(int i=0;i<n;i++)
+  for(int w=cap; w>=wt[i]; w--)   // ★ backwards
+    dp[w]=max(dp[w], val[i]+dp[w-wt[i]]);
+return dp[cap];`},
+  {name:'Partition Equal Subset Sum (LC 416)',when:'Subset-sum to total/2 → boolean knapsack.',code:
+`int sum=accumulate(a.begin(),a.end(),0);
+if(sum&1) return false;
+vector<bool> dp(sum/2+1,false); dp[0]=true;
+for(int x: a)
+  for(int w=sum/2; w>=x; w--)
+    dp[w]=dp[w]||dp[w-x];
+return dp[sum/2];`}
+],
+'Unique Paths':[
+  {name:'Minimum Path Sum (LC 64)',when:'Each cell has a cost; take the cheaper predecessor.',code:
+`for(int i=0;i<m;i++)for(int j=0;j<n;j++){
+  if(i==0&&j==0) continue;
+  int up  = i? dp[i-1][j] : INT_MAX;
+  int left= j? dp[i][j-1] : INT_MAX;
+  dp[i][j]=grid[i][j]+min(up,left);
 }`},
-  {name:'Maximum Twin Sum (LC 2130)',when:'Mid + reverse half, then sum paired twins.',code:
-`ListNode* second=reverse(slow);
-int best=0;
-for(ListNode* p1=head; second; p1=p1->next, second=second->next)
-  best=max(best, p1->val + second->val);`}
+  {name:'Unique Paths II — obstacles (LC 63)',when:'Blocked cells contribute 0 paths.',code:
+`for(int i=0;i<m;i++)for(int j=0;j<n;j++){
+  if(grid[i][j]==1){ dp[i][j]=0; continue; }
+  if(i==0&&j==0) dp[i][j]=1;
+  else dp[i][j]=(i?dp[i-1][j]:0)+(j?dp[i][j-1]:0);
+}`}
 ]
 };
 
@@ -483,7 +486,9 @@ function hl(code){
     const ci=line.indexOf('//');
     const codePart=ci>=0?line.slice(0,ci):line, comPart=ci>=0?line.slice(ci):'';
     let h=esc(codePart)
-      .replace(/\b(ListNode|class|struct|int|long|void|bool|auto|vector|unordered_set|unordered_map|return|while|for|do|if|else|true|false|const|nullptr|NULL|new|max|min|swap|push|insert|count|next)\b/g,'<span class="kw">$1</span>')
+      .replace(/\b(stack|queue|deque|priority_queue|class|struct|public|private|int|long|void|bool|auto|char|string|vector|pair|set|map|return|while|for|do|if|else|true|false|const|nullptr|NULL|new|max|min|push|pop|top|front|back|empty|size|push_back|pop_back|push_front|pop_front|stoi|isdigit|INT_MAX)\b/g,'<span class="kw">$1</span>')
+      .replace(/('[^']*')/g,'<span class="str">$1</span>')
+      .replace(/&quot;[^&]*&quot;/g,m=>'<span class="str">'+m+'</span>')
       .replace(/\b(\d+)\b/g,'<span class="nm">$1</span>');
     let cls='cl';
     if(comPart){ cls+=' has-cm'; h+='<span class="cm">'+esc(comPart).replace(/(★[^<]*)/g,'<span class="star">$1</span>')+'</span>'; }
@@ -603,10 +608,10 @@ function mountStepper(p){
   let idx=0;
   function draw(){
     const f=frames[idx];
-    stage.innerHTML=svgList(f);
+    stage.innerHTML=svgFrame(f);
     vmsg.classList.remove('flash');void vmsg.offsetWidth;vmsg.classList.add('flash');
     vmsg.innerHTML=`<span class="stepchip">STEP ${idx+1}</span>${f.msg}`;
-    const sp=listSide(f);
+    const sp=frameSide(f);
     vtables.innerHTML=(sp.heap?`<div style="flex:1;min-width:100%">${sp.heap}</div>`:'')+sp.tables;
     tEls.forEach((e,i)=>e.classList.toggle('hot',i===f.line));
     vpos.textContent=`${idx+1} / ${frames.length}`;
@@ -623,6 +628,7 @@ function mountStepper(p){
 }
 
 render();
+
 </script>
 </body>
 </html>
