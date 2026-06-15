@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Heap / Priority Queue — Heapify · Push · Pop · Heap Sort · Top-K</title>
+<meta name="description" content="Step-by-step animated heap / priority-queue hub: build-heap (heapify), sift-up insert, sift-down extract-min, heap sort, and Kth-largest in a stream. Watch the array-as-tree swap into place. Striver + NeetCode code and variation templates.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  /* --- v2 polish: Inter features + a11y (auto-applied) --- */
+  body{font-feature-settings:"cv02","cv03","cv04","ss01";letter-spacing:-.01em;-webkit-font-smoothing:antialiased;}
+  :focus-visible{outline:2px solid var(--sp,#00e5ff);outline-offset:2px;border-radius:5px;}
+  @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;transition-duration:.001ms!important;scroll-behavior:auto!important;}}
+  :root{
+    --bg:#0d0f14; --bg2:#0a0c11; --panel:#141920; --border:#1e2a38;
+    --text:#c9d1d9; --txt2:#8b949e; --muted:#586069; --faint:#444d56; --head:#e6edf3;
+    --sp:#00e5ff; --tree:#69ff47; --bst:#bf5af2; --warn:#ffd60a; --bad:#ff6b6b;
+  }
+  *{box-sizing:border-box;} html,body{margin:0;padding:0;}
+  body{font-family:'Inter',ui-sans-serif,system-ui,-apple-system,sans-serif;
+    background:radial-gradient(1200px 820px at 72% -12%, #133023 0%, #0d0f14 56%) fixed;
+    color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;}
+  code,kbd,samp{font-family:'JetBrains Mono','Fira Code',ui-monospace,Menlo,monospace;}
+  ::-webkit-scrollbar{width:9px;height:9px;}::-webkit-scrollbar-thumb{background:#26303d;border-radius:5px;}::-webkit-scrollbar-track{background:transparent;}
+
+  .top{border-bottom:1px solid var(--border);padding:18px 26px 14px;backdrop-filter:blur(10px);background:rgba(12,16,22,.72);}
+  .top .row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+  .badge{background:#69ff4722;border:1px solid #69ff4755;color:var(--tree);font-size:10px;font-weight:700;letter-spacing:2px;padding:3px 10px;border-radius:3px;}
+  .backbtn{text-decoration:none;color:var(--txt2);border:1px solid var(--border);background:rgba(255,255,255,.02);font-size:12px;font-weight:600;padding:5px 12px;border-radius:7px;transition:.15s;white-space:nowrap;}
+  .backbtn:hover{border-color:#475569;color:var(--head);background:rgba(255,255,255,.05);}
+  h1{margin:0;font-size:19px;font-weight:700;letter-spacing:-.3px;background:linear-gradient(90deg,#69ff47,#00e5ff 55%,#bf5af2);-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .top .meta{color:var(--faint);font-size:12px;} .top p{margin:6px 0 0;font-size:11px;color:var(--muted);letter-spacing:.3px;}
+
+  .shell{display:flex;min-height:calc(100vh - 84px);}
+  .side{width:250px;min-width:250px;border-right:1px solid var(--border);overflow-y:auto;padding:10px 0 30px;backdrop-filter:blur(10px);background:rgba(9,11,16,.66);}
+  .catlabel{font-size:9px;letter-spacing:1.6px;padding:13px 16px 8px;font-weight:700;font-family:'JetBrains Mono',monospace;display:flex;align-items:center;gap:7px;}
+  .catlabel .catn{margin-left:auto;font-size:9px;color:var(--faint);background:#0e151d;border:1px solid var(--border);border-radius:10px;padding:1px 7px;}
+  .navitem{padding:9px 16px;cursor:pointer;border-left:3px solid transparent;transition:background .15s,border-color .15s;}
+  .navitem:hover{background:#10151c;} .navitem.on{background:var(--panel);}
+  .navitem .tag{font-size:8.5px;font-weight:700;letter-spacing:1.3px;opacity:.65;} .navitem.on .tag{opacity:1;}
+  .navitem .nm{font-size:12.5px;color:var(--txt2);margin-top:2px;line-height:1.3;} .navitem.on .nm{color:var(--head);font-weight:600;}
+
+  .main{flex:1;overflow-y:auto;padding:24px 30px 60px;max-width:1040px;}
+  .fade{animation:fade .35s ease;} @keyframes fade{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+  .phead{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:18px;}
+  .ptag{font-size:9px;font-weight:700;letter-spacing:2px;padding:3px 10px;border-radius:3px;}
+  .pcount{color:var(--faint);font-size:11px;margin-left:8px;}
+  .phead h2{margin:8px 0 0;font-size:24px;font-weight:700;color:var(--head);letter-spacing:-.5px;}
+  .srcline{margin-top:5px;font-size:11px;color:var(--muted);} .srcline b{color:var(--txt2);}
+  .copy{background:var(--panel);border:1px solid #30363d;color:var(--txt2);padding:8px 15px;border-radius:6px;cursor:pointer;font-size:11px;font-family:inherit;letter-spacing:.5px;white-space:nowrap;transition:.2s;}
+  .copy:hover{border-color:#475569;color:var(--head);} .copy.done{background:#1a3a1a;border-color:#69ff47;color:#69ff47;}
+  .pheadbtns{display:flex;gap:8px;flex-wrap:wrap;}
+
+  .cards{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;}
+  .ic{background:rgba(10,12,17,.62);border:1px solid var(--border);border-radius:12px;padding:16px 18px;backdrop-filter:blur(6px);box-shadow:0 8px 30px rgba(0,0,0,.28);}
+  .ic .h{font-size:9.5px;letter-spacing:1.6px;margin-bottom:8px;color:var(--muted);font-weight:700;font-family:'JetBrains Mono',monospace;}
+  .ic p{margin:0;font-size:13.5px;line-height:1.72;color:var(--text);}
+  .ic.analogy{grid-column:1/3;} .ic.bugs{grid-column:1/3;border-color:#ff6b6b33;} .ic.bugs .h{color:var(--bad);}
+  .ic.bugs ul{margin:0;padding-left:18px;} .ic.bugs li{font-size:13px;line-height:1.8;color:var(--text);margin-bottom:3px;}
+  .ic.bugs code{background:#1c2530;color:#ffd479;padding:0 4px;border-radius:3px;font-size:11px;} .ic b{color:var(--head);}
+  .probs{background:rgba(10,12,17,.6);border:1px solid var(--border);border-radius:8px;padding:11px 15px;margin-bottom:16px;}
+  .probs .h{font-size:9px;letter-spacing:1.5px;color:var(--muted);margin-bottom:8px;font-weight:700;}
+  .chip{display:inline-block;background:var(--panel);border:1px solid #30363d;color:var(--txt2);font-size:11px;padding:4px 10px;border-radius:4px;margin:0 6px 6px 0;}
+
+  .split{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:16px;align-items:start;margin-bottom:14px;}
+  .split.nocode{grid-template-columns:1fr;} .split.nocode .codeCol{display:none;}
+  @media(max-width:1080px){ .split{grid-template-columns:1fr;} }
+
+  .cb{background:rgba(7,10,14,.82);border:1px solid var(--border);border-radius:8px;overflow:hidden;backdrop-filter:blur(6px);box-shadow:0 8px 30px rgba(0,0,0,.28);}
+  .cbbar{background:var(--panel);border-bottom:1px solid var(--border);padding:9px 14px;display:flex;align-items:center;gap:8px;}
+  .dots{display:flex;gap:6px;} .dots i{width:10px;height:10px;border-radius:50%;display:inline-block;}
+  .cbtitle{font-size:11px;color:var(--muted);margin-left:6px;}
+  pre{margin:0;padding:16px 12px;font-size:12.5px;line-height:1.8;overflow-x:auto;white-space:pre;font-family:'JetBrains Mono','Fira Code',ui-monospace,Menlo,monospace;}
+  .kw{color:#ff7b72;} .nm{color:#79c0ff;} .cm{color:#586069;font-style:italic;} .star{color:#ffd60a;font-weight:700;} .str{color:#a5d6ff;}
+  .cl{display:block;padding:0 8px;border-radius:5px;border-left:2px solid transparent;transition:background .14s,border-color .14s;}
+  .cmdot{display:inline-block;width:9px;margin-right:8px;font-size:7px;color:#2c3540;vertical-align:middle;transition:color .14s,transform .14s;}
+  .cl:not(.has-cm) .cmdot{visibility:hidden;} .cl.has-cm{cursor:pointer;}
+  .cl.has-cm:hover{background:#0f1c25;border-left-color:#2a4452;} .cl.has-cm:hover .cmdot{color:var(--warn);}
+  .cl .cm{display:none;} .cl.reveal .cm{display:inline;animation:cmin .2s ease;}
+  .cl.reveal .cmdot{color:#69ff47;transform:scale(1.25);} .cl.reveal{background:#0c1a14;border-left-color:#1f7a3a;}
+  @keyframes cmin{from{opacity:0;}to{opacity:1;}}
+  .cbtoggle{margin-left:auto;background:transparent;border:1px solid #30363d;color:var(--txt2);font-family:inherit;font-size:10px;letter-spacing:.5px;padding:4px 10px;border-radius:5px;cursor:pointer;transition:.15s;}
+  .cbtoggle:hover{border-color:#475569;color:var(--head);} .cbtoggle.on{background:#0c1a14;border-color:#1f7a3a;color:#69ff47;}
+  .cbnote{font-size:10px;color:var(--faint);padding:6px 16px 10px;letter-spacing:.3px;}
+  .varWrap{margin-bottom:16px;animation:fade .3s ease;}
+  .varhead{font-size:10px;letter-spacing:1.6px;color:#ffd479;font-weight:700;font-family:'JetBrains Mono',monospace;margin:2px 0 12px;}
+  .varcb{margin-bottom:12px;}
+  .vtag{font-size:8.5px;font-weight:700;letter-spacing:1px;padding:2px 8px;border-radius:3px;background:#3a2e0a;border:1px solid #6b5212;color:#ffd479;}
+  .varwhen{font-size:12px;line-height:1.55;color:var(--txt2);padding:9px 14px 0;}
+  .varwhen b{color:var(--head);} .varwhen code{background:#1c2530;color:#ffd479;padding:0 4px;border-radius:3px;font-size:11px;}
+
+  .demo{background:rgba(10,12,17,.6);border:1px solid var(--border);border-radius:10px;padding:14px;backdrop-filter:blur(6px);box-shadow:0 8px 30px rgba(0,0,0,.28);}
+  .demo .h{font-size:9px;letter-spacing:1.5px;color:var(--tree);margin-bottom:11px;font-weight:700;}
+  .stage{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:8px;}
+  .stage svg{width:100%;height:auto;display:block;}
+  .stepchip{display:inline-block;margin-right:9px;font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:1.2px;font-weight:700;color:var(--tree);background:#0a2a16;border:1px solid #14502a;border-radius:20px;padding:2px 9px;vertical-align:1px;}
+  .vmsg{margin-top:11px;font-size:13.5px;line-height:1.6;color:var(--text);background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--tree);border-radius:7px;padding:11px 13px;min-height:22px;}
+  .vmsg b{color:var(--head);} .vmsg .ok{color:#69ff47;font-weight:700;} .vmsg .bad{color:#ff6b6b;font-weight:700;}
+  .vmsg.flash{animation:stepin .35s ease;} @keyframes stepin{from{opacity:.3;transform:translateY(3px);}to{opacity:1;transform:none;}}
+  .vctrl{display:flex;gap:7px;align-items:center;margin-top:11px;flex-wrap:wrap;}
+  .vctrl button{background:var(--panel);border:1px solid #30363d;color:var(--text);padding:6px 13px;border-radius:6px;cursor:pointer;font-size:13px;font-family:inherit;font-weight:600;transition:.15s;}
+  .vctrl button:hover:not(:disabled){background:#1c2530;} .vctrl button:disabled{opacity:.4;cursor:not-allowed;}
+  .vctrl button.play{background:var(--tree);border-color:var(--tree);color:#06220f;}
+  .spd{display:inline-flex;align-items:center;gap:7px;margin-left:auto;} .spd input{width:104px;accent-color:var(--tree);cursor:pointer;}
+  .spd b{font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace;} .vpos{font-size:11px;color:var(--faint);font-family:'JetBrains Mono',monospace;}
+  .vtables{margin-top:11px;display:flex;gap:14px;flex-wrap:wrap;}
+  .vtbl{font-family:'JetBrains Mono',monospace;font-size:11px;background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:10px 11px;}
+  .vtbl .cap{color:var(--muted);margin-bottom:7px;letter-spacing:1px;font-weight:700;}
+  .qrow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-height:26px;}
+  .qlabel{font-size:10px;color:var(--muted);letter-spacing:1.2px;font-weight:700;}
+  .qp{background:#1f6e3a;border:1px solid #2fa85a;color:#d6ffe4;font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:13px;font-family:'JetBrains Mono',monospace;animation:qin .28s ease;}
+  .qp.empty{background:transparent;border:1px dashed #2a3340;color:var(--faint);font-weight:400;font-style:italic;}
+  @keyframes qin{from{opacity:0;transform:translateY(5px) scale(.85);}to{opacity:1;transform:none;}}
+  .cost{margin-top:9px;font-size:13px;font-weight:700;color:var(--tree);font-family:'JetBrains Mono',monospace;}
+  .trace{margin-top:13px;background:#070a0e;border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+  .trace .th{background:var(--panel);border-bottom:1px solid var(--border);padding:7px 13px;font-size:10px;letter-spacing:1px;color:var(--muted);font-weight:700;} .trace .th b{color:var(--tree);}
+  .trace pre{padding:11px 8px;font-size:11.5px;line-height:1.7;}
+  .tln{display:block;padding:1px 12px;border-left:3px solid transparent;white-space:pre;color:#7d8895;transition:background .2s,color .2s,border-color .2s;}
+  .tln.hot{background:#0f2a1a;border-left-color:var(--tree);color:#dfffe9;font-weight:700;}
+  .pnav{display:flex;justify-content:space-between;align-items:center;margin-top:18px;padding-top:16px;border-top:1px solid var(--border);}
+  .pnav button{background:transparent;border:1px solid #30363d;color:var(--txt2);padding:8px 18px;border-radius:6px;cursor:pointer;font-size:12px;font-family:inherit;transition:.15s;}
+  .pnav button:hover:not(:disabled){border-color:#475569;color:var(--head);} .pnav button:disabled{color:#2a323d;cursor:not-allowed;} .pnav .pos{font-size:11px;color:var(--faint);}
+
+  svg .tedge{stroke:#2c3a4c;stroke-width:2.2;transition:stroke .3s;}
+  svg .tedge.on{stroke:#3f7e54;}
+  svg .tnval{fill:#e6edf3;font:700 14px 'JetBrains Mono',monospace;text-anchor:middle;dominant-baseline:central;}
+  svg .tbadge{fill:#9aa6b3;font:600 9.5px 'JetBrains Mono',monospace;text-anchor:middle;}
+
+  .menuToggle{display:none;}
+  @media(max-width:860px){
+    .shell{flex-direction:column;}
+    .side{width:100%;min-width:0;border-right:none;border-bottom:1px solid var(--border);max-height:0;overflow:hidden;padding:0;transition:max-height .3s ease;}
+    .side.open{max-height:1500px;padding:10px 0 20px;} .menuToggle{display:inline-block;}
+    .cards{grid-template-columns:1fr;} .ic.analogy,.ic.bugs{grid-column:auto;} .main{padding:18px 16px 50px;}
+  }
+</style>
+</head>
+<body>
+  <div class="top">
+    <div class="row">
+      <a class="backbtn" href="/" title="Topics">← Topics</a>
+      <span class="badge">HEAP / PQ</span>
+      <h1>Heap / Priority Queue</h1>
+      <span class="meta">5 patterns · C++ · Anshu</span>
+      <button class="copy menuToggle" id="menuToggle" style="margin-left:auto">☰ patterns</button>
+    </div>
+    <p>AlgoMaster-style notes + <b>Striver + NeetCode</b> C++, with the heap drawn as an <b>array-and-tree</b> that swaps elements into place <b>step by step</b> as each code line lights up. Every pattern ships variation templates.</p>
+  </div>
+
+  <div class="shell">
+    <div class="side" id="side"></div>
+    <div class="main" id="main"></div>
+  </div>
+
+<script>
+/* ════════════════ HEAP / PRIORITY QUEUE ════════════════
+   The heap lives in an array; we draw it as a complete binary tree.
+   parent(i) = (i-1)/2   left(i) = 2i+1   right(i) = 2i+2
+   Each frame carries a snapshot of the array + per-index highlight state. */
+const CAP = 15;                                   // up to 4 levels (indices 0..14)
+const HPOS = (function(){
+  const W=560,H=300,padX=34,padY=30,maxLvl=3,pos=[];
+  for(let i=0;i<CAP;i++){
+    const lvl=Math.floor(Math.log2(i+1)), cnt=1<<lvl, pil=i-(cnt-1);
+    pos.push([ padX+((pil+0.5)/cnt)*(W-2*padX), padY+(lvl/maxLvl)*(H-2*padY) ]);
+  }
+  return pos;
+})();
+
+/* ════════════════ SCENE ════════════════ */
+function svgHeap(f){
+  const A=f.heap||[], n=A.length;
+  let s=`<svg viewBox="0 0 560 320" preserveAspectRatio="xMidYMid meet">`;
+  for(let c=1;c<n;c++){ const par=(c-1)>>1; const [x1,y1]=HPOS[par],[x2,y2]=HPOS[c];
+    const st=f.node&&f.node[c]; const on=(st==='swap'||st==='cmp'||st==='done'||st==='root');
+    s+=`<line class="tedge${on?' on':''}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/>`; }
+  for(let i=0;i<n;i++){ const [x,y]=HPOS[i]; const st=(f.node&&f.node[i])||'';
+    let stroke='#3a4658',fill='#10161e',sw=2.2;
+    if(st==='heap'){stroke='#00e5ff';fill='#06222b';}
+    if(st==='done'){stroke='#69ff47';fill='#0c2417';}
+    if(st==='cmp'){stroke='#00e5ff';fill='#06222b';sw=3;}
+    if(st==='swap'){stroke='#ff9f0a';fill='#241803';sw=3.4;}
+    if(st==='root'){stroke='#bf5af2';fill='#1a1026';sw=3;}
+    if(st==='locked'){stroke='#2f6b41';fill='#0c1f14';}
+    if(st==='current'){stroke='#ffd60a';fill='#241d04';sw=3.8;}
+    const halo = st==='current'?`<circle cx="${x}" cy="${y}" r="25" fill="none" stroke="#ffd60a" stroke-width="1.3" opacity=".5"/>`:'';
+    const idx=`<text class="tbadge" x="${x}" y="${y-26}">${i}</text>`;
+    s+=`${halo}${idx}<circle cx="${x}" cy="${y}" r="18" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/><text class="tnval" x="${x}" y="${y}">${A[i]}</text>`;
+  }
+  return s+'</svg>';
+}
+function qpills(label,arr){
+  let h=`<div class="qrow"><span class="qlabel">${label}</span>`;
+  if(!arr.length) h+=`<span class="qp empty">empty</span>`; else arr.forEach(t=>h+=`<span class="qp">${t}</span>`);
+  return h+`</div>`;
+}
+function heapArr(f){
+  const A=f.heap||[];
+  const cells=A.map((v,i)=>{
+    const st=f.node&&f.node[i];
+    let bg='#0e151d',bd='#26303d',cl='#bdf0ff';
+    if(st==='cmp'){bg='#06222b';bd='#0e6b80';cl='#bdf0ff';}
+    if(st==='swap'){bg='#241803';bd='#ff9f0a';cl='#ffd6a0';}
+    if(st==='root'){bg='#1a1026';bd='#7d4ec9';cl='#e6c6ff';}
+    if(st==='locked'){bg='#0c1f14';bd='#2f6b41';cl='#8fdba8';}
+    if(st==='done'){bg='#0c2417';bd='#69ff47';cl='#c9ffd8';}
+    if(st==='current'){bg='#241d04';bd='#ffd60a';cl='#ffe9a8';}
+    return `<div style="display:flex;flex-direction:column;align-items:center;gap:3px">`+
+      `<span style="font-size:8.5px;color:#586069;font-family:'JetBrains Mono',monospace">${i}</span>`+
+      `<span style="min-width:26px;text-align:center;padding:5px 7px;border-radius:7px;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:12px;background:${bg};border:1px solid ${bd};color:${cl}">${v}</span></div>`;
+  }).join('');
+  return `<div class="vtbl" style="flex:1;min-width:100%"><div class="cap">ARRAY VIEW — heap[i], children at 2i+1 / 2i+2</div><div class="qrow" style="gap:6px">${cells||'<span class="qp empty">empty</span>'}</div></div>`;
+}
+function heapSide(f){
+  let html='';
+  if(f.stream) html+=qpills('INCOMING →',f.stream);
+  if(f.kth!=null) html+=`<div class="cost">k-th largest so far = ${f.kth}</div>`;
+  return html;
+}
+
+/* ════════════════ FRAME GENERATORS ════════════════ */
+function genBuildHeap(){
+  const A=[5,3,8,1,9,2,7,6,4], n=A.length, F=[];
+  const snap=(line,msg,marks)=>F.push({heap:A.slice(),node:marks||{},msg,line});
+  snap(0,`Start with the raw array drawn as a complete binary tree. Min-heapify <b>bottom-up</b> — leaves are already valid heaps.`,{});
+  function sift(i){
+    while(true){
+      let l=2*i+1,r=2*i+2,s=i; const m={};m[i]='current';if(l<n)m[l]='cmp';if(r<n)m[r]='cmp';
+      snap(5,`Sift-down index <b>${i}</b> (value ${A[i]}). Compare with children${l<n?` ${A[l]}`:''}${r<n?`, ${A[r]}`:''}.`,m);
+      if(l<n&&A[l]<A[s])s=l; if(r<n&&A[r]<A[s])s=r;
+      if(s===i){const mm={};mm[i]='done';snap(6,`${A[i]} ≤ both children → this subtree is a valid min-heap.`,mm);break;}
+      const ms={};ms[i]='swap';ms[s]='swap';
+      snap(7,`Smaller child ${A[s]} &lt; ${A[i]} → swap down and keep sifting.`,ms);
+      [A[i],A[s]]=[A[s],A[i]]; i=s;
+    }
+  }
+  for(let i=Math.floor(n/2)-1;i>=0;i--){
+    const m={};m[i]='current';
+    snap(1,`Last non-leaf is index ${Math.floor(n/2)-1}; walk up to the root. Fixing index <b>${i}</b>.`,m);
+    sift(i);
+  }
+  const done={};A.forEach((_,i)=>done[i]='done');
+  snap(-1,`<span class="ok">Min-heap built in O(n)</span> — not O(n log n). Root ${A[0]} is the minimum.`,done);
+  return F;
+}
+
+function genPush(){
+  let A=[1,3,2,6,9,8,7]; const F=[]; const val=0;
+  const snap=(line,msg,marks)=>F.push({heap:A.slice(),node:marks||{},msg,line});
+  snap(0,`A valid min-heap. Insert <b>${val}</b>: always add at the next array slot to keep the tree complete.`,{});
+  A.push(val); let i=A.length-1;
+  snap(1,`Placed ${val} at index ${i}. Now <b>sift up</b> while it's smaller than its parent.`,(()=>{const m={};m[i]='current';return m;})());
+  while(i>0){
+    const par=(i-1)>>1; const m={};m[i]='current';m[par]='cmp';
+    snap(2,`Compare ${A[i]} with parent ${A[par]} (index ${par}).`,m);
+    if(A[i]>=A[par]){const mm={};mm[i]='done';snap(2,`${A[i]} ≥ ${A[par]} → heap order holds, stop.`,mm);break;}
+    const ms={};ms[i]='swap';ms[par]='swap';
+    snap(3,`${A[i]} &lt; ${A[par]} → swap up.`,ms);
+    [A[i],A[par]]=[A[par],A[i]]; i=par;
+  }
+  if(i===0){const m={};m[0]='done';snap(4,`Reached the root — ${A[0]} is the new minimum.`,m);}
+  const done={};A.forEach((_,k)=>done[k]='done');
+  snap(-1,`<span class="ok">Inserted in O(log n).</span> Heap = [${A.join(', ')}].`,done);
+  return F;
+}
+
+function genPop(){
+  let A=[1,3,2,6,9,8,7]; const F=[];
+  const snap=(line,msg,marks)=>F.push({heap:A.slice(),node:marks||{},msg,line});
+  snap(0,`Extract-min: the answer is always the root <b>${A[0]}</b>.`,{0:'root'});
+  const min=A[0], last=A[A.length-1];
+  A[0]=last; A.pop();
+  snap(1,`Move the last element ${last} to the root and drop the tail. Removed min = ${min}.`,{0:'current'});
+  let i=0,n=A.length;
+  while(true){
+    let l=2*i+1,r=2*i+2,s=i; const m={};m[i]='current';if(l<n)m[l]='cmp';if(r<n)m[r]='cmp';
+    snap(3,`Sift-down: compare ${A[i]} with children${l<n?` ${A[l]}`:''}${r<n?`, ${A[r]}`:''}.`,m);
+    if(l<n&&A[l]<A[s])s=l; if(r<n&&A[r]<A[s])s=r;
+    if(s===i){const mm={};mm[i]='done';snap(6,`${A[i]} ≤ its children → settled.`,mm);break;}
+    const ms={};ms[i]='swap';ms[s]='swap';
+    snap(5,`Smaller child ${A[s]} &lt; ${A[i]} → swap down.`,ms);
+    [A[i],A[s]]=[A[s],A[i]]; i=s;
+  }
+  const done={};A.forEach((_,k)=>done[k]='done');
+  snap(-1,`<span class="ok">Popped ${min} in O(log n).</span> New root (min) = ${A[0]}.`,done);
+  return F;
+}
+
+function genHeapSort(){
+  let A=[4,10,3,5,1,2]; const N=A.length, F=[];
+  const snap=(line,msg,marks)=>F.push({heap:A.slice(),node:marks||{},msg,line});
+  function sift(i,n){
+    while(true){
+      let l=2*i+1,r=2*i+2,s=i; const m={};m[i]='current';if(l<n)m[l]='cmp';if(r<n)m[r]='cmp';
+      for(let k=n;k<A.length;k++)m[k]='locked';
+      snap(4,`Sift-down ${A[i]} in heap of size ${n}: compare with children to keep the <b>max</b> on top.`,m);
+      if(l<n&&A[l]>A[s])s=l; if(r<n&&A[r]>A[s])s=r;
+      if(s===i)break;
+      const ms={};ms[i]='swap';ms[s]='swap';for(let k=n;k<A.length;k++)ms[k]='locked';
+      snap(4,`Larger child ${A[s]} &gt; ${A[i]} → swap down.`,ms);
+      [A[i],A[s]]=[A[s],A[i]]; i=s;
+    }
+  }
+  snap(0,`Heap sort = build a <b>max</b>-heap, then repeatedly move the max to the back.`,{});
+  for(let i=Math.floor(N/2)-1;i>=0;i--)sift(i,N);
+  const built={};A.forEach((_,k)=>built[k]='heap');
+  snap(1,`Max-heap built — root ${A[0]} is the largest.`,built);
+  for(let end=N-1;end>0;end--){
+    const m={};m[0]='swap';m[end]='swap';for(let k=end+1;k<A.length;k++)m[k]='locked';
+    snap(3,`Swap max ${A[0]} to index ${end} — its final sorted position.`,m);
+    [A[0],A[end]]=[A[end],A[0]];
+    const ml={};for(let k=end;k<A.length;k++)ml[k]='locked';
+    snap(4,`Index ${end} locked into the sorted tail. Shrink the heap to ${end} and sift the new root down.`,ml);
+    sift(0,end);
+  }
+  const done={};A.forEach((_,k)=>done[k]='done');
+  snap(-1,`<span class="ok">Sorted in O(n log n), in place.</span> [${A.join(', ')}].`,done);
+  return F;
+}
+
+function genKth(){
+  const nums=[4,5,8,2,3,5,10,9], k=3, F=[]; let A=[];
+  const snap=(line,msg,marks,extra)=>F.push(Object.assign({heap:A.slice(),node:marks||{},msg,line},extra||{}));
+  function pushH(x){ A.push(x); let i=A.length-1; while(i>0){const p=(i-1)>>1; if(A[i]<A[p]){[A[i],A[p]]=[A[p],A[i]];i=p;}else break;} }
+  function popH(){ const mn=A[0]; A[0]=A[A.length-1]; A.pop(); let i=0,n=A.length;
+    while(true){let l=2*i+1,r=2*i+2,s=i; if(l<n&&A[l]<A[s])s=l; if(r<n&&A[r]<A[s])s=r; if(s===i)break; [A[i],A[s]]=[A[s],A[i]]; i=s;} return mn; }
+  snap(0,`Goal: the <b>${k}rd largest</b> seen so far. Keep a <b>min-heap of size ${k}</b> — its root is the answer.`,{},{stream:nums.slice(),kth:'—'});
+  for(let idx=0;idx<nums.length;idx++){
+    const x=nums[idx];
+    pushH(x); const pos=A.lastIndexOf(x); const m={}; if(pos>=0)m[pos]='current';
+    snap(2,`See <b>${x}</b> → push into the heap (size ${A.length}).`,m,{stream:nums.slice(idx+1),kth:A.length>=k?A[0]:'—'});
+    if(A.length>k){ const popped=popH(); snap(3,`Size ${A.length+1} &gt; ${k} → pop the smallest (${popped}); too small to be the ${k}rd largest.`,{0:'root'},{stream:nums.slice(idx+1),kth:A[0]}); }
+    if(A.length===k){ snap(4,`Top of the size-${k} min-heap = <b>${A[0]}</b> → current ${k}rd largest.`,{0:'root'},{stream:nums.slice(idx+1),kth:A[0]}); }
+  }
+  const done={};A.forEach((_,i)=>done[i]='done'); done[0]='root';
+  snap(-1,`<span class="ok">${k}rd largest = ${A[0]}.</span> Each element costs O(log k), total O(n log k).`,done,{stream:[],kth:A[0]});
+  return F;
+}
+
+/* ════════════════ PATTERN DATA ════════════════ */
+const CAT={ CORE:{c:'#00e5ff',label:'HEAP MECHANICS'}, SORT:{c:'#ff9f0a',label:'HEAP SORT'}, TOPK:{c:'#bf5af2',label:'TOP-K / STREAM'} };
+const SRC='Pattern framing · <b>AlgoMaster</b> &nbsp;|&nbsp; Code · <b>Striver + NeetCode</b>';
+
+const P=[
+{
+  cat:'CORE', label:'Build Heap (heapify, O(n))', gen:genBuildHeap,
+  src:SRC,
+  when:'Turn an arbitrary array into a heap in <b>one pass</b> — the setup step for heap sort, and any time you already have all the data up front.',
+  insight:'Sift-down from the <b>last non-leaf</b> (index n/2−1) up to the root. The cost telescopes to <b>O(n)</b>, not O(n log n), because most nodes are shallow leaves.',
+  analogy:'Settling a stadium crowd by sections from the lowest rows up — each small block self-sorts before you merge it into the bigger one above.',
+  bugs:['Sifting <i>up</i> from each node (that’s O(n log n), the slow build).','Starting at the root instead of the last parent.','Off-by-one on the last-non-leaf index n/2−1.'],
+  problems:['Build Heap','Heap Sort','Kth Largest Element in an Array','Top K Frequent Elements'],
+  code:`// Striver / NeetCode — build a min-heap in O(n)
+void buildHeap(vector<int>& a){
+    int n = a.size();
+    for(int i = n/2 - 1; i >= 0; i--)  // ★ last non-leaf -> root
+        siftDown(a, i, n);
+}
+void siftDown(vector<int>& a, int i, int n){
+    while(2*i + 1 < n){
+        int c = 2*i + 1;                       // left child
+        if(c + 1 < n && a[c+1] < a[c]) c++;    // smaller child
+        if(a[i] <= a[c]) break;                // heap order ok
+        swap(a[i], a[c]); i = c;               // descend
+    }
+}`,
+  trace:['buildHeap(a){','  for(i=n/2-1; i>=0; i--)','    siftDown(a, i, n); }','siftDown(a,i,n){','  // compare node with','  c = smaller child of i;','  if(a[i] <= a[c]) break;','  swap(a[i],a[c]); i=c;']
+},
+{
+  cat:'CORE', label:'Insert / Push (sift-up)', gen:genPush,
+  src:SRC,
+  when:'Add one element to a live heap — every <code>priority_queue.push</code> / online "add to the structure" step.',
+  insight:'Append at the end (keeps the tree complete), then <b>bubble up</b>: while the new value beats its parent, swap. At most one path of length log n.',
+  analogy:'A new employee who outranks their manager keeps getting promoted one level at a time until everyone above them outranks them.',
+  bugs:['Inserting at the front and shifting (breaks the array-heap mapping).','Comparing against a child instead of the parent.','Parent index typo — it’s (i−1)/2, not i/2.'],
+  problems:['Kth Largest Element in a Stream','Design a Priority Queue','Merge K Sorted Lists','Task Scheduler'],
+  code:`// Striver / NeetCode — push into a min-heap (sift up)
+void push(vector<int>& a, int x){
+    a.push_back(x);                 // add at the end
+    int i = a.size() - 1;
+    while(i > 0 && a[i] < a[(i-1)/2]){   // ★ smaller than parent?
+        swap(a[i], a[(i-1)/2]);
+        i = (i-1)/2;                // climb to the parent
+    }
+}`,
+  trace:['push(a, x){','  a.push_back(x); i = a.size()-1;','  while(i>0 && a[i] < a[(i-1)/2]){','    swap(a[i], a[(i-1)/2]);','    i = (i-1)/2; } }']
+},
+{
+  cat:'CORE', label:'Extract-Min / Pop (sift-down)', gen:genPop,
+  src:SRC,
+  when:'Remove the best element — every <code>pop</code>/<code>top</code> in Dijkstra, Prim, merge-k, median, and scheduling.',
+  insight:'The min is the root. Move the <b>last</b> element to the root, shrink, then <b>sift down</b>: swap with the smaller child until heap order is restored.',
+  analogy:'The CEO leaves; you temporarily seat the newest hire at the top, then demote them past whichever stronger subordinate keeps outranking them.',
+  bugs:['Swapping with the larger child in a min-heap (must pick the smaller).','Forgetting to shrink the size before sifting.','Reading <code>top()</code> after pop without re-checking emptiness.'],
+  problems:['Kth Largest Element in an Array','Find Median from Data Stream','Dijkstra / Prim','Meeting Rooms II'],
+  code:`// Striver / NeetCode — pop the min (sift down)
+int pop(vector<int>& a){
+    int mn = a[0];
+    a[0] = a.back(); a.pop_back();      // last -> root, shrink
+    int i = 0, n = a.size();
+    while(2*i + 1 < n){
+        int c = 2*i + 1;
+        if(c + 1 < n && a[c+1] < a[c]) c++;  // smaller child
+        if(a[i] <= a[c]) break;
+        swap(a[i], a[c]); i = c;             // ★ descend
+    }
+    return mn;
+}`,
+  trace:['pop(a){','  mn=a[0]; a[0]=a.back(); a.pop_back();','  i=0; n=a.size();','  while(2i+1 < n){','    c = smaller child;','    swap(a[i],a[c]); i=c;','    // until a[i] <= children','  return mn; }']
+},
+{
+  cat:'SORT', label:'Heap Sort (in place)', gen:genHeapSort,
+  src:SRC,
+  when:'Sort with <b>O(1) extra space</b> and guaranteed O(n log n) — when recursion depth or quicksort’s worst case is a concern.',
+  insight:'Build a <b>max</b>-heap, then repeatedly swap the root (max) with the last heap slot, shrink the heap by one, and sift the new root down. The tail grows sorted.',
+  analogy:'A tournament where the champion is crowned, sent to the trophy shelf at the end of the row, and the remaining players replay to find the next champion.',
+  bugs:['Using a min-heap and getting descending order by accident.','Sifting into the locked sorted tail (use the shrunken size n).','Forgetting to re-sift the root after each swap-out.'],
+  problems:['Sort an Array','Heap Sort','Kth Largest Element','Sort Nearly Sorted (K) Array'],
+  code:`// Striver / NeetCode — heap sort (ascending, max-heap)
+void heapSort(vector<int>& a){
+    int n = a.size();
+    buildMaxHeap(a);                    // O(n)
+    for(int end = n - 1; end > 0; end--){
+        swap(a[0], a[end]);             // ★ max -> sorted tail
+        siftDown(a, 0, end);            // restore on shrunken heap
+    }
+}`,
+  trace:['heapSort(a){','  buildMaxHeap(a);   // O(n)','  for(end=n-1; end>0; end--){','    swap(a[0], a[end]);   // max -> back','    siftDown(a, 0, end); } }']
+},
+{
+  cat:'TOPK', label:'Kth Largest in a Stream', gen:genKth,
+  src:SRC,
+  when:'Maintain the K largest as data streams in — leaderboards, "Kth largest so far", top-K frequent, K closest points.',
+  insight:'Keep a <b>min</b>-heap of size K. Push each value; if size exceeds K, pop the smallest. The root is always the <b>Kth largest</b>. Counter-intuitive but key: a <i>min</i>-heap tracks the <i>largest</i> K.',
+  analogy:'A VIP lounge with K seats: anyone may enter, but the moment it overflows the lowest-ranked guest is shown the door — the bouncer at the door is the Kth best.',
+  bugs:['Using a max-heap of size K (then the root is the largest, not the Kth).','Popping before the heap exceeds K.','Forgetting K can exceed the count early on.'],
+  problems:['Kth Largest Element in a Stream','Kth Largest in an Array','Top K Frequent Elements','K Closest Points to Origin'],
+  code:`// Striver / NeetCode — Kth largest via size-K min-heap
+int kthLargest(vector<int>& nums, int k){
+    priority_queue<int, vector<int>, greater<int>> pq; // min-heap
+    for(int x : nums){
+        pq.push(x);
+        if(pq.size() > k) pq.pop();   // ★ drop the smallest
+    }
+    return pq.top();                  // Kth largest
+}`,
+  trace:['kthLargest(nums, k){','  min-heap pq;   // greater<int>','    pq.push(x);','    if(pq.size() > k) pq.pop();','  return pq.top();   // Kth largest }']
+}
+];
+
+/* ════════════════ VARIATION TEMPLATES ════════════════ */
+const VARS={
+'Build Heap (heapify, O(n))':[
+  {name:'Max-heap (flip the comparison)',when:'Swap when a child is larger — the root becomes the maximum.',code:
+`void siftDownMax(vector<int>& a,int i,int n){
+  while(2*i+1<n){
+    int c=2*i+1;
+    if(c+1<n && a[c+1]>a[c]) c++;   // LARGER child
+    if(a[i]>=a[c]) break;
+    swap(a[i],a[c]); i=c;
+  }
+}`},
+  {name:'std::priority_queue (no manual heapify)',when:'The STL builds the heap for you from a range.',code:
+`// max-heap by default:
+priority_queue<int> pq(nums.begin(), nums.end());
+// min-heap:
+priority_queue<int,vector<int>,greater<int>> mn(nums.begin(),nums.end());`}
+],
+'Insert / Push (sift-up)':[
+  {name:'Decrease-key (lazy via re-push)',when:'No real decrease-key in std::pq — push the new value and skip stale pops.',code:
+`pq.push({newDist, node});
+// when popping:
+auto [d,u]=pq.top(); pq.pop();
+if(d > dist[u]) continue;   // ★ stale entry, ignore`},
+  {name:'Heap of pairs (priority + payload)',when:'Order by the first field; carry data in the second.',code:
+`priority_queue<pair<int,int>> pq;   // (priority, id)
+pq.push({freq, id});
+auto [p, id] = pq.top();`}
+],
+'Extract-Min / Pop (sift-down)':[
+  {name:'Two heaps — running median',when:'Max-heap of the low half, min-heap of the high half; balance sizes.',code:
+`priority_queue<int> lo;                          // max-heap (lower half)
+priority_queue<int,vector<int>,greater<int>> hi; // min-heap (upper half)
+lo.push(x);
+hi.push(lo.top()); lo.pop();          // shuffle across
+if(hi.size() > lo.size()){ lo.push(hi.top()); hi.pop(); }
+double median = lo.size()>hi.size() ? lo.top() : (lo.top()+hi.top())/2.0;`},
+  {name:'Merge K sorted lists',when:'Heap holds one node per list; pop the smallest, push its next.',code:
+`priority_queue<Node*, vector<Node*>, Cmp> pq;
+for(auto l: lists) if(l) pq.push(l);
+while(!pq.empty()){
+  Node* n=pq.top(); pq.pop();
+  tail->next=n; tail=n;
+  if(n->next) pq.push(n->next);
+}`}
+],
+'Heap Sort (in place)':[
+  {name:'Descending order',when:'Use a min-heap instead — smallest floats to the back.',code:
+`// build a MIN-heap, swap root (min) to the tail each round
+buildMinHeap(a);
+for(int end=n-1; end>0; end--){
+  swap(a[0], a[end]);
+  siftDownMin(a, 0, end);
+}   // a is now descending`},
+  {name:'Sort a nearly-sorted (K) array',when:'Each element is at most K from its spot — a size-(K+1) heap suffices.',code:
+`priority_queue<int,vector<int>,greater<int>> pq;
+int idx=0;
+for(int x: a){
+  pq.push(x);
+  if(pq.size() > k){ a[idx++]=pq.top(); pq.pop(); }
+}
+while(!pq.empty()){ a[idx++]=pq.top(); pq.pop(); }`}
+],
+'Kth Largest in a Stream':[
+  {name:'Top K Frequent Elements',when:'Count, then keep a size-K min-heap keyed by frequency.',code:
+`unordered_map<int,int> cnt; for(int x: nums) cnt[x]++;
+priority_queue<pair<int,int>, vector<pair<int,int>>, greater<>> pq;
+for(auto& [v,c]: cnt){
+  pq.push({c, v});
+  if(pq.size() > k) pq.pop();   // drop least frequent
+}`},
+  {name:'K Closest Points to Origin',when:'Max-heap of size K on distance — pop the farthest when it overflows.',code:
+`priority_queue<pair<int,vector<int>>> pq;   // (dist, point), max on top
+for(auto& p: points){
+  int d=p[0]*p[0]+p[1]*p[1];
+  pq.push({d, p});
+  if(pq.size() > k) pq.pop();   // farthest leaves
+}`},
+  {name:'Kth Smallest (flip to a max-heap)',when:'Symmetric: a size-K max-heap keeps the K smallest; its root is the Kth smallest.',code:
+`priority_queue<int> pq;            // max-heap
+for(int x: nums){
+  pq.push(x);
+  if(pq.size() > k) pq.pop();      // drop the largest
+}
+return pq.top();                   // Kth smallest`}
+]
+};
+
+/* ════════════════ SYNTAX HIGHLIGHT ════════════════ */
+function hl(code){
+  const esc=t=>t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return code.split('\n').map(line=>{
+    const ci=line.indexOf('//');
+    const codePart=ci>=0?line.slice(0,ci):line, comPart=ci>=0?line.slice(ci):'';
+    let h=esc(codePart)
+      .replace(/\b(class|public|private|struct|int|long|double|void|bool|auto|vector|queue|stack|priority_queue|greater|pair|unordered_map|return|while|for|if|else|true|false|const|new|delete|nullptr|NULL|max|min|abs|reverse|swap|push|pop|top|front|back|empty|size|push_back|pop_back|begin|end)\b/g,'<span class="kw">$1</span>')
+      .replace(/\b(\d+)\b/g,'<span class="nm">$1</span>');
+    let cls='cl';
+    if(comPart){ cls+=' has-cm'; h+='<span class="cm">'+esc(comPart).replace(/(★[^<]*)/g,'<span class="star">$1</span>')+'</span>'; }
+    return `<span class="${cls}"><span class="cmdot">●</span>${h===''?'&nbsp;':h}</span>`;
+  }).join('');
+}
+
+/* ════════════════ VARIATIONS PANEL ════════════════ */
+function varPanel(p){
+  const vs=VARS[p.label]||[];
+  if(!vs.length) return '';
+  return `<div class="varhead">🔀 VARIATION TEMPLATES — same heap, small twists</div>`+
+    vs.map((v,i)=>`<div class="cb varcb">
+      <div class="cbbar"><span class="vtag">VARIATION ${i+1}</span><span class="cbtitle">${v.name}</span><button class="cbtoggle varcopy" data-vi="${i}">copy</button></div>
+      <div class="varwhen">${v.when}</div>
+      <pre>${hl(v.code)}</pre>
+    </div>`).join('');
+}
+
+/* ════════════════ RENDER ════════════════ */
+const side=document.getElementById('side'), main=document.getElementById('main');
+let active=0, stepTimer=null;
+document.getElementById('menuToggle').onclick=()=>side.classList.toggle('open');
+
+function buildSidebar(){
+  const groups=[]; let cur=null;
+  P.forEach((p,i)=>{ if(!cur||cur.cat!==p.cat){cur={cat:p.cat,items:[]};groups.push(cur);} cur.items.push({p,i}); });
+  let html='';
+  groups.forEach(g=>{ const c=CAT[g.cat].c;
+    html+=`<div class="catlabel" style="color:${c}">${CAT[g.cat].label}<span class="catn">${g.items.length}</span></div>`+
+    g.items.map(({p,i})=>`<div class="navitem ${i===active?'on':''}" data-i="${i}" style="${i===active?'border-left-color:'+c:''}">
+        <div class="tag" style="color:${c}">${CAT[p.cat].label}</div><div class="nm">${p.label}</div></div>`).join('');
+  });
+  side.innerHTML=html;
+  side.querySelectorAll('.navitem').forEach(el=>el.onclick=()=>{active=+el.dataset.i;render();if(window.innerWidth<=860)side.classList.remove('open');});
+}
+
+function render(){
+  if(stepTimer){clearInterval(stepTimer);stepTimer=null;}
+  const p=P[active], col=CAT[p.cat].c;
+  const notes=`<div class="cards">
+      <div class="ic"><div class="h">WHEN TO USE</div><p>${p.when}</p></div>
+      <div class="ic" style="border-color:${col}33"><div class="h" style="color:${col}">★ KEY INSIGHT</div><p>${p.insight}</p></div>
+      <div class="ic analogy"><div class="h" style="color:${col}">◈ ANALOGY / MENTAL MODEL</div><p>${p.analogy}</p></div>
+      <div class="ic bugs"><div class="h">⚠ BUGS YOU ACTUALLY HIT</div><ul>${p.bugs.map(b=>`<li>${b}</li>`).join('')}</ul></div>
+    </div>
+    <div class="probs"><div class="h">EXAMPLE PROBLEMS</div>${p.problems.map(n=>`<span class="chip">${n}</span>`).join('')}</div>`;
+
+  const codeHtml=`<div class="cb">
+      <div class="cbbar"><span class="dots"><i style="background:#ff5f56"></i><i style="background:#ffbd2e"></i><i style="background:#27c93f"></i></span>
+        <span class="cbtitle">${p.label.toLowerCase().replace(/[^a-z]+/g,'_').replace(/^_|_$/g,'')}.cpp</span>
+        <button class="cbtoggle" id="revealAll">💬 reveal all</button></div>
+      <pre>${hl(p.code)}</pre>
+      <div class="cbnote">● = this line hides a note — click to reveal, click again to hide.</div>
+    </div>`;
+
+  main.innerHTML=`<div class="fade">
+    <div class="phead">
+      <div>
+        <span class="ptag" style="background:${col}22;border:1px solid ${col}55;color:${col}">${CAT[p.cat].label}</span>
+        <span class="pcount">Pattern ${active+1} / ${P.length}</span>
+        <h2>${p.label}</h2>
+        <div class="srcline">${p.src}</div>
+      </div>
+      <div class="pheadbtns">
+        <button class="copy" id="notesBtn">📝 show notes</button>
+        <button class="copy" id="varBtn">🔀 variations</button>
+        <button class="copy" id="codeBtn">⌨ hide code</button>
+        <button class="copy" id="copyBtn">copy code</button>
+      </div>
+    </div>
+    <div class="notesWrap" id="notesWrap" style="display:none">${notes}</div>
+    <div class="varWrap" id="varWrap" style="display:none">${varPanel(p)}</div>
+    <div class="split" id="split">
+      <div class="demo">
+        <div class="h">◈ STEP-BY-STEP — ${p.label.toUpperCase()}</div>
+        <div class="stage" id="stage"></div>
+        <div class="vmsg" id="vmsg"></div>
+        <div class="vtables" id="vtables"></div>
+        <div class="vctrl">
+          <button class="play" id="play">▶ play</button>
+          <button id="stepBtn">step ›</button>
+          <button id="resetBtn">⟲ reset</button>
+          <span class="vpos" id="vpos"></span>
+          <span class="spd">speed <input type="range" id="spd" min="280" max="1700" value="950"><b id="spdlbl"></b></span>
+        </div>
+        <div class="trace"><div class="th">CODE BEING TRACED — <b>active line highlights live</b></div><pre id="trace"></pre></div>
+      </div>
+      <div class="codeCol">${codeHtml}</div>
+    </div>
+    <div class="pnav">
+      <button id="prevBtn" ${active===0?'disabled':''}>← prev</button>
+      <span class="pos">${active+1} of ${P.length}</span>
+      <button id="nextBtn" ${active===P.length-1?'disabled':''}>next →</button>
+    </div></div>`;
+  main.scrollTop=0;
+
+  const nb=main.querySelector('#notesBtn'), nw=main.querySelector('#notesWrap');
+  nb.onclick=()=>{const show=nw.style.display==='none';nw.style.display=show?'':'none';nb.textContent=show?'📝 hide notes':'📝 show notes';nb.classList.toggle('done',show);};
+  const vb=main.querySelector('#varBtn'), vw=main.querySelector('#varWrap');
+  vb.onclick=()=>{const show=vw.style.display==='none';vw.style.display=show?'':'none';vb.textContent=show?'🔀 hide variations':'🔀 variations';vb.classList.toggle('done',show);};
+  main.querySelectorAll('.varcopy').forEach(b=>b.onclick=()=>{const v=(VARS[p.label]||[])[+b.dataset.vi];navigator.clipboard.writeText(v.code);b.textContent='✓';setTimeout(()=>b.textContent='copy',1200);});
+  const cbtn=main.querySelector('#codeBtn'), split=main.querySelector('#split');
+  cbtn.onclick=()=>{const hid=!split.classList.contains('nocode');split.classList.toggle('nocode',hid);cbtn.textContent=hid?'⌨ show code':'⌨ hide code';cbtn.classList.toggle('done',hid);};
+  main.querySelector('#copyBtn').onclick=e=>{navigator.clipboard.writeText(p.code);e.target.textContent='✓ copied';e.target.classList.add('done');setTimeout(()=>{e.target.textContent='copy code';e.target.classList.remove('done');},1500);};
+  main.querySelector('#prevBtn').onclick=()=>{if(active>0){active--;render();}};
+  main.querySelector('#nextBtn').onclick=()=>{if(active<P.length-1){active++;render();}};
+  main.querySelectorAll('.cl.has-cm').forEach(el=>el.onclick=()=>el.classList.toggle('reveal'));
+  const ra=main.querySelector('#revealAll');
+  ra.onclick=()=>{const ls=[...main.querySelector('.cb').querySelectorAll('.cl.has-cm')];const on=ls.some(l=>l.classList.contains('reveal'));ls.forEach(l=>l.classList.toggle('reveal',!on));ra.classList.toggle('on',!on);ra.textContent=on?'💬 reveal all':'🙈 hide all';};
+
+  mountStepper(p);
+  buildSidebar();
+}
+
+function mountStepper(p){
+  const frames=p.gen();
+  const stage=main.querySelector('#stage'), vmsg=main.querySelector('#vmsg'),
+        vtables=main.querySelector('#vtables'), vpos=main.querySelector('#vpos'),
+        traceEl=main.querySelector('#trace'), playBtn=main.querySelector('#play'),
+        spd=main.querySelector('#spd'), spdlbl=main.querySelector('#spdlbl');
+  const tEls=[]; p.trace.forEach(ln=>{const x=document.createElement('span');x.className='tln';x.innerHTML=hl(ln)||'&nbsp;';traceEl.appendChild(x);tEls.push(x);});
+  let idx=0;
+  function draw(){
+    const f=frames[idx];
+    stage.innerHTML=svgHeap(f);
+    vmsg.classList.remove('flash');void vmsg.offsetWidth;vmsg.classList.add('flash');
+    vmsg.innerHTML=`<span class="stepchip">STEP ${idx+1}</span>${f.msg}`;
+    const extra=heapSide(f);
+    vtables.innerHTML=heapArr(f)+(extra?`<div style="flex:1;min-width:100%">${extra}</div>`:'');
+    tEls.forEach((e,i)=>e.classList.toggle('hot',i===f.line));
+    vpos.textContent=`${idx+1} / ${frames.length}`;
+  }
+  function stop(){if(stepTimer){clearInterval(stepTimer);stepTimer=null;}playBtn.textContent='▶ play';}
+  function play(){ if(stepTimer){stop();return;} if(idx>=frames.length-1)idx=0; playBtn.textContent='❚❚ pause';
+    stepTimer=setInterval(()=>{ if(idx>=frames.length-1){stop();return;} idx++;draw(); }, +spd.value); }
+  const setspd=()=>{spdlbl.textContent=(spd.value/1000).toFixed(2)+'s'; if(stepTimer){clearInterval(stepTimer);stepTimer=setInterval(()=>{if(idx>=frames.length-1){stop();return;}idx++;draw();},+spd.value);}};
+  spd.oninput=setspd; setspd();
+  playBtn.onclick=play;
+  main.querySelector('#stepBtn').onclick=()=>{stop();if(idx<frames.length-1){idx++;draw();}};
+  main.querySelector('#resetBtn').onclick=()=>{stop();idx=0;draw();};
+  draw();
+}
+
+render();
+
+</script>
+</body>
+</html>
