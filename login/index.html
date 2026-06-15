@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sign in · Visualise</title>
+  <meta name="description" content="Sign in to Visualise to unlock the interactive DSA pattern hubs.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root{ --bg:#06080c; --line:#19222f; --line2:#243244; --text:#eef2f8; --muted:#90a0b3; --faint:#5a6675;
+           --cyan:#00e5ff; --green:#5dff8f; --accent:#7c93ff; --pink:#ff5acd; --bad:#ff6b6b; }
+    *{box-sizing:border-box;} html,body{margin:0;padding:0;min-height:100%;}
+    body{min-height:100vh;color:var(--text);font-family:'Inter',ui-sans-serif,system-ui,sans-serif;
+      letter-spacing:-.01em;-webkit-font-smoothing:antialiased;display:grid;place-items:center;padding:24px;
+      background:radial-gradient(820px 540px at 12% -8%,rgba(0,229,255,.12),transparent 60%),
+                 radial-gradient(760px 520px at 92% 0%,rgba(255,90,205,.10),transparent 58%),
+                 radial-gradient(1000px 700px at 50% 120%,rgba(124,147,255,.10),transparent 62%),var(--bg);}
+    a{color:inherit;} :focus-visible{outline:2px solid var(--cyan);outline-offset:2px;border-radius:6px;}
+    .card{width:min(420px,100%);border:1px solid var(--line);border-radius:18px;padding:30px 28px 26px;
+      background:linear-gradient(180deg,rgba(16,22,31,.72),rgba(9,12,17,.85));backdrop-filter:blur(12px);
+      box-shadow:0 30px 80px rgba(0,0,0,.5);animation:rise .6s cubic-bezier(.2,.7,.3,1) both;}
+    @keyframes rise{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:none;}}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:16px;letter-spacing:-.4px;margin-bottom:20px;text-decoration:none;}
+    .brand .mark{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;color:var(--cyan);
+      background:linear-gradient(140deg,rgba(0,229,255,.18),rgba(124,147,255,.16));border:1px solid rgba(0,229,255,.3);}
+    .brand .mark svg{width:15px;height:15px;}
+    h1{margin:0 0 5px;font-size:23px;font-weight:700;letter-spacing:-.6px;}
+    .sub{margin:0 0 22px;color:var(--muted);font-size:13.5px;line-height:1.55;}
+    label{display:block;font-size:11px;letter-spacing:.6px;text-transform:uppercase;font-weight:700;color:var(--faint);margin:14px 0 6px;font-family:'JetBrains Mono',monospace;}
+    input{width:100%;padding:11px 13px;border-radius:10px;border:1px solid var(--line2);background:rgba(7,10,14,.7);
+      color:var(--text);font-size:14px;font-family:inherit;transition:.15s;}
+    input:focus{outline:none;border-color:var(--cyan);box-shadow:0 0 0 3px rgba(0,229,255,.12);}
+    .btn{width:100%;margin-top:18px;padding:12px;border-radius:11px;border:none;cursor:pointer;font-size:14px;font-weight:700;
+      font-family:inherit;color:#06220f;background:linear-gradient(100deg,var(--cyan),var(--green));transition:.18s;letter-spacing:.2px;}
+    .btn:hover{filter:brightness(1.07);transform:translateY(-1px);} .btn:disabled{opacity:.55;cursor:not-allowed;transform:none;}
+    .ghost{background:transparent;border:1px solid var(--line2);color:var(--text);font-weight:600;}
+    .ghost:hover{border-color:#475569;filter:none;}
+    .or{display:flex;align-items:center;gap:12px;color:var(--faint);font-size:11px;letter-spacing:1px;margin:18px 0 4px;font-family:'JetBrains Mono',monospace;}
+    .or::before,.or::after{content:"";flex:1;height:1px;background:var(--line);}
+    .gbtn{width:100%;margin-top:14px;padding:11px;border-radius:11px;cursor:pointer;font-size:14px;font-weight:600;font-family:inherit;
+      display:flex;align-items:center;justify-content:center;gap:10px;color:var(--text);background:rgba(255,255,255,.04);border:1px solid var(--line2);transition:.15s;}
+    .gbtn:hover{border-color:#475569;background:rgba(255,255,255,.07);}
+    .gbtn svg{width:17px;height:17px;}
+    .switch{margin-top:18px;text-align:center;font-size:13px;color:var(--muted);}
+    .switch button{background:none;border:none;color:var(--cyan);font-weight:600;cursor:pointer;font-size:13px;font-family:inherit;padding:0;}
+    .msg{margin-top:16px;font-size:13px;line-height:1.5;padding:10px 13px;border-radius:9px;display:none;}
+    .msg.err{display:block;background:rgba(255,107,107,.08);border:1px solid rgba(255,107,107,.3);color:#ffb4b4;}
+    .msg.ok{display:block;background:rgba(93,255,143,.08);border:1px solid rgba(93,255,143,.3);color:#bfffd2;}
+    .linkrow{margin-top:16px;text-align:center;}
+    .linkrow a{color:var(--faint);font-size:12px;text-decoration:none;} .linkrow a:hover{color:var(--text);}
+    .note{margin-top:14px;font-size:11.5px;color:var(--faint);line-height:1.5;text-align:center;}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <a class="brand" href="/">
+      <span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="16" y="16" width="6" height="6" rx="1"/><rect x="2" y="16" width="6" height="6" rx="1"/><rect x="9" y="2" width="6" height="6" rx="1"/><path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3"/><path d="M12 12V8"/></svg></span>
+      visualise
+    </a>
+    <h1 id="title">Welcome back</h1>
+    <p class="sub" id="sub">Sign in to unlock the interactive DSA pattern hubs.</p>
+
+    <form id="form" autocomplete="on">
+      <label for="email">Email</label>
+      <input id="email" type="email" required placeholder="you@example.com" autocomplete="email">
+      <label for="pw">Password</label>
+      <input id="pw" type="password" required minlength="6" placeholder="••••••••" autocomplete="current-password">
+      <button class="btn" id="submit" type="submit">Sign in</button>
+    </form>
+
+    <button class="btn ghost" id="magic" style="margin-top:10px">Email me a magic link instead</button>
+
+    <div class="or">OR</div>
+    <button class="gbtn" id="google">
+      <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.27-4.74 3.27-8.1Z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23Z"/><path fill="#FBBC05" d="M5.84 14.1a6.6 6.6 0 0 1 0-4.2V7.06H2.18a11 11 0 0 0 0 9.88l3.66-2.84Z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1A11 11 0 0 0 2.18 7.06l3.66 2.84C6.71 7.3 9.14 5.38 12 5.38Z"/></svg>
+      Continue with Google
+    </button>
+
+    <div class="msg" id="msg"></div>
+
+    <div class="switch" id="switch">New here? <button id="toggle" type="button">Create an account</button></div>
+    <div class="linkrow"><a href="/">← Back to topics</a></div>
+    <div class="note" id="demoNote" style="display:none">⚠️ Auth isn't configured yet (placeholder keys). Add your Supabase URL + anon key to <b>supabase-config.js</b> — see SUPABASE_SETUP.md.</div>
+  </div>
+
+  <script src="/supabase-config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+  (function(){
+    var cfg = window.SUPABASE_CONFIG || {};
+    var configured = !!(cfg.url && cfg.anonKey && cfg.url.indexOf("YOUR-")===-1 && cfg.anonKey.indexOf("YOUR-")===-1);
+    var params = new URLSearchParams(location.search);
+    var next = params.get("next") || "/";
+    function safeNext(n){ try{ if(n.indexOf("/")===0 && n.indexOf("//")!==0) return n; }catch(e){} return "/"; }
+    next = safeNext(next);
+
+    var msg=document.getElementById("msg");
+    function show(kind,text){ msg.className="msg "+kind; msg.innerHTML=text; }
+
+    if(!configured){
+      document.getElementById("demoNote").style.display="block";
+      ["submit","magic","google"].forEach(function(id){ document.getElementById(id).disabled=true; });
+      document.querySelectorAll("input").forEach(function(i){ i.disabled=true; });
+      return;
+    }
+
+    var sb = window.supabase.createClient(cfg.url, cfg.anonKey,
+      { auth:{ persistSession:true, autoRefreshToken:true, detectSessionInUrl:true } });
+
+    // already signed in (or just returned from OAuth/magic-link)? go on.
+    sb.auth.getSession().then(function(res){ if(res.data && res.data.session) location.replace(next); });
+
+    var mode="signin";
+    var title=document.getElementById("title"), sub=document.getElementById("sub"),
+        submit=document.getElementById("submit"), sw=document.getElementById("switch"),
+        pw=document.getElementById("pw");
+    function doToggle(){
+      mode = mode==="signin" ? "signup" : "signin";
+      var up = mode==="signup";
+      title.textContent = up ? "Create your account" : "Welcome back";
+      sub.textContent   = up ? "One account unlocks every pattern hub." : "Sign in to unlock the interactive DSA pattern hubs.";
+      submit.textContent= up ? "Create account" : "Sign in";
+      pw.autocomplete   = up ? "new-password" : "current-password";
+      sw.innerHTML = up ? 'Already have an account? <button id="toggle" type="button">Sign in</button>'
+                        : 'New here? <button id="toggle" type="button">Create an account</button>';
+      document.getElementById("toggle").onclick = doToggle;   // rebind the fresh button
+      msg.className="msg";
+    }
+    document.getElementById("toggle").onclick = doToggle;
+
+    document.getElementById("form").onsubmit=function(e){
+      e.preventDefault();
+      var email=document.getElementById("email").value.trim(), pass=pw.value;
+      submit.disabled=true; submit.textContent="…";
+      var p = mode==="signup" ? sb.auth.signUp({email:email,password:pass})
+                              : sb.auth.signInWithPassword({email:email,password:pass});
+      p.then(function(res){
+        submit.disabled=false; submit.textContent = mode==="signup"?"Create account":"Sign in";
+        if(res.error){ show("err", res.error.message); return; }
+        if(mode==="signup" && res.data && !res.data.session){
+          show("ok","Account created. Check your inbox to confirm your email, then sign in.");
+          return;
+        }
+        location.replace(next);
+      });
+    };
+
+    document.getElementById("magic").onclick=function(){
+      var email=document.getElementById("email").value.trim();
+      if(!email){ show("err","Enter your email first, then tap the magic link button."); return; }
+      this.disabled=true;
+      sb.auth.signInWithOtp({ email:email, options:{ emailRedirectTo: location.origin+"/login?next="+encodeURIComponent(next) } })
+        .then(function(res){
+          document.getElementById("magic").disabled=false;
+          if(res.error){ show("err",res.error.message); return; }
+          show("ok","Magic link sent to <b>"+email+"</b> — open it on this device to sign in.");
+        });
+    };
+
+    document.getElementById("google").onclick=function(){
+      sb.auth.signInWithOAuth({ provider:"google", options:{ redirectTo: location.origin+"/login?next="+encodeURIComponent(next) } })
+        .then(function(res){ if(res.error) show("err",res.error.message); });
+    };
+  })();
+  </script>
+</body>
+</html>

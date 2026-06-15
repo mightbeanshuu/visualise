@@ -125,6 +125,7 @@ h1,h2{font-family:'Inter',sans-serif !important;font-weight:700;letter-spacing:-
 @keyframes rise{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:none;}}
 main>*:first-child h1,header+* h1{animation:rise .7s cubic-bezier(.2,.7,.3,1) both;}
 </style>
+  <link rel="stylesheet" href="/glass.css">
 </head>
 <body>
   <header class="nav">
@@ -255,5 +256,11 @@ main>*:first-child h1,header+* h1{animation:rise .7s cubic-bezier(.2,.7,.3,1) bo
       <span><a href="/graphs/bfs-patterns/">BFS hub</a> · <a href="/graphs/dfs-patterns/">DFS hub</a> · <a href="/graphs/weighted-patterns/">Weighted hub</a> · <a href="https://github.com/mightbeanshuu" target="_blank" rel="noopener">GitHub</a></span>
     </div>
   </footer>
+
+<!-- visualise: auth gate + what's-next + resizable panels -->
+<script src="/supabase-config.js"></script>
+<script src="/auth.js"></script>
+<script src="/whatsnext.js"></script>
+<script src="/panels.js"></script>
 </body>
 </html>

@@ -1,0 +1,80 @@
+/* ════════════════════════════════════════════════════════════════
+   visualise · liquid-glass skin  (shared, loaded after each hub's
+   inline <style> so it wins ties; !important only on surface props)
+   Built from ui-ux-pro-max Glassmorphism/Spatial guidance + Magic MCP.
+   ════════════════════════════════════════════════════════════════ */
+:root{
+  --glass-bg:        rgba(255,255,255,.045);
+  --glass-bg-strong: rgba(255,255,255,.065);
+  --glass-stroke:    rgba(255,255,255,.10);
+  --glass-blur:      18px;
+  --glass-sat:       150%;
+  --glass-hi:        inset 0 1px 0 rgba(255,255,255,.16), inset 0 0 0 1px rgba(255,255,255,.025);
+  --glass-shadow:    0 10px 34px rgba(0,0,0,.42);
+}
+
+/* shared glass surface for the main panels & cards */
+.top, .side, .ic, .probs, .cb, .demo, .stage, .vmsg, .trace, .varWrap .cb, .vtbl{
+  background: var(--glass-bg) !important;
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
+  border: 1px solid var(--glass-stroke) !important;
+  box-shadow: var(--glass-hi), var(--glass-shadow) !important;
+}
+.top{ border-radius:0 !important; box-shadow: var(--glass-hi), 0 8px 26px rgba(0,0,0,.34) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(150%); backdrop-filter: blur(22px) saturate(150%); }
+.side{ border-radius:0 !important; }
+.stage{ background: rgba(255,255,255,.025) !important; }
+
+/* the inner deep panels keep contrast (code/trace get a darker glass) */
+.cb, .trace{ background: rgba(8,12,18,.46) !important; }
+pre{ background:transparent !important; }
+.cbbar{ background: rgba(255,255,255,.04) !important; border-bottom:1px solid var(--glass-stroke) !important;
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+
+/* rounder, softer corners everywhere */
+.ic, .cb, .demo, .stage, .vmsg, .trace, .probs, .vtbl{ border-radius:16px !important; }
+
+/* ---- specular sheen that drifts across glass panels (the "liquid") ---- */
+.demo, .cb{ position:relative; overflow:hidden; }
+.demo::before, .cb::before{
+  content:""; position:absolute; inset:0; pointer-events:none; z-index:0; border-radius:inherit;
+  background:
+    radial-gradient(120% 60% at 12% -10%, rgba(255,255,255,.10), transparent 60%),
+    linear-gradient(115deg, transparent 38%, rgba(255,255,255,.07) 48%, transparent 58%);
+  background-size: 100% 100%, 280% 100%;
+  background-position: 0 0, 130% 0;
+  animation: vxsheen 9s ease-in-out infinite;
+}
+.demo > *, .cb > *{ position:relative; z-index:1; }
+@keyframes vxsheen{ 50%{ background-position: 0 0, -40% 0; } }
+
+/* glassy interactive chrome */
+.copy, .cbtoggle, .vctrl button, .backbtn, .pnav button, .chip{
+  background: rgba(255,255,255,.05) !important;
+  border:1px solid var(--glass-stroke) !important;
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  border-radius:10px !important; transition: transform .15s ease, background .18s, border-color .18s, box-shadow .18s;
+}
+.copy:hover, .cbtoggle:hover, .vctrl button:hover:not(:disabled), .backbtn:hover, .pnav button:hover:not(:disabled){
+  background: rgba(255,255,255,.10) !important; transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(0,0,0,.3);
+}
+.vctrl button.play{ background: linear-gradient(100deg, rgba(0,229,255,.9), rgba(93,255,143,.9)) !important;
+  color:#06220f !important; border-color: rgba(255,255,255,.25) !important; }
+
+/* nav items + sidebar hover get a frosted highlight */
+.navitem{ border-radius:0 10px 10px 0; transition: background .16s, border-color .16s; }
+.navitem:hover{ background: rgba(255,255,255,.05) !important; }
+.navitem.on{ background: rgba(255,255,255,.08) !important; -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+
+/* badges/pills pick up a subtle glass */
+.badge, .ptag, .vtag, .stepchip{ -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+
+@media (prefers-reduced-motion: reduce){
+  .demo::before, .cb::before{ animation:none; }
+}
+/* graceful fallback where backdrop-filter is unsupported */
+@supports not ((backdrop-filter: blur(2px)) or (-webkit-backdrop-filter: blur(2px))){
+  .top,.side,.ic,.probs,.cb,.demo,.stage,.vmsg,.trace,.vtbl{ background: rgba(13,17,23,.92) !important; }
+}
