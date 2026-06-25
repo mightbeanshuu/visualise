@@ -130,12 +130,108 @@
     .cards{grid-template-columns:1fr;} .ic.analogy,.ic.bugs{grid-column:auto;} .main{padding:18px 16px 50px;}
     .qlabel{min-width:0;}
   }
+
+  /* ════════ LANDING HERO + 3D BACKGROUND (graphs-style, indigo accent) ════════ */
+  #dp-bg{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;display:block;}
+  .top,.shell,.hz{position:relative;z-index:1;}
+  .hz{--ind:124,147,255;--cy:0,229,255;--gn:105,255,71;
+    --hr:16px;
+    --neu:0 18px 40px -18px rgba(0,0,0,.82), 0 2px 0 0 rgba(255,255,255,.03) inset, 0 0 0 1px rgba(255,255,255,.015) inset;
+    --neu-h:0 30px 60px -22px rgba(0,0,0,.9), 0 2px 0 0 rgba(255,255,255,.05) inset, 0 0 0 1px rgba(255,255,255,.025) inset;
+    --glass:linear-gradient(180deg,rgba(22,28,40,.6),rgba(9,12,17,.74));}
+  .hz svg{display:block;}
+  .hz-wrap{width:min(1140px,calc(100% - 44px));margin:0 auto;}
+  .hz-hero{padding:72px 0 26px;display:grid;gap:20px;justify-items:start;}
+  .hz-eyebrow{display:inline-flex;align-items:center;gap:9px;color:#9fb0ff;font-size:11px;
+    letter-spacing:2px;text-transform:uppercase;font-weight:700;font-family:'JetBrains Mono',monospace;
+    border:1px solid rgba(var(--ind),.28);background:rgba(var(--ind),.08);padding:7px 14px;border-radius:30px;
+    backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);}
+  .hz-eyebrow .pulse{width:7px;height:7px;border-radius:50%;background:#7c93ff;animation:hzblink 1.8s ease-in-out infinite;}
+  @keyframes hzblink{50%{opacity:.25;}}
+  .hz-h1{margin:0;font-size:clamp(40px,7.6vw,78px);line-height:1.02;letter-spacing:-2.2px;font-weight:800;
+    background:linear-gradient(102deg,#fff 4%,#00e5ff 34%,#7c93ff 62%,#69ff47 96%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;background-size:220% auto;
+    animation:hzshimmer 9s ease-in-out infinite;}
+  @keyframes hzshimmer{50%{background-position:100% center;}}
+  .hz-sub{margin:0;color:var(--txt2);line-height:1.66;max-width:660px;font-size:16.5px;font-weight:400;}
+  .hz-sub b{color:var(--head);font-weight:600;}
+  .hz-cta{display:flex;gap:13px;flex-wrap:wrap;margin-top:2px;}
+  .hz-btn{display:inline-flex;align-items:center;gap:8px;font-family:inherit;font-weight:600;font-size:14px;
+    border-radius:30px;padding:11px 22px;text-decoration:none;cursor:pointer;border:1px solid transparent;
+    transition:transform .22s cubic-bezier(.2,.7,.3,1),box-shadow .22s,background .22s,border-color .22s;}
+  .hz-btn svg{width:16px;height:16px;transition:transform .25s;}
+  .hz-btn:hover svg{transform:translateX(4px);}
+  .hz-btn-primary{background:linear-gradient(100deg,#00e5ff,#7c93ff);color:#06121f;
+    box-shadow:0 16px 34px -18px rgba(0,0,0,.7), 0 1px 0 0 rgba(255,255,255,.18) inset;}
+  .hz-btn-primary:hover{transform:translateY(-2px);box-shadow:0 24px 46px -18px rgba(0,0,0,.78), 0 1px 0 0 rgba(255,255,255,.22) inset;}
+  .hz-btn-ghost{background:var(--glass);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+    border-color:var(--border);color:var(--head);box-shadow:var(--neu);}
+  .hz-btn-ghost:hover{transform:translateY(-2px);border-color:rgba(var(--ind),.45);box-shadow:var(--neu-h);}
+  .hz-cards{display:grid;grid-template-columns:repeat(5,1fr);gap:13px;width:100%;margin-top:10px;}
+  .hz-card{text-align:left;font-family:inherit;cursor:pointer;color:inherit;text-decoration:none;
+    border:1px solid var(--border);border-radius:var(--hr);background:var(--glass);
+    backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:var(--neu);
+    padding:16px 16px 15px;display:flex;flex-direction:column;gap:10px;
+    transition:transform .26s cubic-bezier(.2,.7,.3,1),border-color .26s,box-shadow .26s;}
+  .hz-card:hover{transform:translateY(-5px);border-color:rgba(var(--ind),.5);box-shadow:var(--neu-h);}
+  .hz-card .ci{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;flex-shrink:0;
+    color:#9fb0ff;border:1px solid rgba(var(--ind),.28);background:rgba(var(--ind),.09);}
+  .hz-card .ci svg{width:19px;height:19px;}
+  .hz-card .cn{font-size:13.5px;font-weight:600;color:var(--head);letter-spacing:-.2px;line-height:1.25;}
+  .hz-card .cc{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--muted);line-height:1.4;}
+  .hz-card .cc b{color:#69ff47;font-weight:700;}
+  @media(max-width:980px){.hz-cards{grid-template-columns:repeat(2,1fr);}}
+  @media(max-width:860px){.hz-hero{padding:48px 0 22px;}}
+  @media(max-width:480px){.hz-cards{grid-template-columns:1fr;}}
+  @media(prefers-reduced-motion:reduce){.hz-h1,.hz-eyebrow .pulse,.hz-card{animation:none!important;}}
 </style>
   <link rel="stylesheet" href="/glass.css">
   <link rel="stylesheet" href="/ask-widget.css">
 </head>
 <body>
-  <div class="top">
+  <canvas id="dp-bg" aria-hidden="true"></canvas>
+
+  <!-- ════════ LANDING HERO ════════ -->
+  <section class="hz">
+    <div class="hz-wrap hz-hero">
+      <span class="hz-eyebrow"><span class="pulse"></span> Dynamic Programming · Pattern Hub</span>
+      <h1 class="hz-h1">Watch the DP<br>table fill itself.</h1>
+      <p class="hz-sub">Six core dynamic-programming patterns across <b>1-D, 2-D &amp; grid</b> — each with AlgoMaster intuition, <b>Striver + NeetCode</b> C++, and the table filling cell by cell as the matching code line lights up. Built around how you actually learn.</p>
+      <div class="hz-cta">
+        <a class="hz-btn hz-btn-primary" href="#tool">Explore the patterns <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
+        <a class="hz-btn hz-btn-ghost" href="#tool">Watch a table fill</a>
+      </div>
+      <div class="hz-cards">
+        <a class="hz-card" href="#tool" data-i="0">
+          <span class="ci"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4v-4h4v-4h4V8h4"/><path d="M4 20V8"/></svg></span>
+          <span class="cn">Climbing Stairs</span>
+          <span class="cc"><b>dp[i]</b> = dp[i-1]+dp[i-2]</span>
+        </a>
+        <a class="hz-card" href="#tool" data-i="1">
+          <span class="ci"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V10l9-7 9 7v11"/><path d="M9 21v-6h6v6"/></svg></span>
+          <span class="cn">House Robber</span>
+          <span class="cc"><b>max</b>(skip, rob+i-2)</span>
+        </a>
+        <a class="hz-card" href="#tool" data-i="2">
+          <span class="ci"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="5"/><path d="M16 8a5 5 0 1 1 0 8 5 5 0 0 1-3.5-1.5"/></svg></span>
+          <span class="cn">Coin Change</span>
+          <span class="cc"><b>min</b>(dp[a-c]+1)</span>
+        </a>
+        <a class="hz-card" href="#tool" data-i="3">
+          <span class="ci"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 4v16"/><path d="m12 14 2 2 4-4"/></svg></span>
+          <span class="cn">LCS</span>
+          <span class="cc">match → <b>diagonal</b>+1</span>
+        </a>
+        <a class="hz-card" href="#tool" data-i="4">
+          <span class="ci"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v2"/><rect x="3" y="7" width="18" height="14" rx="2"/></svg></span>
+          <span class="cn">0/1 Knapsack</span>
+          <span class="cc"><b>max</b>(skip, take)</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <div class="top" id="tool">
     <div class="row">
       <a class="backbtn" href="/" title="Topics">← Topics</a>
       <span class="badge">DYNAMIC PROGRAMMING</span>
@@ -633,6 +729,116 @@ function mountStepper(p){
 
 render();
 
+/* hero cards → jump to the matching pattern in the tool */
+document.querySelectorAll('.hz-card').forEach(c=>c.addEventListener('click',e=>{
+  e.preventDefault();
+  const i=+c.dataset.i;
+  if(!Number.isNaN(i)&&i<P.length){active=i;render();}
+  document.getElementById('tool').scrollIntoView({behavior:'smooth',block:'start'});
+}));
+
+</script>
+
+<!-- Three.js drifting node-and-edge network background (indigo accent) -->
+<script type="module">
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const canvas = document.getElementById('dp-bg');
+  // Reduced-motion (or no canvas) → skip Three.js; the CSS radial gradient stands in statically.
+  if (!reduce && canvas) {
+    try {
+      const THREE = await import('https://unpkg.com/three@0.160.0/build/three.module.js');
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, 0.1, 100);
+      camera.position.z = 26;
+
+      const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+      renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));   // dpr <= 1.5
+      renderer.setSize(innerWidth, innerHeight);
+
+      const COUNT = 128;                 // <= 150 nodes
+      const SPREAD = 30;
+      const palette = [
+        new THREE.Color(0x7c93ff),       // indigo (primary)
+        new THREE.Color(0x7c93ff),       // indigo again → biased toward accent
+        new THREE.Color(0x00e5ff),       // cyan (low presence)
+        new THREE.Color(0x69ff47),       // green (sparse)
+      ];
+
+      const positions = new Float32Array(COUNT * 3);
+      const colors = new Float32Array(COUNT * 3);
+      const pts = [];
+      for (let i = 0; i < COUNT; i++) {
+        const x = (Math.random() - 0.5) * SPREAD;
+        const y = (Math.random() - 0.5) * SPREAD;
+        const z = (Math.random() - 0.5) * SPREAD;
+        positions[i*3] = x; positions[i*3+1] = y; positions[i*3+2] = z;
+        pts.push(new THREE.Vector3(x, y, z));
+        const c = palette[i % 9 === 0 ? 3 : i % 4 === 0 ? 2 : i % 2];
+        colors[i*3] = c.r; colors[i*3+1] = c.g; colors[i*3+2] = c.b;
+      }
+
+      const pGeo = new THREE.BufferGeometry();
+      pGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      pGeo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+      const pMat = new THREE.PointsMaterial({
+        size: 0.4, vertexColors: true, transparent: true, opacity: 0.8,
+        sizeAttenuation: true, depthWrite: false, blending: THREE.AdditiveBlending,
+      });
+      const points = new THREE.Points(pGeo, pMat);
+
+      // faint edges between nearby nodes, computed once
+      const linePos = [], lineCol = [];
+      const MAXD = 6.4, MAXEDGES = 300;
+      let edges = 0;
+      for (let i = 0; i < COUNT && edges < MAXEDGES; i++) {
+        for (let j = i + 1; j < COUNT && edges < MAXEDGES; j++) {
+          if (pts[i].distanceTo(pts[j]) < MAXD) {
+            linePos.push(pts[i].x, pts[i].y, pts[i].z, pts[j].x, pts[j].y, pts[j].z);
+            lineCol.push(colors[i*3], colors[i*3+1], colors[i*3+2], colors[j*3], colors[j*3+1], colors[j*3+2]);
+            edges++;
+          }
+        }
+      }
+      const lGeo = new THREE.BufferGeometry();
+      lGeo.setAttribute('position', new THREE.Float32BufferAttribute(linePos, 3));
+      lGeo.setAttribute('color', new THREE.Float32BufferAttribute(lineCol, 3));
+      const lMat = new THREE.LineBasicMaterial({
+        vertexColors: true, transparent: true, opacity: 0.14, blending: THREE.AdditiveBlending, depthWrite: false,
+      });
+      const lines = new THREE.LineSegments(lGeo, lMat);
+
+      const group = new THREE.Group();
+      group.add(points); group.add(lines);
+      group.scale.set(1.05, 1.05, 1.05);
+      scene.add(group);
+
+      addEventListener('resize', () => {
+        camera.aspect = innerWidth / innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(innerWidth, innerHeight);
+      }, { passive: true });
+
+      let running = true;
+      document.addEventListener('visibilitychange', () => {   // pause on hidden tab
+        running = !document.hidden;
+        if (running) loop();
+      });
+
+      const t0 = performance.now();
+      function loop() {
+        if (!running) return;
+        const t = (performance.now() - t0) * 0.00006;
+        group.rotation.y = t;
+        group.rotation.x = Math.sin(t * 0.6) * 0.18;
+        renderer.render(scene, camera);
+        requestAnimationFrame(loop);
+      }
+      loop();
+    } catch (e) {
+      /* CDN/WebGL unavailable — CSS gradient remains as the backdrop */
+    }
+  }
 </script>
 
 <!-- visualise: auth gate + what's-next + resizable panels -->
