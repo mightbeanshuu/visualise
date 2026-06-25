@@ -130,12 +130,109 @@
     .cards{grid-template-columns:1fr;} .ic.analogy,.ic.bugs{grid-column:auto;} .main{padding:18px 16px 50px;}
     .qlabel{min-width:0;}
   }
+
+  /* ════════ LANDING HERO + node-network background (graphs-style) ════════ */
+  #bg-canvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;display:block;}
+  .top,.shell,.lhero{position:relative;z-index:1;}
+  .lh-wrap{width:min(1140px,calc(100% - 40px));margin:0 auto;}
+  .lhero{padding:84px 0 30px;}
+  .lh-inner{display:grid;gap:22px;justify-items:start;}
+  .lhero svg{display:block;}
+  .lh-eyebrow{display:inline-flex;align-items:center;gap:9px;color:#7dd3fc;font-size:11.5px;
+    letter-spacing:2px;text-transform:uppercase;font-weight:700;font-family:'JetBrains Mono',monospace;
+    border:1px solid rgba(56,189,248,.28);background:rgba(56,189,248,.07);padding:7px 14px;border-radius:30px;
+    backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);}
+  .lh-pulse{width:7px;height:7px;border-radius:50%;background:#38bdf8;box-shadow:0 0 0 3px rgba(56,189,248,.14);animation:lhblink 1.7s ease-in-out infinite;}
+  @keyframes lhblink{50%{opacity:.25;}}
+  .lh-title{margin:0;font-size:clamp(42px,8vw,80px);line-height:1.0;letter-spacing:-2.2px;font-weight:800;
+    background:linear-gradient(102deg,#fff 4%,#38bdf8 38%,#00e5ff 62%,#69ff47 92%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;background-size:220% auto;
+    animation:lhshimmer 9s ease-in-out infinite;}
+  @keyframes lhshimmer{50%{background-position:100% center;}}
+  .lh-sub{margin:0;color:var(--txt2);line-height:1.66;max-width:640px;font-size:17px;font-weight:400;}
+  .lh-sub b{color:var(--head);font-weight:600;}
+  .lh-cta{display:flex;gap:13px;flex-wrap:wrap;margin-top:2px;}
+  .lh-btn{display:inline-flex;align-items:center;gap:8px;font-family:inherit;font-weight:600;font-size:14px;
+    border-radius:30px;padding:11px 22px;text-decoration:none;cursor:pointer;border:1px solid transparent;
+    transition:transform .22s cubic-bezier(.2,.7,.3,1),box-shadow .22s,border-color .22s;}
+  .lh-btn svg{width:16px;height:16px;transition:transform .25s;}
+  .lh-btn:hover svg{transform:translateX(4px);}
+  .lh-btn-primary{background:linear-gradient(100deg,#38bdf8,#22d3ee);color:#06223f;
+    box-shadow:0 14px 30px -14px rgba(56,189,248,.6),0 1px 0 0 rgba(255,255,255,.18) inset;}
+  .lh-btn-primary:hover{transform:translateY(-2px);box-shadow:0 20px 38px -14px rgba(56,189,248,.55),0 1px 0 0 rgba(255,255,255,.22) inset;}
+  .lh-btn-ghost{background:linear-gradient(180deg,rgba(22,30,42,.6),rgba(10,13,18,.7));color:var(--head);
+    border-color:var(--border);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+    box-shadow:0 16px 34px -20px rgba(0,0,0,.8),0 1px 0 0 rgba(255,255,255,.04) inset;}
+  .lh-btn-ghost:hover{transform:translateY(-2px);border-color:rgba(56,189,248,.4);}
+  .lh-cards{display:grid;grid-template-columns:repeat(5,1fr);gap:13px;width:100%;margin-top:10px;}
+  .lh-card{display:flex;flex-direction:column;gap:10px;text-decoration:none;color:inherit;padding:17px 16px;border-radius:14px;
+    border:1px solid var(--border);background:linear-gradient(180deg,rgba(20,27,38,.6),rgba(9,12,17,.72));
+    backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+    box-shadow:0 16px 36px -20px rgba(0,0,0,.8),0 1px 0 0 rgba(255,255,255,.03) inset;
+    transition:transform .24s cubic-bezier(.2,.7,.3,1),box-shadow .24s,border-color .24s;}
+  .lh-card:hover{transform:translateY(-4px);border-color:rgba(56,189,248,.38);
+    box-shadow:0 26px 50px -22px rgba(0,0,0,.85),0 1px 0 0 rgba(255,255,255,.05) inset;}
+  .lh-card .lh-ic{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;flex-shrink:0;
+    color:#7dd3fc;border:1px solid rgba(56,189,248,.26);background:rgba(56,189,248,.08);}
+  .lh-card .lh-ic svg{width:18px;height:18px;}
+  .lh-card .lh-nm{font-size:13px;font-weight:600;color:var(--head);letter-spacing:-.2px;line-height:1.3;}
+  .lh-card .lh-dc{font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace;letter-spacing:.2px;}
+  @keyframes lhrise{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:none;}}
+  .lh-inner>*{animation:lhrise .7s cubic-bezier(.2,.7,.3,1) both;}
+  .lh-inner>*:nth-child(2){animation-delay:.08s;}.lh-inner>*:nth-child(3){animation-delay:.16s;}
+  .lh-inner>*:nth-child(4){animation-delay:.24s;}.lh-inner>*:nth-child(5){animation-delay:.32s;}
+  @media(max-width:1080px){.lh-cards{grid-template-columns:repeat(3,1fr);}}
+  @media(max-width:860px){.lhero{padding:54px 0 24px;}.lh-cards{grid-template-columns:repeat(2,1fr);}}
+  @media(max-width:480px){.lh-cards{grid-template-columns:1fr;}}
 </style>
   <link rel="stylesheet" href="/glass.css">
   <link rel="stylesheet" href="/ask-widget.css">
 </head>
 <body>
-  <div class="top">
+  <canvas id="bg-canvas" aria-hidden="true"></canvas>
+
+  <!-- ════════ LANDING HERO ════════ -->
+  <section class="lhero">
+    <div class="lh-wrap lh-inner">
+      <span class="lh-eyebrow"><span class="lh-pulse"></span> Stack &amp; Queue · Pattern Hub</span>
+      <h1 class="lh-title">Watch the stack<br>push &amp; pop.</h1>
+      <p class="lh-sub">One animated hub for every stack &amp; queue pattern — valid parentheses, monotonic stack, min stack, queue via stacks and sliding-window maximum. <b>Striver + NeetCode</b> C++, a live stack / deque that steps <b>line by line</b>, real LeetCode problems and variation templates.</p>
+      <div class="lh-cta">
+        <a class="lh-btn lh-btn-primary" href="#tool">Open the visualiser
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
+        <a class="lh-btn lh-btn-ghost" href="/">← All topics</a>
+      </div>
+      <div class="lh-cards">
+        <a class="lh-card" href="#tool">
+          <span class="lh-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H7a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2 2 2 0 0 1 2 2v5a2 2 0 0 0 2 2h1"/><path d="M16 3h1a2 2 0 0 1 2 2v5a2 2 0 0 0 2 2 2 2 0 0 0-2 2v5a2 2 0 0 1-2 2h-1"/></svg></span>
+          <span class="lh-nm">Valid parentheses</span>
+          <span class="lh-dc">match the top</span>
+        </a>
+        <a class="lh-card" href="#tool">
+          <span class="lh-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20h4V10H3z"/><path d="M10 20h4V4h-4z"/><path d="M17 20h4v-7h-4z"/></svg></span>
+          <span class="lh-nm">Monotonic stack</span>
+          <span class="lh-dc">next greater</span>
+        </a>
+        <a class="lh-card" href="#tool">
+          <span class="lh-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/><path d="M12 3v12"/></svg></span>
+          <span class="lh-nm">Min stack</span>
+          <span class="lh-dc">O(1) min</span>
+        </a>
+        <a class="lh-card" href="#tool">
+          <span class="lh-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/><path d="M5 7v10"/></svg></span>
+          <span class="lh-nm">Queue via stacks</span>
+          <span class="lh-dc">amortised O(1)</span>
+        </a>
+        <a class="lh-card" href="#tool">
+          <span class="lh-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="14" height="8" rx="1"/><path d="M20 6v12"/></svg></span>
+          <span class="lh-nm">Sliding-window max</span>
+          <span class="lh-dc">deque trick</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <div class="top" id="tool">
     <div class="row">
       <a class="backbtn" href="/" title="Topics">← Topics</a>
       <span class="badge">STACK · QUEUE</span>
@@ -825,6 +922,112 @@ function mountStepper(p){
 }
 
 render();
+</script>
+
+<!-- Three.js drifting node-and-edge network background (sky-tinted) -->
+<script type="module">
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const canvas = document.getElementById('bg-canvas');
+  // Reduced-motion (or no canvas): skip Three.js — the CSS radial gradient
+  // background stands in as a static backdrop. No animation runs.
+  if (!reduce && canvas) {
+    try {
+      const THREE = await import('https://unpkg.com/three@0.160.0/build/three.module.js');
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, 0.1, 100);
+      camera.position.z = 26;
+
+      const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+      renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));   // dpr <= 1.5
+      renderer.setSize(innerWidth, innerHeight);
+
+      const COUNT = 128;                 // <= 150 nodes
+      const SPREAD = 30;
+      const palette = [
+        new THREE.Color(0x38bdf8),       // sky (primary accent)
+        new THREE.Color(0x00e5ff),       // site cyan
+        new THREE.Color(0x69ff47),       // site green (sparse)
+        new THREE.Color(0xffd60a),       // warn amber (rare)
+      ];
+
+      const positions = new Float32Array(COUNT * 3);
+      const colors = new Float32Array(COUNT * 3);
+      const pts = [];
+      for (let i = 0; i < COUNT; i++) {
+        const x = (Math.random() - 0.5) * SPREAD;
+        const y = (Math.random() - 0.5) * SPREAD;
+        const z = (Math.random() - 0.5) * SPREAD;
+        positions[i*3] = x; positions[i*3+1] = y; positions[i*3+2] = z;
+        pts.push(new THREE.Vector3(x, y, z));
+        // mostly sky/cyan, with occasional green/amber accents
+        const c = palette[i % 11 === 0 ? 3 : (i % 5 === 0 ? 2 : (i % 2))];
+        colors[i*3] = c.r; colors[i*3+1] = c.g; colors[i*3+2] = c.b;
+      }
+
+      // nodes
+      const pGeo = new THREE.BufferGeometry();
+      pGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      pGeo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+      const pMat = new THREE.PointsMaterial({
+        size: 0.4, vertexColors: true, transparent: true, opacity: 0.8,
+        sizeAttenuation: true, depthWrite: false, blending: THREE.AdditiveBlending,
+      });
+      const points = new THREE.Points(pGeo, pMat);
+
+      // edges — connect nodes within a distance, computed once
+      const linePos = [];
+      const lineCol = [];
+      const MAXD = 6.4, MAXEDGES = 300;
+      let edges = 0;
+      for (let i = 0; i < COUNT && edges < MAXEDGES; i++) {
+        for (let j = i + 1; j < COUNT && edges < MAXEDGES; j++) {
+          if (pts[i].distanceTo(pts[j]) < MAXD) {
+            linePos.push(pts[i].x, pts[i].y, pts[i].z, pts[j].x, pts[j].y, pts[j].z);
+            lineCol.push(colors[i*3], colors[i*3+1], colors[i*3+2], colors[j*3], colors[j*3+1], colors[j*3+2]);
+            edges++;
+          }
+        }
+      }
+      const lGeo = new THREE.BufferGeometry();
+      lGeo.setAttribute('position', new THREE.Float32BufferAttribute(linePos, 3));
+      lGeo.setAttribute('color', new THREE.Float32BufferAttribute(lineCol, 3));
+      const lMat = new THREE.LineBasicMaterial({
+        vertexColors: true, transparent: true, opacity: 0.14, blending: THREE.AdditiveBlending, depthWrite: false,
+      });
+      const lines = new THREE.LineSegments(lGeo, lMat);
+
+      const group = new THREE.Group();
+      group.add(points); group.add(lines);
+      group.scale.set(1.05, 1.05, 1.05);
+      scene.add(group);
+
+      addEventListener('resize', () => {
+        camera.aspect = innerWidth / innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(innerWidth, innerHeight);
+      }, { passive: true });
+
+      let running = true;
+      document.addEventListener('visibilitychange', () => {   // pause on hidden tab
+        running = !document.hidden;
+        if (running) loop();
+      });
+
+      const t0 = performance.now();
+      function loop() {
+        if (!running) return;
+        const t = (performance.now() - t0) * 0.00006;
+        group.rotation.y = t;
+        group.rotation.x = Math.sin(t * 0.6) * 0.18;
+        renderer.render(scene, camera);
+        requestAnimationFrame(loop);
+      }
+      loop();
+    } catch (e) {
+      /* CDN/WebGL unavailable — CSS gradient remains as the backdrop */
+    }
+  }
 </script>
 
 <!-- visualise: auth gate + what's-next + resizable panels -->
