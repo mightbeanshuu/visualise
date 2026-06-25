@@ -282,7 +282,7 @@ header h1, .htitle{font-family:'Inter',sans-serif;font-weight:700;}
       <span class="meta">14 patterns · C++ · Anshu</span>
       <button class="copy menuToggle" id="menuToggle" style="margin-left:auto">☰ patterns</button>
     </div>
-    <p>DFS templates + call-stack dry-runs with the <b>code line lighting up as it executes</b>. Built around how you actually learn.</p>
+    <p>Step-by-step animated DFS patterns with clean C++ and click-to-reveal notes.</p>
   </div>
 
   <div class="shell">
@@ -301,6 +301,89 @@ const CAT = {
 }
 
 const P = P_DFS;
+
+/* ───── per-pattern PRACTICE problems (GFG → LeetCode → NeetCode) ─────
+   Keyed by pattern label; merged onto each P[i] without touching __dfsdata.js.
+   Links are direct where confident; GFG falls back to a never-404 search URL. */
+const gfgS = q => 'https://www.geeksforgeeks.org/?s=' + encodeURIComponent(q);
+const PRACTICE = {
+  'Basic Graph DFS (recursive)':[
+    {name:'DFS of Graph', diff:'Easy', gfg:'https://www.geeksforgeeks.org/problems/depth-first-traversal-for-a-graph/1'},
+    {name:'Clone Graph', diff:'Medium', lc:'https://leetcode.com/problems/clone-graph/', neet:'https://neetcode.io/problems/clone-graph'},
+    {name:'Find if Path Exists in Graph', diff:'Easy', lc:'https://leetcode.com/problems/find-if-path-exists-in-graph/'},
+    {name:'Keys and Rooms', diff:'Medium', lc:'https://leetcode.com/problems/keys-and-rooms/', gfg:gfgS('keys and rooms')}
+  ],
+  'Iterative DFS (explicit stack)':[
+    {name:'Number of Islands (iterative)', diff:'Medium', lc:'https://leetcode.com/problems/number-of-islands/', neet:'https://neetcode.io/problems/count-number-of-islands'},
+    {name:'Flood Fill', diff:'Easy', lc:'https://leetcode.com/problems/flood-fill/'},
+    {name:'Clone Graph', diff:'Medium', lc:'https://leetcode.com/problems/clone-graph/', neet:'https://neetcode.io/problems/clone-graph'}
+  ],
+  'Connected Components (DFS)':[
+    {name:'Number of Provinces', diff:'Medium', lc:'https://leetcode.com/problems/number-of-provinces/', gfg:'https://www.geeksforgeeks.org/problems/number-of-provinces/1'},
+    {name:'Number of Connected Components in an Undirected Graph', diff:'Medium', lc:'https://leetcode.com/problems/number-of-connected-components-in-an-undirected-graph/', neet:'https://neetcode.io/problems/count-connected-components'},
+    {name:'Graph Valid Tree', diff:'Medium', lc:'https://leetcode.com/problems/graph-valid-tree/', neet:'https://neetcode.io/problems/valid-tree'}
+  ],
+  'Flood Fill (DFS)':[
+    {name:'Flood Fill', diff:'Easy', lc:'https://leetcode.com/problems/flood-fill/', gfg:gfgS('flood fill algorithm')},
+    {name:'Number of Islands', diff:'Medium', lc:'https://leetcode.com/problems/number-of-islands/', neet:'https://neetcode.io/problems/count-number-of-islands'},
+    {name:'Coloring A Border', diff:'Medium', lc:'https://leetcode.com/problems/coloring-a-border/'}
+  ],
+  'Number of Islands (DFS)':[
+    {name:'Number of Islands', diff:'Medium', lc:'https://leetcode.com/problems/number-of-islands/', neet:'https://neetcode.io/problems/count-number-of-islands'},
+    {name:'Max Area of Island', diff:'Medium', lc:'https://leetcode.com/problems/max-area-of-island/', neet:'https://neetcode.io/problems/max-area-of-island'},
+    {name:'Island Perimeter', diff:'Easy', lc:'https://leetcode.com/problems/island-perimeter/'},
+    {name:'Number of Closed Islands', diff:'Medium', lc:'https://leetcode.com/problems/number-of-closed-islands/'}
+  ],
+  'Max Area / Component Size (DFS)':[
+    {name:'Max Area of Island', diff:'Medium', lc:'https://leetcode.com/problems/max-area-of-island/', neet:'https://neetcode.io/problems/max-area-of-island'},
+    {name:'Count Sub Islands', diff:'Medium', lc:'https://leetcode.com/problems/count-sub-islands/'},
+    {name:'Number of Islands', diff:'Medium', lc:'https://leetcode.com/problems/number-of-islands/', neet:'https://neetcode.io/problems/count-number-of-islands'}
+  ],
+  'Two-Grid Sub Islands (DFS)':[
+    {name:'Count Sub Islands', diff:'Medium', lc:'https://leetcode.com/problems/count-sub-islands/'},
+    {name:'Number of Closed Islands', diff:'Medium', lc:'https://leetcode.com/problems/number-of-closed-islands/'},
+    {name:'Number of Enclaves', diff:'Medium', lc:'https://leetcode.com/problems/number-of-enclaves/'}
+  ],
+  'Grid DFS — 8-Directional':[
+    {name:'Making A Large Island', diff:'Hard', lc:'https://leetcode.com/problems/making-a-large-island/'},
+    {name:'Number of Islands', diff:'Medium', lc:'https://leetcode.com/problems/number-of-islands/', neet:'https://neetcode.io/problems/count-number-of-islands'},
+    {name:'Max Area of Island', diff:'Medium', lc:'https://leetcode.com/problems/max-area-of-island/', neet:'https://neetcode.io/problems/max-area-of-island'}
+  ],
+  'Boundary DFS (Surrounded / Enclaves)':[
+    {name:'Surrounded Regions', diff:'Medium', lc:'https://leetcode.com/problems/surrounded-regions/', neet:'https://neetcode.io/problems/surrounded-regions'},
+    {name:'Number of Enclaves', diff:'Medium', lc:'https://leetcode.com/problems/number-of-enclaves/'},
+    {name:'Pacific Atlantic Water Flow', diff:'Medium', lc:'https://leetcode.com/problems/pacific-atlantic-water-flow/', neet:'https://neetcode.io/problems/pacific-atlantic-water-flow'}
+  ],
+  'Cycle Detection — Undirected (DFS)':[
+    {name:'Detect Cycle in an Undirected Graph', diff:'Medium', gfg:'https://www.geeksforgeeks.org/problems/detect-cycle-in-an-undirected-graph/1'},
+    {name:'Graph Valid Tree', diff:'Medium', lc:'https://leetcode.com/problems/graph-valid-tree/', neet:'https://neetcode.io/problems/valid-tree'},
+    {name:'Redundant Connection', diff:'Medium', lc:'https://leetcode.com/problems/redundant-connection/'}
+  ],
+  'Cycle Detection — Directed (DFS, 3-colour)':[
+    {name:'Course Schedule', diff:'Medium', lc:'https://leetcode.com/problems/course-schedule/', neet:'https://neetcode.io/problems/course-schedule'},
+    {name:'Find Eventual Safe States', diff:'Medium', lc:'https://leetcode.com/problems/find-eventual-safe-states/'},
+    {name:'Detect Cycle in a Directed Graph', diff:'Medium', gfg:'https://www.geeksforgeeks.org/problems/detect-cycle-in-a-directed-graph/1'},
+    {name:'Course Schedule II', diff:'Medium', lc:'https://leetcode.com/problems/course-schedule-ii/', neet:'https://neetcode.io/problems/course-schedule-ii'}
+  ],
+  'Bipartite Check (DFS colouring)':[
+    {name:'Is Graph Bipartite?', diff:'Medium', lc:'https://leetcode.com/problems/is-graph-bipartite/'},
+    {name:'Possible Bipartition', diff:'Medium', lc:'https://leetcode.com/problems/possible-bipartition/'},
+    {name:'Bipartite Graph', diff:'Medium', gfg:'https://www.geeksforgeeks.org/problems/bipartite-graph/1'}
+  ],
+  'Topological Sort (DFS post-order)':[
+    {name:'Course Schedule II', diff:'Medium', lc:'https://leetcode.com/problems/course-schedule-ii/', neet:'https://neetcode.io/problems/course-schedule-ii'},
+    {name:'Topological Sort', diff:'Medium', gfg:'https://www.geeksforgeeks.org/problems/topological-sort/1'},
+    {name:'Alien Dictionary', diff:'Hard', lc:'https://leetcode.com/problems/alien-dictionary/', gfg:'https://www.geeksforgeeks.org/problems/alien-dictionary/1'},
+    {name:'Course Schedule', diff:'Medium', lc:'https://leetcode.com/problems/course-schedule/', neet:'https://neetcode.io/problems/course-schedule'}
+  ],
+  'All Paths source→target (Backtracking)':[
+    {name:'All Paths From Source to Target', diff:'Medium', lc:'https://leetcode.com/problems/all-paths-from-source-to-target/'},
+    {name:'Combination Sum', diff:'Medium', lc:'https://leetcode.com/problems/combination-sum/', neet:'https://neetcode.io/problems/combination-target-sum'},
+    {name:'Path Sum II', diff:'Medium', lc:'https://leetcode.com/problems/path-sum-ii/'},
+    {name:'Subsets', diff:'Medium', lc:'https://leetcode.com/problems/subsets/', neet:'https://neetcode.io/problems/subsets'}
+  ]
+};
+P.forEach(p=>{ if(PRACTICE[p.label]) p.practice = PRACTICE[p.label]; });
 
 /* ───── trace code shown beside the animation (line highlights as it runs) ───── */
 const TRACE = {
@@ -433,12 +516,14 @@ function render(){
       </div>
       <div class="pheadbtns">
         <button class="copy" id="notesBtn">📝 show notes</button>
+        <button class="copy" id="practiceBtn">🎯 practice</button>
         <button class="copy" id="codeBtn">⌨ hide code</button>
         <button class="copy" id="copyBtn">copy code</button>
       </div>
     </div>
 
     <div class="notesWrap" id="notesWrap" style="display:none">${notesHtml}</div>
+    <div class="notesWrap" id="practiceWrap" style="display:none"></div>
 
     <div class="split">
       <div class="splitcol"><div class="demo" id="demoHost"></div></div>
@@ -457,6 +542,17 @@ function render(){
   { const nb=document.getElementById('notesBtn'), nw=document.getElementById('notesWrap');
     nb.onclick=()=>{ const show=nw.style.display==='none'; nw.style.display=show?'':'none';
       nb.textContent=show?'📝 hide notes':'📝 show notes'; nb.classList.toggle('done',show); }; }
+
+  // 🎯 practice panel — built lazily so the deferred practice.js module is ready;
+  // rebuilt on each open so the activity heatmap stays current.
+  { const pb=document.getElementById('practiceBtn'), pw=document.getElementById('practiceWrap');
+    pb.onclick=()=>{ const show=pw.style.display==='none'; pw.style.display=show?'':'none';
+      pb.textContent=show?'🎯 hide practice':'🎯 practice'; pb.classList.toggle('done',show);
+      if(show && window.VXPractice){
+        const list=(p.practice&&p.practice.length)?VXPractice.practiceBlock(p.label,p.practice):'';
+        pw.innerHTML=list+VXPractice.heatmapBlock();
+        VXPractice.wire(main);
+      } else if(show){ pw.innerHTML='<div class="ic"><p>Practice module loading… reopen in a moment.</p></div>'; } }; }
 
   // code column collapses → animation takes the whole width (persisted)
   { const cb2=document.getElementById('codeBtn'), sp=document.querySelector('.split');
@@ -826,6 +922,8 @@ function vizSVG(spec,frames){
   });
   // "we are here" pointer — glides from node to node as the algorithm walks
   s+=`<g id="ptr" class="ptr" opacity="0"><path d="M0,2 L-8,-12 L8,-12 Z"/><text x="0" y="-19" text-anchor="middle">here</text></g>`;
+  // small step-gist label anchored to the active node / edge (additive)
+  s+=`<text id="vizAnno" text-anchor="middle" font-size="10" font-family="'JetBrains Mono',monospace" fill="#bdf3ff" opacity="0"></text>`;
   s+=`</g>`;
   // ── Call-stack column (top of stack at the top) ──
   const qx=500, qw=120, qh=40;
@@ -877,6 +975,33 @@ function vizUpd(svg,spec,frames,f){
   if(ptr){ if(has){ const p=frames.layout[f.cur];
       ptr.style.transform=`translate(${p[0]}px,${p[1]-24}px)`; ptr.setAttribute('opacity','1'); }
     else ptr.setAttribute('opacity','0'); }
+  // ── step-gist label on the active element (edge midpoint, or below the node) ──
+  const anno=Q('#vizAnno');
+  if(anno){
+    let txt='', ax=0, ay=0, show=false;
+    if(f.edge){                                   // an edge is the active element this frame
+      const pa=frames.layout[f.edge[0]], pb=frames.layout[f.edge[1]];
+      if(pa&&pb){
+        ax=(pa[0]+pb[0])/2; ay=(pa[1]+pb[1])/2 - 6;
+        const arrow=directed?'→':'–';
+        const pre=f.edgeType==='back'?'back-edge ':f.edgeType==='tree'?'tree ':'';
+        txt=pre+f.edge[0]+arrow+f.edge[1]; show=true;
+      }
+    } else if(has){                               // a single node is the active element
+      const pc=frames.layout[f.cur];
+      if(pc){
+        const st=f.nodeState?f.nodeState[f.cur]:0;
+        txt=(st===2?'finish ':'visit ')+f.cur;
+        ax=pc[0]; ay=pc[1]+r+15;                   // below node, clear of label + "here" pointer
+        show=true;
+      }
+    }
+    if(show){
+      ax=Math.max(18,Math.min(ax,472)); ay=Math.max(12,Math.min(ay,406));
+      anno.setAttribute('x',ax); anno.setAttribute('y',ay);
+      anno.textContent=txt; anno.setAttribute('opacity','0.9');
+    } else { anno.setAttribute('opacity','0'); anno.textContent=''; }
+  }
 }
 
 function vizGrid(spec,f){
@@ -1012,6 +1137,8 @@ render();
 initBG();
 </script>
 
+<!-- visualise: shared practice module (per-pattern problems + heatmap) -->
+<script defer src="/practice.js"></script>
 <!-- visualise: auth gate + what's-next + resizable panels -->
 <script src="/supabase-config.js"></script>
 <script src="/auth.js"></script>
