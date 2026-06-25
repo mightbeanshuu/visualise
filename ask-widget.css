@@ -1,40 +1,65 @@
 /* ════════════════════════════════════════════════════════════════
    visualise · Ask-AI widget  (glassmorphism + neumorphism, on-brand)
    palette: bg #0c1016 · cyan #00e5ff · accent #7c93ff · text #eef2f8
-   Sits bottom-RIGHT (the #vx-lock button owns bottom-LEFT).
+   FAB sits bottom-RIGHT, ABOVE the auth chip (#vauth at right/bottom 16px).
+   The #vx-lock button owns bottom-LEFT, so that corner stays clear.
    ════════════════════════════════════════════════════════════════ */
 :root{
   --ai-bg:#0c1016; --ai-cyan:#00e5ff; --ai-accent:#7c93ff; --ai-text:#eef2f8;
   --ai-muted:#8b98a8;
-  --ai-glass:rgba(20,26,36,.62);
+  --ai-glass:rgba(12,16,22,.66);
   --ai-stroke:rgba(255,255,255,.10);
-  --ai-neu: -6px -6px 16px rgba(255,255,255,.022), 8px 8px 22px rgba(0,0,0,.55);
-  --ai-hi: inset 0 1px 0 rgba(255,255,255,.14);
+  /* soft dual light/dark neumorphic shadow — NO colored glow halo */
+  --ai-neu: -5px -5px 14px rgba(255,255,255,.018), 7px 7px 20px rgba(0,0,0,.55);
+  --ai-hi: inset 0 1px 0 rgba(255,255,255,.10);
 }
 
-/* ---- floating launcher ---- */
+/* ---- floating launcher (frosted glass + neumorphism, restrained) ---- */
 #ai-fab{
-  position:fixed; right:20px; bottom:20px; z-index:90;
-  width:56px; height:56px; border:none; border-radius:50%; cursor:pointer;
-  display:inline-flex; align-items:center; justify-content:center;
-  color:#03121a;
-  background:radial-gradient(120% 120% at 30% 25%, var(--ai-cyan), var(--ai-accent));
-  box-shadow:0 8px 26px rgba(0,229,255,.32), var(--ai-hi),
-             -4px -4px 12px rgba(255,255,255,.04), 6px 6px 18px rgba(0,0,0,.55);
-  transition:transform .18s ease, box-shadow .18s ease;
+  position:fixed; right:16px; bottom:74px; z-index:90;
+  height:52px; min-width:52px; padding:0; border-radius:26px; cursor:pointer;
+  display:inline-flex; align-items:center; justify-content:center; gap:9px;
+  color:var(--ai-text);
+  background:var(--ai-glass);
+  -webkit-backdrop-filter:blur(18px) saturate(140%);
+  backdrop-filter:blur(18px) saturate(140%);
+  border:1px solid var(--ai-stroke);
+  box-shadow:var(--ai-hi), var(--ai-neu);
+  transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
   font-family:'Inter',ui-sans-serif,system-ui,sans-serif;
+  font-size:13px; font-weight:600; letter-spacing:-.1px;
 }
-#ai-fab:hover{ transform:translateY(-2px) scale(1.04);
-  box-shadow:0 12px 34px rgba(0,229,255,.45), var(--ai-hi); }
-#ai-fab:active{ transform:translateY(0) scale(.97); }
-#ai-fab svg{ width:26px; height:26px; }
-#ai-fab.ai-open{ opacity:0; pointer-events:none; transform:scale(.6); }
+#ai-fab .ai-fab-ico{
+  width:52px; height:52px; flex:0 0 auto;
+  display:inline-flex; align-items:center; justify-content:center;
+  color:var(--ai-cyan);
+}
+#ai-fab svg{ width:24px; height:24px; }
+#ai-fab .ai-fab-label{ display:none; padding-right:16px; white-space:nowrap; }
+#ai-fab:hover{
+  transform:translateY(-2px);
+  border-color:rgba(255,255,255,.18);
+  box-shadow:var(--ai-hi),
+             -5px -5px 14px rgba(255,255,255,.022),
+             9px 11px 26px rgba(0,0,0,.62);
+}
+#ai-fab:active{ transform:translateY(0); }
+#ai-fab:focus-visible{ outline:2px solid rgba(0,229,255,.55); outline-offset:3px; }
+#ai-fab.ai-open{ opacity:0; pointer-events:none; transform:scale(.85); }
+
+/* show a compact "Ask AI" label on wider screens for clarity */
+@media (min-width:720px){
+  #ai-fab{ padding-right:0; }
+  #ai-fab .ai-fab-label{ display:inline; }
+}
 
 /* ---- panel ---- */
 #ai-panel{
-  position:fixed; right:20px; bottom:20px; z-index:91;
+  position:fixed; right:16px; bottom:74px; z-index:91;
   width:min(420px, calc(100vw - 32px));
-  max-height:min(640px, calc(100vh - 40px));
+  height:min(560px, calc(100vh - 90px));
+  min-width:300px; min-height:280px;
+  max-width:calc(100vw - 24px); max-height:calc(100vh - 24px);
   display:none; flex-direction:column;
   font-family:'Inter',ui-sans-serif,system-ui,-apple-system,sans-serif;
   color:var(--ai-text);
@@ -42,44 +67,50 @@
   -webkit-backdrop-filter:blur(22px) saturate(150%);
   backdrop-filter:blur(22px) saturate(150%);
   border:1px solid var(--ai-stroke);
-  border-radius:20px;
+  border-radius:18px;
   box-shadow:var(--ai-hi), var(--ai-neu), 0 18px 50px rgba(0,0,0,.55);
   overflow:hidden;
+  resize:both;
 }
 #ai-panel.ai-show{ display:flex; animation:ai-pop .22s cubic-bezier(.2,.8,.25,1); }
-@keyframes ai-pop{ from{ opacity:0; transform:translateY(14px) scale(.96); }
+@keyframes ai-pop{ from{ opacity:0; transform:translateY(14px) scale(.97); }
   to{ opacity:1; transform:none; } }
 
+/* drag handle = the header */
 #ai-panel .ai-head{
   display:flex; align-items:center; gap:10px;
-  padding:14px 16px; border-bottom:1px solid var(--ai-stroke);
-  background:linear-gradient(180deg, rgba(124,147,255,.08), transparent);
+  padding:13px 14px; border-bottom:1px solid var(--ai-stroke);
+  background:linear-gradient(180deg, rgba(124,147,255,.06), transparent);
+  cursor:grab; touch-action:none; user-select:none; flex:0 0 auto;
 }
+#ai-panel .ai-head.ai-dragging{ cursor:grabbing; }
 #ai-panel .ai-head .ai-dot{
   width:30px; height:30px; border-radius:9px; flex:0 0 auto;
-  display:inline-flex; align-items:center; justify-content:center; color:#03121a;
-  background:radial-gradient(120% 120% at 30% 25%, var(--ai-cyan), var(--ai-accent));
-  box-shadow:var(--ai-hi);
+  display:inline-flex; align-items:center; justify-content:center; color:var(--ai-cyan);
+  background:rgba(0,229,255,.08);
+  border:1px solid var(--ai-stroke);
 }
 #ai-panel .ai-head .ai-dot svg{ width:17px; height:17px; }
 #ai-panel .ai-head h3{
   margin:0; font-size:14.5px; font-weight:700; letter-spacing:-.2px; flex:1;
 }
 #ai-panel .ai-head .ai-sub{ display:block; font-size:11px; font-weight:500; color:var(--ai-muted); }
-#ai-close{
-  width:30px; height:30px; flex:0 0 auto; border-radius:9px; cursor:pointer;
+.ai-head-btn{
+  width:28px; height:28px; flex:0 0 auto; border-radius:8px; cursor:pointer;
   border:1px solid var(--ai-stroke); background:rgba(255,255,255,.03);
-  color:var(--ai-muted); font-size:17px; line-height:1;
+  color:var(--ai-muted); font-size:14px; line-height:1;
   display:inline-flex; align-items:center; justify-content:center;
   transition:color .15s, border-color .15s;
 }
-#ai-close:hover{ color:var(--ai-text); border-color:rgba(255,255,255,.22); }
+.ai-head-btn:hover{ color:var(--ai-text); border-color:rgba(255,255,255,.22); }
+#ai-reset svg{ width:15px; height:15px; }
+#ai-close{ font-size:17px; }
 
-#ai-panel .ai-body{ padding:14px 16px; overflow-y:auto; }
+#ai-panel .ai-body{ padding:14px 16px; overflow-y:auto; flex:1 1 auto; min-height:0; }
 
 #ai-panel .ai-answer{
   font-size:13.5px; line-height:1.62; color:var(--ai-text);
-  margin-bottom:12px; word-wrap:break-word; overflow-wrap:anywhere;
+  margin-bottom:0; word-wrap:break-word; overflow-wrap:anywhere;
 }
 #ai-panel .ai-answer:empty{ display:none; }
 #ai-panel .ai-answer p{ margin:0 0 9px; }
@@ -101,6 +132,7 @@
 #ai-panel .ai-foot{
   padding:12px 16px 14px; border-top:1px solid var(--ai-stroke);
   background:linear-gradient(0deg, rgba(0,0,0,.18), transparent);
+  flex:0 0 auto;
 }
 #ai-input{
   width:100%; box-sizing:border-box; resize:vertical; min-height:62px; max-height:160px;
@@ -124,11 +156,20 @@
   flex:0 0 auto; cursor:pointer; border:none; border-radius:11px;
   padding:9px 18px; font-family:inherit; font-size:13px; font-weight:700; color:#03121a;
   background:linear-gradient(120deg, var(--ai-cyan), var(--ai-accent));
-  box-shadow:var(--ai-hi), 0 6px 16px rgba(0,229,255,.28);
+  box-shadow:var(--ai-hi), 0 4px 12px rgba(0,229,255,.20);
   transition:transform .15s, opacity .15s, box-shadow .15s;
 }
 #ai-send:hover:not(:disabled){ transform:translateY(-1px); }
 #ai-send:disabled{ opacity:.55; cursor:not-allowed; }
+
+/* custom bottom-right resize grip (visual cue for native resize:both) */
+#ai-panel .ai-grip{
+  position:absolute; right:3px; bottom:3px; width:16px; height:16px;
+  pointer-events:none; z-index:2; opacity:.55;
+  background:
+    linear-gradient(135deg, transparent 46%, var(--ai-muted) 46%, var(--ai-muted) 54%, transparent 54%),
+    linear-gradient(135deg, transparent 70%, var(--ai-muted) 70%, var(--ai-muted) 78%, transparent 78%);
+}
 
 /* loading dots */
 .ai-loading{ display:inline-flex; gap:5px; align-items:center; color:var(--ai-muted); font-size:12.5px; }
@@ -147,6 +188,5 @@
   .ai-loading .ai-dots i{ animation:none; opacity:.7; }
 }
 @media (max-width:520px){
-  #ai-panel{ right:12px; left:12px; bottom:12px; width:auto; }
-  #ai-fab{ right:14px; bottom:14px; }
+  #ai-fab{ right:14px; bottom:72px; }
 }
