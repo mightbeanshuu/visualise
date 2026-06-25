@@ -137,12 +137,94 @@
     .side.open{max-height:1500px;padding:10px 0 20px;} .menuToggle{display:inline-block;}
     .cards{grid-template-columns:1fr;} .ic.analogy,.ic.bugs{grid-column:auto;} .main{padding:18px 16px 50px;}
   }
+
+  /* ════════════════ LANDING HERO (graphs-style) ════════════════ */
+  #bg-canvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;display:block;}
+  .top,.shell,.thero{position:relative;z-index:1;}
+  .thero{padding:78px 26px 40px;max-width:1080px;margin:0 auto;display:grid;gap:22px;justify-items:start;}
+  .teyebrow{display:inline-flex;align-items:center;gap:9px;color:#5dff8f;font-size:11.5px;letter-spacing:2px;text-transform:uppercase;font-weight:700;font-family:'JetBrains Mono',monospace;border:1px solid rgba(93,255,143,.25);background:rgba(93,255,143,.06);padding:7px 14px;border-radius:30px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);}
+  .teyebrow .tpulse{width:7px;height:7px;border-radius:50%;background:#5dff8f;box-shadow:0 0 9px rgba(93,255,143,.7);animation:tblink 1.7s ease-in-out infinite;}
+  @keyframes tblink{50%{opacity:.25;}}
+  .thead{margin:0;font-size:clamp(40px,7.6vw,78px);line-height:1.0;letter-spacing:-2.2px;font-weight:700;
+    background:linear-gradient(102deg,#fff 4%,#5dff8f 34%,#00e5ff 64%,#bf5af2 94%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;background-size:220% auto;animation:tshimmer 9s ease-in-out infinite;}
+  @keyframes tshimmer{50%{background-position:100% center;}}
+  .tsub{margin:0;color:var(--txt2);line-height:1.66;max-width:680px;font-size:17px;font-weight:400;}
+  .tsub b{color:var(--head);font-weight:600;}
+  .tcta{display:flex;gap:14px;flex-wrap:wrap;margin-top:4px;}
+  .tbtn{display:inline-flex;align-items:center;gap:8px;font-family:inherit;font-weight:600;font-size:14px;border-radius:30px;
+    padding:12px 22px;text-decoration:none;cursor:pointer;border:1px solid transparent;
+    transition:transform .22s cubic-bezier(.2,.7,.3,1),box-shadow .22s,border-color .22s;}
+  .tbtn svg{width:16px;height:16px;transition:transform .25s;}
+  .tbtn:hover svg{transform:translateX(4px);}
+  .tbtn-primary{background:linear-gradient(100deg,#5dff8f,#00e5ff);color:#04140c;
+    box-shadow:0 14px 30px -18px rgba(0,0,0,.7),0 2px 0 0 rgba(255,255,255,.08) inset;}
+  .tbtn-primary:hover{transform:translateY(-2px);box-shadow:0 20px 40px -20px rgba(0,0,0,.75),0 2px 0 0 rgba(255,255,255,.1) inset;}
+  .tbtn-ghost{background:linear-gradient(180deg,rgba(20,27,38,.6),rgba(9,12,17,.74));backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+    border-color:var(--border);color:var(--head);box-shadow:0 18px 40px -22px rgba(0,0,0,.85),0 1px 0 0 rgba(255,255,255,.03) inset;}
+  .tbtn-ghost:hover{transform:translateY(-2px);border-color:#2f6e8a;box-shadow:0 26px 52px -22px rgba(0,0,0,.9),0 1px 0 0 rgba(255,255,255,.05) inset;}
+  .tinside{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;width:100%;margin-top:8px;}
+  .tincard{display:flex;align-items:flex-start;gap:12px;padding:15px 16px;border-radius:14px;text-decoration:none;color:inherit;cursor:pointer;
+    border:1px solid var(--border);background:linear-gradient(180deg,rgba(20,27,38,.55),rgba(9,12,17,.7));
+    backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+    box-shadow:0 16px 36px -22px rgba(0,0,0,.8),0 1px 0 0 rgba(255,255,255,.03) inset;
+    transition:transform .24s cubic-bezier(.2,.7,.3,1),border-color .24s,box-shadow .24s;}
+  .tincard:hover{transform:translateY(-4px);border-color:#2a3a4c;box-shadow:0 26px 50px -24px rgba(0,0,0,.9),0 1px 0 0 rgba(255,255,255,.05) inset;}
+  .tincard .tii{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;flex-shrink:0;
+    color:#5dff8f;border:1px solid rgba(93,255,143,.26);background:rgba(93,255,143,.08);}
+  .tincard .tii svg{width:19px;height:19px;}
+  .tincard .tit{font-size:13.5px;font-weight:600;color:var(--head);letter-spacing:-.2px;}
+  .tincard .tid{font-size:11.5px;color:var(--muted);margin-top:3px;line-height:1.45;}
+  @keyframes trise{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:none;}}
+  .thero>*{animation:trise .7s cubic-bezier(.2,.7,.3,1) both;}
+  .thero>*:nth-child(2){animation-delay:.07s;}.thero>*:nth-child(3){animation-delay:.14s;}
+  .thero>*:nth-child(4){animation-delay:.21s;}.thero>*:nth-child(5){animation-delay:.28s;}
+  @media(max-width:860px){.thero{padding:52px 16px 30px;}.tinside{grid-template-columns:1fr;}}
+  @media(max-width:560px){.thead{letter-spacing:-1.2px;}}
 </style>
   <link rel="stylesheet" href="/glass.css">
   <link rel="stylesheet" href="/ask-widget.css">
 </head>
 <body>
-  <div class="top">
+  <canvas id="bg-canvas" aria-hidden="true"></canvas>
+
+  <section class="thero">
+    <span class="teyebrow"><span class="tpulse"></span> ● TREES · PATTERN HUB</span>
+    <h1 class="thead">See binary trees<br>actually recurse.</h1>
+    <p class="tsub">Nine interactive binary-tree patterns — DFS traversals, level-order BFS, height &amp; diameter, path sum, LCA and BST validation — with the tree, the <b>call stack</b> and the result array animating step by step as each line of <b>Striver + NeetCode</b> code lights up.</p>
+    <div class="tcta">
+      <a class="tbtn tbtn-primary" href="#tool">Launch the hub <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
+      <a class="tbtn tbtn-ghost" href="#inside">What's inside</a>
+    </div>
+    <div class="tinside" id="inside">
+      <a class="tincard" href="#tool" data-pi="0">
+        <span class="tii"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2.4"/><circle cx="5.5" cy="18.5" r="2.4"/><circle cx="18.5" cy="18.5" r="2.4"/><path d="M12 7.4v3.4M12 10.8 6.6 16.4M12 10.8l5.4 5.6"/></svg></span>
+        <span><span class="tit">DFS Traversals</span><span class="tid">Pre · in · post order, recursion stack</span></span>
+      </a>
+      <a class="tincard" href="#tool" data-pi="3">
+        <span class="tii"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="4" rx="1"/><rect x="5" y="10" width="14" height="4" rx="1"/><rect x="7" y="16" width="10" height="4" rx="1"/></svg></span>
+        <span><span class="tit">Level-Order BFS</span><span class="tid">Queue by levels, views &amp; zigzag</span></span>
+      </a>
+      <a class="tincard" href="#tool" data-pi="5">
+        <span class="tii"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18"/><path d="m6 9 6-6 6 6"/><path d="M4 21h16"/></svg></span>
+        <span><span class="tit">Height &amp; Diameter</span><span class="tid">Bottom-up postorder tree DP</span></span>
+      </a>
+      <a class="tincard" href="#tool" data-pi="6">
+        <span class="tii"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v4M12 8 6 14M12 8l6 6"/><circle cx="12" cy="4" r="1.6"/><circle cx="6" cy="15.5" r="1.6"/><path d="M16 18l2 2 4-4"/></svg></span>
+        <span><span class="tit">Path Sum</span><span class="tid">Root→leaf budget, backtracking</span></span>
+      </a>
+      <a class="tincard" href="#tool" data-pi="7">
+        <span class="tii"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2.2"/><circle cx="6" cy="13" r="2.2"/><circle cx="18" cy="13" r="2.2"/><circle cx="6" cy="20" r="2.2"/><circle cx="18" cy="20" r="2.2"/><path d="M12 7.2 7.2 11M12 7.2 16.8 11M6 15.2v2.6M18 15.2v2.6"/></svg></span>
+        <span><span class="tit">Lowest Common Ancestor</span><span class="tid">Split point bubbles up</span></span>
+      </a>
+      <a class="tincard" href="#tool" data-pi="8">
+        <span class="tii"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h6M15 12h6"/><path d="M9 8v8M15 8v8"/><circle cx="12" cy="12" r="2.2"/></svg></span>
+        <span><span class="tit">Validate BST</span><span class="tid">(low, high) window down the tree</span></span>
+      </a>
+    </div>
+  </section>
+
+  <div class="top" id="tool">
     <div class="row">
       <a class="backbtn" href="/" title="Topics">← Topics</a>
       <span class="badge">BINARY TREES</span>
@@ -850,6 +932,119 @@ function mountStepper(p){
 }
 
 render();
+
+/* hero "what's inside" cards → jump to the matching pattern in the tool */
+document.querySelectorAll('.tincard[data-pi]').forEach(card=>{
+  card.addEventListener('click',()=>{
+    const i=+card.dataset.pi;
+    if(!Number.isNaN(i)&&i>=0&&i<P.length){ active=i; render(); }
+  });
+});
+</script>
+
+<!-- Three.js drifting node-and-edge network background (green-tinted) -->
+<script type="module">
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const canvas = document.getElementById('bg-canvas');
+  // On reduced-motion (or no canvas) we skip Three.js entirely — the CSS radial
+  // gradient background stands in as a static backdrop. No animation runs.
+  if (!reduce && canvas) {
+    try {
+      const THREE = await import('https://unpkg.com/three@0.160.0/build/three.module.js');
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, 0.1, 100);
+      camera.position.z = 26;
+
+      const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+      renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));
+      renderer.setSize(innerWidth, innerHeight);
+
+      const COUNT = 128;                 // <= 150 particles
+      const SPREAD = 30;
+      const palette = [
+        new THREE.Color(0x5dff8f),       // green (primary accent)
+        new THREE.Color(0x5dff8f),       // green (weighted toward green)
+        new THREE.Color(0x00e5ff),       // site cyan
+        new THREE.Color(0xbf5af2),       // bst purple (sparse)
+      ];
+
+      const positions = new Float32Array(COUNT * 3);
+      const colors = new Float32Array(COUNT * 3);
+      const pts = [];
+      for (let i = 0; i < COUNT; i++) {
+        const x = (Math.random() - 0.5) * SPREAD;
+        const y = (Math.random() - 0.5) * SPREAD;
+        const z = (Math.random() - 0.5) * SPREAD;
+        positions[i*3] = x; positions[i*3+1] = y; positions[i*3+2] = z;
+        pts.push(new THREE.Vector3(x, y, z));
+        const c = palette[i % 9 === 0 ? 3 : i % 3];
+        colors[i*3] = c.r; colors[i*3+1] = c.g; colors[i*3+2] = c.b;
+      }
+
+      // nodes
+      const pGeo = new THREE.BufferGeometry();
+      pGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      pGeo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+      const pMat = new THREE.PointsMaterial({
+        size: 0.4, vertexColors: true, transparent: true, opacity: 0.8,
+        sizeAttenuation: true, depthWrite: false, blending: THREE.AdditiveBlending,
+      });
+      const points = new THREE.Points(pGeo, pMat);
+
+      // edges — connect nearby nodes, computed once
+      const linePos = [];
+      const lineCol = [];
+      const MAXD = 6.4, MAXEDGES = 300;
+      let edges = 0;
+      for (let i = 0; i < COUNT && edges < MAXEDGES; i++) {
+        for (let j = i + 1; j < COUNT && edges < MAXEDGES; j++) {
+          if (pts[i].distanceTo(pts[j]) < MAXD) {
+            linePos.push(pts[i].x, pts[i].y, pts[i].z, pts[j].x, pts[j].y, pts[j].z);
+            lineCol.push(colors[i*3], colors[i*3+1], colors[i*3+2], colors[j*3], colors[j*3+1], colors[j*3+2]);
+            edges++;
+          }
+        }
+      }
+      const lGeo = new THREE.BufferGeometry();
+      lGeo.setAttribute('position', new THREE.Float32BufferAttribute(linePos, 3));
+      lGeo.setAttribute('color', new THREE.Float32BufferAttribute(lineCol, 3));
+      const lMat = new THREE.LineBasicMaterial({
+        vertexColors: true, transparent: true, opacity: 0.14, blending: THREE.AdditiveBlending, depthWrite: false,
+      });
+      const lines = new THREE.LineSegments(lGeo, lMat);
+
+      const group = new THREE.Group();
+      group.add(points); group.add(lines);
+      group.scale.set(1.05, 1.05, 1.05);
+      scene.add(group);
+
+      addEventListener('resize', () => {
+        camera.aspect = innerWidth / innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(innerWidth, innerHeight);
+      }, { passive: true });
+
+      let running = true;
+      document.addEventListener('visibilitychange', () => {
+        running = !document.hidden;
+        if (running) loop();
+      });
+
+      const t0 = performance.now();
+      function loop() {
+        if (!running) return;            // pause while tab hidden
+        const t = (performance.now() - t0) * 0.00006;
+        group.rotation.y = t;
+        group.rotation.x = Math.sin(t * 0.6) * 0.18;
+        renderer.render(scene, camera);
+        requestAnimationFrame(loop);
+      }
+      loop();
+    } catch (e) {
+      /* CDN/WebGL unavailable — CSS gradient remains as the backdrop */
+    }
+  }
 </script>
 
 <!-- visualise: auth gate + what's-next + resizable panels -->
