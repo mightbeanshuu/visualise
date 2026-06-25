@@ -47,48 +47,82 @@
   }
   function keyOf(p) { return p.classList.contains("demo") ? "demo" : "code"; }
 
+  /* return the direct-child .vx-bar elements of a panel (newest-first not
+     guaranteed — order is DOM order) */
+  function barsOf(p) {
+    return [].slice.call(p.children).filter(function (c) {
+      return c.classList && c.classList.contains("vx-bar");
+    });
+  }
+
   function enhance() {
     var split = document.querySelector("#main #split");
-    if (!split || split.getAttribute("data-vx") === "1") return;
-    split.setAttribute("data-vx", "1");
-    split.classList.add("vx-split");
+    if (!split) return;
 
-    var panels = panelsIn(split);
-    panels.forEach(function (p) {
-      var k = keyOf(p);
-      // handle bar
-      var bar = document.createElement("div");
-      bar.className = "vx-bar";
-      bar.draggable = true;
-      bar.innerHTML =
-        '<span class="vx-grip" aria-hidden="true">⠿</span>' +
-        '<span class="vx-title">' + (TITLES[k] || k) + '</span>' +
-        '<span class="vx-hint">drag corner ⤡ to resize</span>' +
-        '<span class="vx-moves">' +
-          '<button class="vx-mv vx-up" title="Move up" aria-label="Move panel up">↑</button>' +
-          '<button class="vx-mv vx-down" title="Move down" aria-label="Move panel down">↓</button>' +
-        '</span>';
-      p.insertBefore(bar, p.firstChild);
+    /* Pause the observer while we mutate the DOM, so our own inserts/removes
+       can never re-trigger enhance() and stack a second bar. Always reconnect
+       in finally, even if something throws mid-way. */
+    obs.disconnect();
+    try {
+      split.classList.add("vx-split");
 
-      bar.querySelector(".vx-up").onclick = function () { move(split, p, -1); };
-      bar.querySelector(".vx-down").onclick = function () { move(split, p, 1); };
+      var panels = panelsIn(split);
+      panels.forEach(function (p) {
+        var k = keyOf(p);
 
-      // drag-to-reorder
-      bar.addEventListener("dragstart", function (e) {
-        if (state.locked) { e.preventDefault(); return; }
-        e.dataTransfer.setData("text/plain", k); split.classList.add("vx-dragging");
+        /* Idempotent guard: at most ONE .vx-bar per panel. If extras exist
+           (from an earlier double-fire), drop all but the first. If a bar is
+           already present, this panel is enhanced — just make sure it's the
+           first child and skip re-binding. */
+        var bars = barsOf(p);
+        if (bars.length) {
+          for (var i = 1; i < bars.length; i++) { p.removeChild(bars[i]); }
+          if (p.firstChild !== bars[0]) p.insertBefore(bars[0], p.firstChild);
+          return;
+        }
+
+        // handle bar
+        var bar = document.createElement("div");
+        bar.className = "vx-bar";
+        bar.draggable = true;
+        bar.innerHTML =
+          '<span class="vx-grip" aria-hidden="true">⠿</span>' +
+          '<span class="vx-title">' + (TITLES[k] || k) + '</span>' +
+          '<span class="vx-hint">drag corner ⤡ to resize</span>' +
+          '<span class="vx-moves">' +
+            '<button class="vx-mv vx-up" title="Move up" aria-label="Move panel up">↑</button>' +
+            '<button class="vx-mv vx-down" title="Move down" aria-label="Move panel down">↓</button>' +
+          '</span>';
+        p.insertBefore(bar, p.firstChild);
+
+        bar.querySelector(".vx-up").onclick = function () { move(split, p, -1); };
+        bar.querySelector(".vx-down").onclick = function () { move(split, p, 1); };
+
+        // drag-to-reorder
+        bar.addEventListener("dragstart", function (e) {
+          if (state.locked) { e.preventDefault(); return; }
+          e.dataTransfer.setData("text/plain", k); split.classList.add("vx-dragging");
+        });
+        bar.addEventListener("dragend", function () { split.classList.remove("vx-dragging"); });
+
+        /* p-level drop/dragover listeners bound once per panel node */
+        if (!p.getAttribute("data-vx-bound")) {
+          p.setAttribute("data-vx-bound", "1");
+          p.addEventListener("dragover", function (e) { if (!state.locked) e.preventDefault(); });
+          p.addEventListener("drop", function (e) {
+            e.preventDefault();
+            var from = e.dataTransfer.getData("text/plain"); if (!from || from === keyOf(p)) return;
+            var dragged = panelsIn(split).filter(function (x) { return keyOf(x) === from; })[0];
+            if (dragged) { split.insertBefore(dragged, p); commitOrder(split); }
+          });
+        }
       });
-      bar.addEventListener("dragend", function () { split.classList.remove("vx-dragging"); });
-      p.addEventListener("dragover", function (e) { if (!state.locked) e.preventDefault(); });
-      p.addEventListener("drop", function (e) {
-        e.preventDefault();
-        var from = e.dataTransfer.getData("text/plain"); if (!from || from === k) return;
-        var dragged = panels.filter(function (x) { return keyOf(x) === from; })[0];
-        if (dragged) { split.insertBefore(dragged, p); commitOrder(split); }
-      });
-    });
 
-    applyState(split);
+      applyState(split);
+    } finally {
+      /* reconnect — resume watching for the next real re-render */
+      obs.observe(mainEl, { childList: true, subtree: true });
+    }
   }
 
   function move(split, p, dir) {

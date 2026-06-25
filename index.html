@@ -13,7 +13,11 @@
       --bg:#06080c; --panel:#0c1016; --line:#19222f; --line2:#243244;
       --text:#eef2f8; --muted:#90a0b3; --faint:#5a6675;
       --cyan:#00e5ff; --green:#5dff8f; --accent:#7c93ff; --pink:#ff5acd;
-      --r:14px;
+      --r:18px;
+      /* neumorphic dual-light shadow tuned for the dark bg */
+      --neu:8px 8px 20px rgba(0,0,0,.5), -6px -6px 18px rgba(255,255,255,.022);
+      --neu-sm:5px 5px 14px rgba(0,0,0,.42), -4px -4px 12px rgba(255,255,255,.02);
+      --glass:linear-gradient(180deg,rgba(22,29,40,.6),rgba(9,12,17,.55));
     }
     *{box-sizing:border-box;}
     html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;}
@@ -36,37 +40,45 @@
     svg{display:block;}
     :focus-visible{outline:2px solid var(--cyan);outline-offset:3px;border-radius:6px;}
 
-    /* faint blueprint grid */
+    /* three.js network background canvas */
+    #bgfx{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0;
+      transition:opacity 1.2s ease;}
+    #bgfx.on{opacity:1;}
+
+    /* faint blueprint grid (sits above the canvas, below content) */
     body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
       background-image:
-        linear-gradient(rgba(124,147,255,.05) 1px,transparent 1px),
-        linear-gradient(90deg,rgba(124,147,255,.05) 1px,transparent 1px);
+        linear-gradient(rgba(124,147,255,.045) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(124,147,255,.045) 1px,transparent 1px);
       background-size:46px 46px;
       mask-image:radial-gradient(950px 620px at 50% -2%,#000 28%,transparent 76%);
       -webkit-mask-image:radial-gradient(950px 620px at 50% -2%,#000 28%,transparent 76%);}
     main,header,footer{position:relative;z-index:1;}
 
     /* nav */
-    .nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
-      background:rgba(6,8,12,.7);border-bottom:1px solid var(--line);}
+    .nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(16px) saturate(140%);-webkit-backdrop-filter:blur(16px) saturate(140%);
+      background:rgba(6,8,12,.62);border-bottom:1px solid var(--line);}
     .nav .wrap{display:flex;align-items:center;justify-content:space-between;padding:13px 0;}
     .logo{display:flex;align-items:center;gap:11px;font-weight:700;letter-spacing:-.4px;font-size:16.5px;text-decoration:none;}
-    .logo .mark{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;
-      background:linear-gradient(140deg,rgba(0,229,255,.18),rgba(124,147,255,.16));
-      border:1px solid rgba(0,229,255,.3);box-shadow:0 0 18px rgba(0,229,255,.22) inset;}
-    .logo .mark svg{width:15px;height:15px;color:var(--cyan);}
+    .logo .mark{width:30px;height:30px;border-radius:10px;display:grid;place-items:center;
+      background:linear-gradient(140deg,rgba(0,229,255,.16),rgba(124,147,255,.14));
+      border:1px solid rgba(0,229,255,.26);
+      box-shadow:inset 2px 2px 6px rgba(0,0,0,.4),inset -2px -2px 6px rgba(255,255,255,.04);}
+    .logo .mark svg{width:16px;height:16px;color:var(--cyan);}
     .nav .links{display:flex;align-items:center;gap:6px;}
     .nav .links a{color:var(--muted);text-decoration:none;font-size:13.5px;font-weight:500;
-      padding:7px 12px;border-radius:9px;transition:color .18s,background .18s;}
+      padding:7px 12px;border-radius:11px;transition:color .18s,background .18s;}
     .nav .links a:hover{color:var(--text);background:rgba(124,147,255,.08);}
     .nav .links a.gh{display:inline-flex;align-items:center;gap:6px;}
     .nav .links a.gh svg{width:15px;height:15px;}
 
     /* hero */
-    .hero{padding:78px 0 30px;display:grid;gap:22px;justify-items:start;}
+    .hero{padding:84px 0 30px;display:grid;gap:22px;justify-items:start;}
     .eyebrow{display:inline-flex;align-items:center;gap:9px;color:var(--green);font-size:11.5px;
       letter-spacing:2px;text-transform:uppercase;font-weight:700;font-family:'JetBrains Mono',monospace;
-      border:1px solid rgba(93,255,143,.25);background:rgba(93,255,143,.06);padding:6px 14px;border-radius:30px;}
+      border:1px solid rgba(93,255,143,.25);background:rgba(93,255,143,.06);padding:7px 15px;border-radius:30px;
+      backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+      box-shadow:var(--neu-sm);}
     .eyebrow .pulse{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green);animation:blink 1.7s ease-in-out infinite;}
     @keyframes blink{50%{opacity:.25;}}
     h1{margin:0;font-size:clamp(46px,8.4vw,88px);line-height:1.0;letter-spacing:-2.4px;font-weight:700;
@@ -77,35 +89,56 @@
     .sub{margin:0;color:var(--muted);line-height:1.68;max-width:640px;font-size:17px;font-weight:400;}
     .sub b{color:var(--text);font-weight:600;}
 
-    /* stats strip */
+    /* CTA row */
+    .cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:2px;}
+    .btn{display:inline-flex;align-items:center;gap:9px;text-decoration:none;font-weight:600;font-size:14px;
+      padding:13px 22px;border-radius:14px;cursor:pointer;border:1px solid transparent;
+      transition:transform .22s cubic-bezier(.2,.7,.3,1),box-shadow .22s,border-color .22s,background .22s;}
+    .btn svg{width:16px;height:16px;}
+    .btn.primary{color:#04121a;
+      background:linear-gradient(135deg,var(--cyan),var(--accent));
+      box-shadow:6px 6px 18px rgba(0,0,0,.45),-4px -4px 14px rgba(255,255,255,.03),inset 0 1px 0 rgba(255,255,255,.25);}
+    .btn.primary:hover{transform:translateY(-3px);
+      box-shadow:9px 11px 26px rgba(0,0,0,.5),-4px -4px 14px rgba(255,255,255,.04),inset 0 1px 0 rgba(255,255,255,.3);}
+    .btn.primary .ar{transition:transform .25s;}
+    .btn.primary:hover .ar{transform:translateY(3px);}
+    .btn.ghost{color:var(--text);border-color:var(--line2);
+      background:var(--glass);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+      box-shadow:var(--neu-sm);}
+    .btn.ghost:hover{transform:translateY(-3px);border-color:rgba(124,147,255,.4);color:#fff;}
+
+    /* stats strip — glass + neumorphic */
     .stats{display:flex;flex-wrap:wrap;gap:10px 0;border:1px solid var(--line);border-radius:var(--r);
-      background:linear-gradient(180deg,rgba(16,22,31,.55),rgba(9,12,17,.7));overflow:hidden;margin-top:4px;width:100%;}
-    .stat{flex:1 1 0;min-width:130px;padding:16px 20px;display:flex;flex-direction:column;gap:3px;
-      border-left:1px solid var(--line);}
+      background:var(--glass);backdrop-filter:blur(14px) saturate(130%);-webkit-backdrop-filter:blur(14px) saturate(130%);
+      overflow:hidden;margin-top:8px;width:100%;box-shadow:var(--neu);}
+    .stat{flex:1 1 0;min-width:130px;padding:18px 22px;display:flex;flex-direction:column;gap:3px;
+      border-left:1px solid rgba(124,147,255,.1);}
     .stat:first-child{border-left:none;}
-    .stat .num{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:22px;letter-spacing:-.5px;
+    .stat .num{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:23px;letter-spacing:-.5px;
       color:var(--text);}
     .stat .num em{font-style:normal;color:var(--cyan);}
     .stat .lbl{font-size:11.5px;color:var(--faint);letter-spacing:.4px;text-transform:uppercase;font-weight:600;}
 
     /* section head */
-    .sectionhead{display:flex;align-items:baseline;justify-content:space-between;gap:14px;margin:40px 0 18px;flex-wrap:wrap;}
+    .sectionhead{display:flex;align-items:baseline;justify-content:space-between;gap:14px;margin:48px 0 18px;flex-wrap:wrap;scroll-margin-top:80px;}
     .sectionhead h2{margin:0;font-weight:600;font-size:21px;letter-spacing:-.4px;}
     .sectionhead .note{font-size:12px;color:var(--faint);font-family:'JetBrains Mono',monospace;}
     .sectionhead .note b{color:var(--green);}
 
     /* topic grid */
-    .topics{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;}
-    .topics+.topics{margin-top:13px;}
+    .topics{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+    .topics+.topics{margin-top:14px;}
     .topic{--a:124,147,255;position:relative;border:1px solid rgba(var(--a),.16);border-radius:var(--r);
-      background:linear-gradient(180deg,rgba(var(--a),.05),rgba(9,12,17,.72));
+      background:var(--glass);backdrop-filter:blur(13px) saturate(125%);-webkit-backdrop-filter:blur(13px) saturate(125%);
       padding:18px;min-height:158px;display:flex;flex-direction:column;gap:9px;
-      text-decoration:none;color:inherit;overflow:hidden;
+      text-decoration:none;color:inherit;overflow:hidden;box-shadow:var(--neu);
       transition:transform .24s cubic-bezier(.2,.7,.3,1),border-color .24s,box-shadow .24s,opacity .24s;}
-    .topic .ticon{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;
-      color:rgb(var(--a));border:1px solid rgba(var(--a),.28);background:rgba(var(--a),.09);
-      transition:transform .24s,box-shadow .24s;}
-    .topic .ticon svg{width:19px;height:19px;}
+    .topic .ticon{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;
+      color:rgb(var(--a));border:1px solid rgba(var(--a),.24);
+      background:linear-gradient(145deg,rgba(var(--a),.12),rgba(9,12,17,.5));
+      box-shadow:inset 2px 2px 5px rgba(0,0,0,.35),inset -2px -2px 5px rgba(255,255,255,.035);
+      transition:transform .24s;}
+    .topic .ticon svg{width:20px;height:20px;}
     .topic h3{margin:5px 0 0;font-size:15.5px;font-weight:600;letter-spacing:-.3px;}
     .topic p{margin:0;color:var(--muted);font-size:12.5px;line-height:1.5;}
     .pill{position:absolute;top:14px;right:14px;font-family:'JetBrains Mono',monospace;font-size:9px;
@@ -113,27 +146,21 @@
       display:inline-flex;align-items:center;gap:5px;color:var(--faint);border:1px solid var(--line2);background:rgba(11,17,24,.6);}
     .pill .ld{width:5px;height:5px;border-radius:50%;background:currentColor;}
 
-    /* live cards */
+    /* live cards — restrained lift, NO neon glow halo */
     .topic.live{cursor:pointer;}
     .topic.live .pill{color:rgb(var(--a));border-color:rgba(var(--a),.4);background:rgba(var(--a),.08);}
     .topic.live .pill .ld{box-shadow:0 0 7px currentColor;animation:blink 1.7s ease-in-out infinite;}
-    .topic.live:hover{transform:translateY(-6px);border-color:rgba(var(--a),.6);
-      box-shadow:0 20px 46px rgba(0,0,0,.5),0 0 0 1px rgba(var(--a),.14),0 0 34px rgba(var(--a),.1);}
-    .topic.live:hover .ticon{transform:scale(1.06);box-shadow:0 0 18px rgba(var(--a),.35);}
+    .topic.live:hover{transform:translateY(-5px);border-color:rgba(var(--a),.42);
+      box-shadow:11px 14px 30px rgba(0,0,0,.55),-6px -6px 18px rgba(255,255,255,.025);}
+    .topic.live:hover .ticon{transform:scale(1.05);}
     .topic.live .open{margin-top:auto;display:inline-flex;align-items:center;gap:6px;color:rgb(var(--a));font-weight:600;font-size:12.5px;}
     .topic.live .open svg{width:15px;height:15px;transition:transform .25s;}
     .topic.live:hover .open svg{transform:translateX(5px);}
-    /* sweep highlight */
-    .topic.live::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
-      background:linear-gradient(120deg,transparent 30%,rgba(var(--a),.10) 50%,transparent 70%);
-      background-size:240% 100%;background-position:120% 0;opacity:0;transition:opacity .3s;}
-    .topic.live:hover::after{opacity:1;animation:sweep 1.1s ease;}
-    @keyframes sweep{from{background-position:120% 0;}to{background-position:-60% 0;}}
 
     /* coming soon */
-    .topic.soon{opacity:.52;}
+    .topic.soon{opacity:.52;box-shadow:var(--neu-sm);}
     .topic.soon .pill{color:var(--faint);}
-    .topic.soon:hover{opacity:.72;border-color:var(--line2);}
+    .topic.soon:hover{opacity:.72;border-color:var(--line2);transform:translateY(-3px);}
 
     footer{border-top:1px solid var(--line);margin-top:64px;}
     footer .wrap{padding:24px 0 44px;color:var(--faint);font-size:12.5px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;}
@@ -141,21 +168,24 @@
     footer a{color:var(--muted);text-decoration:none;transition:color .18s;} footer a:hover{color:var(--text);}
 
     @media(max-width:980px){.topics{grid-template-columns:repeat(3,1fr);}}
-    @media(max-width:720px){.topics{grid-template-columns:repeat(2,1fr);}.hero{padding:52px 0 26px;}.stat{flex-basis:50%;}.stat:nth-child(odd){border-left:none;}}
-    @media(max-width:440px){.topics{grid-template-columns:1fr;}}
+    @media(max-width:720px){.topics{grid-template-columns:repeat(2,1fr);}.hero{padding:56px 0 26px;}.stat{flex-basis:50%;}.stat:nth-child(odd){border-left:none;}}
+    @media(max-width:440px){.topics{grid-template-columns:1fr;}.btn{flex:1 1 100%;justify-content:center;}}
 
     /* staggered reveal */
     @keyframes rise{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:none;}}
     .hero>*{animation:rise .7s cubic-bezier(.2,.7,.3,1) both;}
-    .hero>*:nth-child(2){animation-delay:.08s;}.hero>*:nth-child(3){animation-delay:.16s;}.hero>*:nth-child(4){animation-delay:.24s;}
+    .hero>*:nth-child(2){animation-delay:.08s;}.hero>*:nth-child(3){animation-delay:.16s;}.hero>*:nth-child(4){animation-delay:.24s;}.hero>*:nth-child(5){animation-delay:.32s;}
     .topic{animation:rise .6s cubic-bezier(.2,.7,.3,1) both;animation-delay:calc(.1s + var(--i,0)*40ms);}
 
     @media(prefers-reduced-motion:reduce){
       *,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important;}
+      #bgfx{display:none;}
     }
   </style>
 </head>
 <body>
+  <canvas id="bgfx" aria-hidden="true"></canvas>
+
   <header class="nav">
     <div class="wrap">
       <a class="logo" href="/">
@@ -176,11 +206,15 @@
       <span class="eyebrow"><span class="pulse"></span> Interactive DSA Roadmap</span>
       <h1>DSA,<br>visualised.</h1>
       <p class="sub">Pick a pattern. Get the <b>intuition</b>, watch it run step-by-step synced to a live code trace, then read full <b>LeetCode-style code</b> with click-to-reveal comments — plus variation templates to stress-test what you learned.</p>
+      <div class="cta">
+        <a class="btn primary" href="#topics">Explore topics <span class="ar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg></span></a>
+        <a class="btn ghost" href="https://github.com/mightbeanshuu" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2c-3.3.7-4-1.6-4-1.6-.5-1.4-1.3-1.8-1.3-1.8-1.1-.7 0-.7 0-.7 1.2 0 1.8 1.2 1.8 1.2 1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.7-1.6-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.2-3.2 0-.4-.5-1.6.2-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0C17.3 4.7 18.3 5 18.3 5c.7 1.6.2 2.8.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .5Z"/></svg>View on GitHub</a>
+      </div>
       <div class="stats" id="stats"></div>
     </section>
 
     <section class="wrap">
-      <div class="sectionhead">
+      <div class="sectionhead" id="topics">
         <h2>Topics</h2>
         <span class="note"><b id="liveN">8</b> live · more coming soon</span>
       </div>
@@ -285,6 +319,120 @@
     const href=a.getAttribute('href');
     if(href!=='/'&&href.startsWith('/')&&path.startsWith(href)) a.style.color='var(--text)';
   });
+  </script>
+
+  <!-- three.js animated graph/particle network background (deferred, non-blocking) -->
+  <script type="module">
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const canvas = document.getElementById('bgfx');
+    if (!reduce && canvas) {
+      try {
+        const THREE = await import('https://unpkg.com/three@0.160.0/build/three.module.js');
+        const COUNT = 120;                 // < 150 nodes for perf
+        const LINK_DIST = 2.7;             // edge threshold
+        const COLORS = [[0,0.9,1],[0.49,1,0.56],[0.486,0.576,1],[1,0.353,0.804]]; // cyan/green/accent/pink
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(60, innerWidth/innerHeight, 0.1, 100);
+        camera.position.z = 13;
+
+        const renderer = new THREE.WebGLRenderer({canvas, antialias:true, alpha:true});
+        renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5)); // cap DPR
+        renderer.setSize(innerWidth, innerHeight, false);
+
+        // nodes
+        const positions = new Float32Array(COUNT*3);
+        const colors = new Float32Array(COUNT*3);
+        const vel = [];
+        const SPREAD = 11;
+        for (let i=0;i<COUNT;i++){
+          positions[i*3]   = (Math.random()-0.5)*SPREAD;
+          positions[i*3+1] = (Math.random()-0.5)*SPREAD*0.62;
+          positions[i*3+2] = (Math.random()-0.5)*SPREAD*0.5;
+          const c = COLORS[i % COLORS.length];
+          colors[i*3]=c[0]; colors[i*3+1]=c[1]; colors[i*3+2]=c[2];
+          vel.push((Math.random()-0.5)*0.006,(Math.random()-0.5)*0.006,(Math.random()-0.5)*0.006);
+        }
+        const nodeGeo = new THREE.BufferGeometry();
+        nodeGeo.setAttribute('position', new THREE.BufferAttribute(positions,3));
+        nodeGeo.setAttribute('color', new THREE.BufferAttribute(colors,3));
+        const nodeMat = new THREE.PointsMaterial({size:0.12, vertexColors:true, transparent:true, opacity:0.85, depthWrite:false, blending:THREE.AdditiveBlending});
+        const points = new THREE.Points(nodeGeo, nodeMat);
+        scene.add(points);
+
+        // edges — capacity-bound buffer, rebuilt each frame
+        const MAX_LINKS = COUNT*7;
+        const linePos = new Float32Array(MAX_LINKS*6);
+        const lineGeo = new THREE.BufferGeometry();
+        lineGeo.setAttribute('position', new THREE.BufferAttribute(linePos,3));
+        const lineMat = new THREE.LineBasicMaterial({color:0x00e5ff, transparent:true, opacity:0.10, blending:THREE.AdditiveBlending, depthWrite:false});
+        const lines = new THREE.LineSegments(lineGeo, lineMat);
+        scene.add(lines);
+
+        const group = new THREE.Group();
+        scene.add(group); group.add(points); group.add(lines);
+
+        let mx=0, my=0;
+        addEventListener('pointermove', e=>{ mx=(e.clientX/innerWidth-0.5); my=(e.clientY/innerHeight-0.5); }, {passive:true});
+
+        function resize(){
+          camera.aspect = innerWidth/innerHeight; camera.updateProjectionMatrix();
+          renderer.setSize(innerWidth, innerHeight, false);
+        }
+        addEventListener('resize', resize);
+
+        const pos = nodeGeo.attributes.position.array;
+        let running = true, raf = 0;
+        document.addEventListener('visibilitychange', ()=>{
+          running = !document.hidden;
+          if (running){ raf = requestAnimationFrame(loop); }
+        });
+
+        const LD2 = LINK_DIST*LINK_DIST;
+        function loop(){
+          if(!running) return;
+          // drift nodes, soft-bounce within bounds
+          for(let i=0;i<COUNT;i++){
+            for(let k=0;k<3;k++){
+              const idx=i*3+k; pos[idx]+=vel[i*3+k];
+              const lim = k===0?SPREAD/2 : k===1?SPREAD*0.31 : SPREAD*0.25;
+              if(pos[idx]>lim||pos[idx]<-lim) vel[i*3+k]*=-1;
+            }
+          }
+          nodeGeo.attributes.position.needsUpdate = true;
+
+          // rebuild edges
+          let li=0;
+          for(let i=0;i<COUNT && li<MAX_LINKS;i++){
+            const ax=pos[i*3],ay=pos[i*3+1],az=pos[i*3+2];
+            for(let j=i+1;j<COUNT && li<MAX_LINKS;j++){
+              const dx=ax-pos[j*3], dy=ay-pos[j*3+1], dz=az-pos[j*3+2];
+              const d2=dx*dx+dy*dy+dz*dz;
+              if(d2<LD2){
+                const o=li*6;
+                linePos[o]=ax;linePos[o+1]=ay;linePos[o+2]=az;
+                linePos[o+3]=pos[j*3];linePos[o+4]=pos[j*3+1];linePos[o+5]=pos[j*3+2];
+                li++;
+              }
+            }
+          }
+          lineGeo.setDrawRange(0, li*2);
+          lineGeo.attributes.position.needsUpdate = true;
+
+          // gentle rotation + parallax toward pointer
+          group.rotation.y += 0.0009;
+          group.rotation.x = my*0.18;
+          camera.position.x += (mx*1.6 - camera.position.x)*0.04;
+          camera.position.y += (-my*1.0 - camera.position.y)*0.04;
+          camera.lookAt(scene.position);
+
+          renderer.render(scene, camera);
+          raf = requestAnimationFrame(loop);
+        }
+        canvas.classList.add('on');
+        raf = requestAnimationFrame(loop);
+      } catch(e){ /* CDN/WebGL unavailable — static gradient background remains */ }
+    }
   </script>
 
 <!-- visualise: auth (login/logout chip; landing stays public) -->

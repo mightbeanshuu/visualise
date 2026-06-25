@@ -11,20 +11,30 @@
   --glass-sat:       150%;
   --glass-hi:        inset 0 1px 0 rgba(255,255,255,.16), inset 0 0 0 1px rgba(255,255,255,.025);
   --glass-shadow:    0 10px 34px rgba(0,0,0,.42);
+
+  /* ---- neumorphism layer (dark-UI soft extrusion, NOT a neon glow) ----
+     a faint top-left highlight + a soft bottom-right shadow so surfaces read
+     as gently raised from the dark page. Kept very subtle on purpose. */
+  --neu-raise:  -6px -6px 16px rgba(255,255,255,.022), 6px 6px 18px rgba(0,0,0,.5);
+  --neu-soft:   -4px -4px 11px rgba(255,255,255,.02), 4px 4px 12px rgba(0,0,0,.45);
+  --neu-press:  inset 2px 2px 6px rgba(0,0,0,.55), inset -2px -2px 6px rgba(255,255,255,.03);
+  --radius:     16px;
 }
 
-/* shared glass surface for the main panels & cards */
+/* shared glass surface for the main panels & cards (glass highlight + neumorphic extrusion) */
 .top, .side, .ic, .probs, .cb, .demo, .stage, .vmsg, .trace, .varWrap .cb, .vtbl{
   background: var(--glass-bg) !important;
   -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
   backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
   border: 1px solid var(--glass-stroke) !important;
-  box-shadow: var(--glass-hi), var(--glass-shadow) !important;
+  box-shadow: var(--glass-hi), var(--neu-raise), var(--glass-shadow) !important;
 }
+/* full-width top nav stays square (it spans edge-to-edge); inner cards round */
 .top{ border-radius:0 !important; box-shadow: var(--glass-hi), 0 8px 26px rgba(0,0,0,.34) !important;
   -webkit-backdrop-filter: blur(22px) saturate(150%); backdrop-filter: blur(22px) saturate(150%); }
 .side{ border-radius:0 !important; }
-.stage{ background: rgba(255,255,255,.025) !important; }
+.stage{ background: rgba(255,255,255,.025) !important;
+  box-shadow: var(--glass-hi), var(--neu-soft) !important; }
 
 /* the inner deep panels keep contrast (code/trace get a darker glass) */
 .cb, .trace{ background: rgba(8,12,18,.46) !important; }
@@ -32,8 +42,10 @@ pre{ background:transparent !important; }
 .cbbar{ background: rgba(255,255,255,.04) !important; border-bottom:1px solid var(--glass-stroke) !important;
   -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
 
-/* rounder, softer corners everywhere */
-.ic, .cb, .demo, .stage, .vmsg, .trace, .probs, .vtbl{ border-radius:16px !important; }
+/* rounder, softer corners everywhere — no element should read as a sharp rect */
+.ic, .cb, .demo, .stage, .vmsg, .trace, .probs, .vtbl{ border-radius:var(--radius) !important; }
+.cbbar{ border-radius:14px 14px 0 0 !important; }
+.badge, .ptag, .vtag, .stepchip, .chip{ border-radius:999px !important; }
 
 /* ---- specular sheen that drifts across glass panels (the "liquid") ---- */
 .demo, .cb{ position:relative; overflow:hidden; }
@@ -49,22 +61,28 @@ pre{ background:transparent !important; }
 .demo > *, .cb > *{ position:relative; z-index:1; }
 @keyframes vxsheen{ 50%{ background-position: 0 0, -40% 0; } }
 
-/* glassy interactive chrome */
+/* glassy interactive chrome — soft neumorphic raised pebbles */
 .copy, .cbtoggle, .vctrl button, .backbtn, .pnav button, .chip{
   background: rgba(255,255,255,.05) !important;
   border:1px solid var(--glass-stroke) !important;
   -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
-  border-radius:10px !important; transition: transform .15s ease, background .18s, border-color .18s, box-shadow .18s;
+  border-radius:14px !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.08), var(--neu-soft) !important;
+  transition: transform .15s ease, background .18s, border-color .18s, box-shadow .18s;
 }
-.copy:hover, .cbtoggle:hover, .vctrl button:hover:not(:disabled), .backbtn:hover, .pnav button:hover:not(:disabled){
+.copy:hover, .cbtoggle:hover, .vctrl button:hover:not(:disabled), .backbtn:hover, .pnav button:hover:not(:disabled), .chip:hover{
   background: rgba(255,255,255,.10) !important; transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(0,0,0,.3);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.12), var(--neu-raise) !important;
+}
+/* pressed: shadows invert inward so the control reads as pushed in */
+.copy:active, .cbtoggle:active, .vctrl button:active:not(:disabled), .backbtn:active, .pnav button:active:not(:disabled), .chip:active{
+  transform: translateY(0); box-shadow: var(--neu-press) !important;
 }
 .vctrl button.play{ background: linear-gradient(100deg, rgba(0,229,255,.9), rgba(93,255,143,.9)) !important;
   color:#06220f !important; border-color: rgba(255,255,255,.25) !important; }
 
 /* nav items + sidebar hover get a frosted highlight */
-.navitem{ border-radius:0 10px 10px 0; transition: background .16s, border-color .16s; }
+.navitem{ border-radius:0 14px 14px 0; transition: background .16s, border-color .16s; }
 .navitem:hover{ background: rgba(255,255,255,.05) !important; }
 .navitem.on{ background: rgba(255,255,255,.08) !important; -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
 
