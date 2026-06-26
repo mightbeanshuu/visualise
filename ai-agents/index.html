@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="apple-touch-icon" href="/favicon.svg">
+  <title>Visualise · AI Agents</title><meta name="description" content="AI agents track landing page.">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/track-landing.css">
+</head>
+<body data-track="agents">
+  <canvas id="bgfx" aria-hidden="true"></canvas>
+  <header class="nav"><div class="wrap"><a class="logo" href="/"><span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="7" y="5" width="10" height="12" rx="3"/><path d="M8 19h8M9 10h.01M15 10h.01M10 14h4"/></svg></span>visualise</a><nav class="links"><a href="/">Tracks</a><a id="navTrack" href="/ai-agents/">Agents</a><a href="/dsa/">DSA</a></nav></div></header>
+  <main><section class="wrap hero"><div class="heroCopy"><span class="eyebrow" id="eyebrow"></span><h1 id="heroTitle"></h1><p class="sub" id="heroSub"></p><div class="cta"><a class="btn primary" id="primaryCta" href="/"></a><a class="btn ghost" id="secondaryCta" href="/dsa/"></a></div></div><div class="visual" id="visual"></div></section><section class="wrap"><div class="sectionhead"><div><h2 id="mainSectionTitle"></h2><p id="mainSectionCopy"></p></div><span class="note"><b id="trackTitle">Agents</b> · <span id="statusPill">Soon</span></span></div><div id="soonBox" class="soonBox"></div><div class="grid" id="contentGrid" style="margin-top:14px"></div></section></main>
+  <footer><div class="wrap"><span>AI Agents track · coming soon</span><span><a href="/">All tracks</a> · <a href="/dsa/">DSA live</a></span></div></footer>
+  <script src="/track-pages.js"></script><script type="module" src="/track-bg.js"></script><script src="/supabase-config.js"></script><script src="/auth.js"></script>
+</body>
+</html>

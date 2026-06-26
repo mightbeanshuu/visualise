@@ -8,6 +8,12 @@ Live site: https://visualise.vercel.app
 
 Separate routes:
 
+- DSA track: https://visualise.vercel.app/dsa/
+- Web development track: https://visualise.vercel.app/web-development/
+- AI/ML track: https://visualise.vercel.app/ai-ml/
+- AI agents track: https://visualise.vercel.app/ai-agents/
+- System design track: https://visualise.vercel.app/system-design/
+- Cloud & DevOps track: https://visualise.vercel.app/cloud-devops/
 - BFS patterns: https://visualise.vercel.app/graphs/bfs-patterns/
 - DFS algorithms: https://visualise.vercel.app/graphs/dfs-patterns/
 - Tries: https://visualise.vercel.app/tries/

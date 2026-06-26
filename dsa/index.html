@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="apple-touch-icon" href="/favicon.svg">
+  <title>Visualise · DSA</title>
+  <meta name="description" content="Interactive DSA track landing page.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/track-landing.css">
+</head>
+<body data-track="dsa">
+  <canvas id="bgfx" aria-hidden="true"></canvas>
+  <header class="nav"><div class="wrap"><a class="logo" href="/"><span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="16" y="16" width="6" height="6" rx="1"/><rect x="2" y="16" width="6" height="6" rx="1"/><rect x="9" y="2" width="6" height="6" rx="1"/><path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3"/><path d="M12 12V8"/></svg></span>visualise</a><nav class="links"><a href="/">Tracks</a><a id="navTrack" href="/dsa/">DSA</a><a href="/graphs/">Graphs</a></nav></div></header>
+  <main>
+    <section class="wrap hero"><div class="heroCopy"><span class="eyebrow" id="eyebrow"></span><h1 id="heroTitle"></h1><p class="sub" id="heroSub"></p><div class="cta"><a class="btn primary" id="primaryCta" href="/graphs/"></a><a class="btn ghost" id="secondaryCta" href="/"></a></div></div><div class="visual" id="visual"></div></section>
+    <section class="wrap"><div class="sectionhead"><div><h2 id="mainSectionTitle"></h2><p id="mainSectionCopy"></p></div><span class="note"><b id="trackTitle">DSA</b> · <span id="statusPill">Live</span></span></div><div class="grid" id="contentGrid"></div></section>
+  </main>
+  <footer><div class="wrap"><span>DSA track · live visual pattern hubs</span><span><a href="/">All tracks</a> · <a href="/graphs/">Graphs</a></span></div></footer>
+  <script src="/track-pages.js"></script>
+  <script type="module" src="/track-bg.js"></script>
+  <script src="/supabase-config.js"></script><script src="/auth.js"></script>
+</body>
+</html>

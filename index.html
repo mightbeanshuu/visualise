@@ -118,12 +118,6 @@
     .open{position:relative;margin-top:18px;display:inline-flex;align-items:center;gap:7px;color:rgb(var(--a));font-weight:760;font-size:13px}
     .open svg{width:15px;height:15px}
 
-    .dsaGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:14px}
-    .dsaLink{--a:0,229,255;min-height:104px;text-decoration:none;color:inherit;border:1px solid rgba(var(--a),.17);border-radius:15px;background:linear-gradient(180deg,rgba(var(--a),.055),rgba(10,13,18,.70));box-shadow:var(--shadow);padding:14px;display:flex;flex-direction:column;gap:8px;transition:.2s}
-    .dsaLink:hover{transform:translateY(-3px);border-color:rgba(var(--a),.46)}
-    .dsaLink b{font-size:13.5px;letter-spacing:-.2px}
-    .dsaLink span{color:var(--muted);font-size:11.5px;line-height:1.45}
-
     footer{border-top:1px solid var(--line);margin-top:64px}
     footer .wrap{padding:24px 0 44px;color:var(--faint);font-size:12.5px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
     footer a{color:var(--muted);text-decoration:none}
@@ -134,13 +128,12 @@
       .orbital{min-height:330px}
       .tracks{grid-template-columns:1fr 1fr}
       .track.live{grid-column:1/-1;grid-row:auto;min-height:420px}
-      .dsaGrid{grid-template-columns:repeat(3,1fr)}
     }
     @media(max-width:680px){
       .wrap{width:min(100% - 30px,1160px)}
       .links a:not(:first-child){display:none}
       .hero{padding:54px 0 18px}
-      .tracks,.dsaGrid{grid-template-columns:1fr}
+      .tracks{grid-template-columns:1fr}
       .btn{width:100%;justify-content:center}
       .track.live{min-height:390px}
     }
@@ -161,7 +154,7 @@
       </a>
       <nav class="links">
         <a href="#tracks">Tracks</a>
-        <a href="#dsa">DSA</a>
+        <a href="/dsa/">DSA</a>
         <a href="https://github.com/mightbeanshuu" target="_blank" rel="noopener">GitHub</a>
       </nav>
     </div>
@@ -174,7 +167,7 @@
         <h1>One place to <b>visualise</b> hard tech.</h1>
         <p class="sub">DSA is live now: interactive pattern hubs, vector dry-runs, code traces and Striver-style solutions. Web development, AI/ML, AI agents and more are queued as upcoming tracks.</p>
         <div class="cta">
-          <a class="btn primary" href="#dsa">Start DSA <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
+          <a class="btn primary" href="/dsa/">Start DSA <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
           <a class="btn ghost" href="#tracks">View roadmap</a>
         </div>
       </div>
@@ -219,13 +212,13 @@
       <div class="sectionhead">
         <div>
           <h2>Learning tracks</h2>
-          <p>Only DSA is open today. The remaining tracks are laid out as coming-soon lanes so the landing page can grow without changing its structure.</p>
+          <p>Each track has its own landing page. DSA is live today; the remaining pages are staged as coming-soon routes.</p>
         </div>
         <span class="note"><b>1</b> live · 5 queued</span>
       </div>
 
       <div class="tracks">
-        <a class="track live" href="#dsa" style="--a:0,229,255">
+        <a class="track live" href="/dsa/" style="--a:0,229,255">
           <div class="trackTop">
             <span class="trackIcon"><svg viewBox="0 0 48 48" fill="none"><path class="stroke" d="M10 35h28M14 13h20M24 13v22"/><rect class="soft" x="7" y="31" width="10" height="10" rx="2"/><rect class="soft" x="31" y="31" width="10" height="10" rx="2"/><rect class="soft" x="18" y="7" width="12" height="12" rx="2"/></svg></span>
             <span class="pill">Live</span>
@@ -246,86 +239,50 @@
           <span class="open">Open DSA roadmap <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
         </a>
 
-        <div class="track soon" style="--a:255,159,10">
+        <a class="track soon" href="/web-development/" style="--a:255,159,10">
           <div class="trackTop"><span class="trackIcon"><svg viewBox="0 0 48 48" fill="none"><rect class="soft" x="7" y="10" width="34" height="25" rx="4"/><path class="stroke" d="M12 18h11M12 24h21M12 30h14M19 39h10"/></svg></span><span class="pill">Soon</span></div>
           <h3>Web Development</h3>
           <p>Frontend fundamentals, APIs, databases, auth, deployment and production UI patterns.</p>
           <div class="trackArt"><svg viewBox="0 0 260 110" fill="none"><rect class="soft" x="18" y="18" width="92" height="64" rx="10"/><rect class="soft" x="132" y="24" width="98" height="18" rx="5"/><rect class="soft" x="132" y="52" width="70" height="12" rx="4"/><path class="stroke" d="M36 38h56M36 54h38M36 68h50"/></svg></div>
-        </div>
+        </a>
 
-        <div class="track soon" style="--a:191,90,242">
+        <a class="track soon" href="/ai-ml/" style="--a:191,90,242">
           <div class="trackTop"><span class="trackIcon"><svg viewBox="0 0 48 48" fill="none"><circle class="soft" cx="24" cy="24" r="13"/><path class="stroke" d="M24 7v7M24 34v7M7 24h7M34 24h7M13 13l5 5M30 30l5 5M35 13l-5 5M18 30l-5 5"/></svg></span><span class="pill">Soon</span></div>
           <h3>AI / ML</h3>
           <p>Math intuition, model training, evaluation, embeddings, RAG and applied ML workflows.</p>
           <div class="trackArt"><svg viewBox="0 0 260 110" fill="none"><path class="stroke" d="M35 78c30-58 62-58 96 0s64 58 94 0"/><circle class="soft" cx="35" cy="78" r="8"/><circle class="soft" cx="130" cy="50" r="8"/><circle class="soft" cx="225" cy="78" r="8"/></svg></div>
-        </div>
+        </a>
 
-        <div class="track soon" style="--a:93,255,143">
+        <a class="track soon" href="/ai-agents/" style="--a:93,255,143">
           <div class="trackTop"><span class="trackIcon"><svg viewBox="0 0 48 48" fill="none"><rect class="soft" x="15" y="10" width="18" height="22" rx="5"/><path class="stroke" d="M12 38h24M18 32v6M30 32v6M16 19h.1M24 19h.1M32 19h.1M19 26h10"/></svg></span><span class="pill">Soon</span></div>
           <h3>AI Agents</h3>
           <p>Tool use, memory, planning loops, agentic workflows, evaluation and deployment patterns.</p>
           <div class="trackArt"><svg viewBox="0 0 260 110" fill="none"><circle class="soft" cx="54" cy="54" r="20"/><circle class="soft" cx="134" cy="28" r="18"/><circle class="soft" cx="196" cy="76" r="18"/><path class="stroke" d="M73 48l43-14M151 40l30 24M75 62l102 12"/></svg></div>
-        </div>
+        </a>
 
-        <div class="track soon" style="--a:124,147,255">
+        <a class="track soon" href="/system-design/" style="--a:124,147,255">
           <div class="trackTop"><span class="trackIcon"><svg viewBox="0 0 48 48" fill="none"><rect class="soft" x="8" y="9" width="12" height="12" rx="2"/><rect class="soft" x="28" y="9" width="12" height="12" rx="2"/><rect class="soft" x="18" y="29" width="12" height="12" rx="2"/><path class="stroke" d="M20 15h8M14 21l8 8M34 21l-8 8"/></svg></span><span class="pill">Soon</span></div>
           <h3>System Design</h3>
           <p>Scalable architectures, tradeoffs, queues, caches, databases and reliability patterns.</p>
           <div class="trackArt"><svg viewBox="0 0 260 110" fill="none"><rect class="soft" x="24" y="36" width="54" height="36" rx="8"/><rect class="soft" x="104" y="18" width="54" height="36" rx="8"/><rect class="soft" x="184" y="56" width="54" height="36" rx="8"/><path class="stroke" d="M78 54h26M158 36l30 28"/></svg></div>
-        </div>
+        </a>
 
-        <div class="track soon" style="--a:255,209,102">
+        <a class="track soon" href="/cloud-devops/" style="--a:255,209,102">
           <div class="trackTop"><span class="trackIcon"><svg viewBox="0 0 48 48" fill="none"><path class="soft" d="M15 34h20a8 8 0 0 0 1-16 12 12 0 0 0-23-3A9.5 9.5 0 0 0 15 34Z"/><path class="stroke" d="M18 25h12M24 19v12"/></svg></span><span class="pill">Soon</span></div>
           <h3>Cloud & DevOps</h3>
           <p>Linux, Docker, CI/CD, observability, infra basics and deploy-ready workflows.</p>
           <div class="trackArt"><svg viewBox="0 0 260 110" fill="none"><path class="soft" d="M45 70h92a22 22 0 0 0 2-44 33 33 0 0 0-64-7 26 26 0 0 0-30 51Z"/><path class="stroke" d="M152 56h70M188 36v40M172 44l16-8 16 8M172 68l16 8 16-8"/></svg></div>
-        </div>
+        </a>
       </div>
-    </section>
-
-    <section class="wrap" id="dsa">
-      <div class="sectionhead">
-        <div>
-          <h2>DSA roadmap live now</h2>
-          <p>Jump straight into the active interactive hubs. These keep the existing Visualise UI and open into the detailed pattern pages.</p>
-        </div>
-        <span class="note"><b>16</b> hubs</span>
-      </div>
-      <div class="dsaGrid" id="dsaGrid"></div>
     </section>
   </main>
 
   <footer>
     <div class="wrap">
       <span>Visualise learning portal · DSA live, more tracks queued</span>
-      <span><a href="/graphs/">Graphs</a> · <a href="/arrays/">Arrays</a> · <a href="/dp/">DP</a> · <a href="/tries/">Tries</a></span>
+      <span><a href="/dsa/">DSA</a> · <a href="/web-development/">Web Development</a> · <a href="/ai-agents/">AI Agents</a></span>
     </div>
   </footer>
-
-  <script>
-    const HUBS=[
-      ['/graphs/','Graphs','BFS, DFS, weighted shortest paths.','0,229,255'],
-      ['/arrays/','Arrays & Hashing','Hashing, two pointers, windows, binary search.','0,229,255'],
-      ['/arrays/#two-pointers','Two Pointers','Sorted pairs, container, 3Sum.','255,159,10'],
-      ['/arrays/#sliding-window','Sliding Window','Fixed and variable windows.','93,255,143'],
-      ['/arrays/#binary-search','Binary Search','Classic, rotated, answer search.','191,90,242'],
-      ['/stack-queue/','Stack & Queue','Parsing, monotonic stack, queues.','56,189,248'],
-      ['/linked-list/','Linked List','Reverse, cycle, middle, palindrome.','255,90,205'],
-      ['/trees/','Trees','Traversals, LCA, BST validation.','93,255,143'],
-      ['/dp/','Dynamic Programming','1-D, 2-D and grid DP tables.','124,147,255'],
-      ['/heap/','Heap / Priority Queue','Heapify, push/pop, top-K.','255,209,102'],
-      ['/tries/','Tries','Prefix trees, wildcard DFS, bit trie.','0,229,255'],
-      ['/backtracking/','Backtracking','Subsets, permutations, N-Queens.','255,90,205'],
-      ['/greedy/','Greedy','Scheduling, jumps, gas station.','93,255,143'],
-      ['/intervals/','Intervals','Merge, insert, sweep overlaps.','255,159,10'],
-      ['/bit-manipulation/','Bit Manipulation','XOR, masks, set bits.','191,90,242'],
-      ['/math-geometry/','Math & Geometry','GCD, sieve, matrices, geometry.','124,147,255']
-    ];
-    document.getElementById('dsaGrid').innerHTML=HUBS.map(([href,t,d,a])=>`
-      <a class="dsaLink" style="--a:${a}" href="${href}">
-        <b>${t}</b><span>${d}</span>
-      </a>`).join('');
-  </script>
 
   <script type="module">
     const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
