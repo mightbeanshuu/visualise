@@ -4,7 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Weighted & Greedy Graphs — Dijkstra · DSU · MST</title>
-<meta name="description" content="Step-by-step animated hub for Dijkstra, Disjoint Set Union, and Minimum Spanning Tree (Kruskal & Prim). AlgoMaster-style pattern notes with Striver C++ code and click-to-reveal comments.">
+<meta name="description" content="Step-by-step animated hub for Dijkstra, Disjoint Set Union, and Minimum Spanning Tree (Kruskal & Prim) with clean C++ and click-to-reveal notes.">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="apple-touch-icon" href="/favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -212,7 +214,7 @@
       <span class="meta">9 patterns · C++ · Anshu</span>
       <button class="copy menuToggle" id="menuToggle" style="margin-left:auto">☰ patterns</button>
     </div>
-    <p>AlgoMaster-style pattern notes + <b>Striver (takeUforward) C++</b>, with a heap / set / MST that animates <b>step by step</b> while the matching code line lights up.</p>
+    <p>Step-by-step animated graph patterns — clean C++ with click-to-reveal notes, a live heap / set / MST, and per-pattern practice.</p>
   </div>
 
   <div class="shell">
@@ -716,6 +718,61 @@ int prim(int V, vector<vector<pair<int,int>>>& adj){
 }
 ];
 
+/* ════════════════ PRACTICE LINKS (GFG · LeetCode · NeetCode) ════════════════ */
+const _gfgS=q=>'https://www.geeksforgeeks.org/?s='+encodeURIComponent(q);
+const _lcS=s=>'https://leetcode.com/problems/'+s+'/';
+const _ncS=s=>'https://neetcode.io/problems/'+s;
+const WPRACTICE={
+ 'Dijkstra (min-heap)':[
+   {name:'Network Delay Time',diff:'Medium',gfg:_gfgS('implementing dijkstra'),lc:_lcS('network-delay-time'),neet:_ncS('network-delay-time')},
+   {name:'Path With Minimum Effort',diff:'Medium',gfg:_gfgS('path with minimum effort'),lc:_lcS('path-with-minimum-effort'),neet:_ncS('path-with-minimum-effort')},
+   {name:'Cheapest Flights Within K Stops',diff:'Medium',gfg:_gfgS('cheapest flights within k stops'),lc:_lcS('cheapest-flights-within-k-stops'),neet:_ncS('cheapest-flights-within-k-stops')},
+   {name:'Swim in Rising Water',diff:'Hard',gfg:_gfgS('swim in rising water'),lc:_lcS('swim-in-rising-water'),neet:_ncS('swim-in-rising-water')}
+ ],
+ 'Shortest Path in a DAG':[
+   {name:'Shortest Path in DAG',diff:'Medium',gfg:_gfgS('shortest path in directed acyclic graph')},
+   {name:'Parallel Courses',diff:'Medium',gfg:_gfgS('parallel courses'),lc:_lcS('parallel-courses')},
+   {name:'Longest Increasing Path in a Matrix',diff:'Hard',gfg:_gfgS('longest increasing path in a matrix'),lc:_lcS('longest-increasing-path-in-a-matrix'),neet:_ncS('longest-increasing-path-in-a-matrix')}
+ ],
+ 'Bellman-Ford (negative edges)':[
+   {name:'Distance from the Source (Bellman-Ford)',diff:'Medium',gfg:_gfgS('distance from the source bellman ford algorithm')},
+   {name:'Cheapest Flights Within K Stops',diff:'Medium',gfg:_gfgS('cheapest flights within k stops'),lc:_lcS('cheapest-flights-within-k-stops'),neet:_ncS('cheapest-flights-within-k-stops')},
+   {name:'Negative Weight Cycle',diff:'Medium',gfg:_gfgS('negative weight cycle')}
+ ],
+ 'Floyd-Warshall (all-pairs)':[
+   {name:'Floyd Warshall',diff:'Medium',gfg:_gfgS('implementing floyd warshall algorithm')},
+   {name:'Find the City (threshold distance)',diff:'Medium',gfg:_gfgS('find the city smallest number of neighbors threshold'),lc:_lcS('find-the-city-with-the-smallest-number-of-neighbors-at-a-threshold-distance')},
+   {name:'Course Schedule IV',diff:'Medium',gfg:_gfgS('course schedule iv'),lc:_lcS('course-schedule-iv')}
+ ],
+ 'Number of Ways (Dijkstra + count)':[
+   {name:'Number of Ways to Arrive at Destination',diff:'Medium',gfg:_gfgS('number of ways to arrive at destination'),lc:_lcS('number-of-ways-to-arrive-at-destination')},
+   {name:'Network Delay Time',diff:'Medium',gfg:_gfgS('network delay time dijkstra'),lc:_lcS('network-delay-time'),neet:_ncS('network-delay-time')}
+ ],
+ "Kahn's Topological Sort (BFS)":[
+   {name:'Course Schedule',diff:'Medium',gfg:_gfgS('detect cycle in a directed graph topological'),lc:_lcS('course-schedule'),neet:_ncS('course-schedule')},
+   {name:'Course Schedule II',diff:'Medium',gfg:_gfgS('topological sort kahn algorithm'),lc:_lcS('course-schedule-ii'),neet:_ncS('course-schedule-ii')},
+   {name:'Alien Dictionary',diff:'Hard',gfg:_gfgS('alien dictionary'),lc:_lcS('alien-dictionary'),neet:_ncS('alien-dictionary')},
+   {name:'Find Eventual Safe States',diff:'Medium',gfg:_gfgS('eventual safe states'),lc:_lcS('find-eventual-safe-states'),neet:_ncS('find-eventual-safe-states')}
+ ],
+ 'Disjoint Set Union':[
+   {name:'Number of Provinces',diff:'Medium',gfg:_gfgS('number of provinces disjoint set'),lc:_lcS('number-of-provinces'),neet:_ncS('number-of-provinces')},
+   {name:'Number of Connected Components',diff:'Medium',gfg:_gfgS('number of connected components undirected graph'),lc:_lcS('number-of-connected-components-in-an-undirected-graph'),neet:_ncS('number-of-connected-components-in-an-undirected-graph')},
+   {name:'Redundant Connection',diff:'Medium',gfg:_gfgS('redundant connection union find'),lc:_lcS('redundant-connection'),neet:_ncS('redundant-connection')},
+   {name:'Accounts Merge',diff:'Medium',gfg:_gfgS('accounts merge union find'),lc:_lcS('accounts-merge'),neet:_ncS('accounts-merge')}
+ ],
+ "Kruskal's MST (edges + DSU)":[
+   {name:'Min Cost to Connect All Points',diff:'Medium',gfg:_gfgS('minimum spanning tree kruskal'),lc:_lcS('min-cost-to-connect-all-points'),neet:_ncS('min-cost-to-connect-all-points')},
+   {name:'Minimum Spanning Tree (GFG)',diff:'Medium',gfg:_gfgS('minimum spanning tree kruskal practice')},
+   {name:'Connecting Cities With Minimum Cost',diff:'Medium',gfg:_gfgS('connecting cities with minimum cost')}
+ ],
+ "Prim's MST (min-heap)":[
+   {name:'Min Cost to Connect All Points',diff:'Medium',gfg:_gfgS('minimum spanning tree prim'),lc:_lcS('min-cost-to-connect-all-points'),neet:_ncS('min-cost-to-connect-all-points')},
+   {name:'Minimum Spanning Tree (GFG)',diff:'Medium',gfg:_gfgS('prim algorithm minimum spanning tree practice')},
+   {name:'Optimize Water Distribution',diff:'Hard',gfg:_gfgS('optimize water distribution in a village')}
+ ]
+};
+P.forEach(p=>{p.practice=WPRACTICE[p.label]||[];});
+
 /* ════════════════ SYNTAX HIGHLIGHT + CLICK-TO-REVEAL ════════════════ */
 function hl(code){
   const esc=t=>t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
@@ -733,6 +790,27 @@ function hl(code){
 }
 
 /* ════════════════ SCENE RENDERING ════════════════ */
+// step-gist label pinned to the active edge (skips accumulated MST tree edges)
+function annoFor(f,g){
+  if(!f||!f.edge||!g.nodes) return '';
+  for(const e of (g.edges||[])){
+    const a=e[0], b=e[1];
+    const key=g.directed?dk(a,b):ek(a,b);
+    const cls=f.edge[key];
+    if(!cls) continue;
+    if(cls==='tree' && !g.directed) continue;      // don't clutter every MST edge
+    const [x1,y1]=g.nodes[a], [x2,y2]=g.nodes[b];
+    const mx=(x1+x2)/2, my=(y1+y2)/2-20;
+    const arrow=g.directed?'→':'–';
+    const verb={relax:'relax',look:'check',cycle:'cycle',tree:'push'}[cls]||cls;
+    const txt=verb+' '+a+arrow+b;
+    const w=txt.length*6.7+16, h=18;
+    const rx=Math.max(3,Math.min(522-w-3, mx-w/2));
+    const ry=Math.max(2,Math.min(336-h-2, my-h/2));
+    return '<g class="vxanno" opacity="0.96"><rect x="'+rx.toFixed(1)+'" y="'+ry.toFixed(1)+'" rx="9" width="'+w.toFixed(1)+'" height="'+h+'" fill="rgba(8,12,18,.86)" stroke="rgba(0,229,255,.55)" stroke-width="1"/><text x="'+(rx+w/2).toFixed(1)+'" y="'+(ry+12.5).toFixed(1)+'" text-anchor="middle" font-family="\'JetBrains Mono\',monospace" font-size="10.5" fill="#bdf3ff">'+txt+'</text></g>';
+  }
+  return '';
+}
 function svgScene(f,g){
   const nodes=g.nodes;
   let s=`<svg viewBox="0 0 522 336" preserveAspectRatio="xMidYMid meet">
@@ -766,6 +844,7 @@ function svgScene(f,g){
     const halo = st==='current'?`<circle cx="${x}" cy="${y}" r="27" fill="none" stroke="#ffd60a" stroke-width="1.4" opacity=".5"/>`:'';
     s+=`${halo}<circle cx="${x}" cy="${y}" r="20" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/><text class="nlabel" x="${x}" y="${y}">${i}</text>`;
   });
+  if(!g.dsu) s+=annoFor(f,g);
   return s+'</svg>';
 }
 
@@ -1029,12 +1108,14 @@ function render(){
       <div class="pheadbtns">
         <button class="copy" id="notesBtn">📝 show notes</button>
         <button class="copy" id="varBtn">🔀 variations</button>
+        <button class="copy" id="practiceBtn">🎯 practice</button>
         <button class="copy" id="codeBtn">⌨ hide code</button>
         <button class="copy" id="copyBtn">copy code</button>
       </div>
     </div>
     <div class="notesWrap" id="notesWrap" style="display:none">${notes}</div>
     <div class="varWrap" id="varWrap" style="display:none">${varPanel(p)}</div>
+    <div class="practiceWrap" id="practiceWrap" style="display:none"></div>
     <div class="split" id="split">
       <div class="demo">
         <div class="h">◈ STEP-BY-STEP — ${p.label.toUpperCase()}</div>
@@ -1064,6 +1145,10 @@ function render(){
   nb.onclick=()=>{const show=nw.style.display==='none';nw.style.display=show?'':'none';nb.textContent=show?'📝 hide notes':'📝 show notes';nb.classList.toggle('done',show);};
   const vb=main.querySelector('#varBtn'), vw=main.querySelector('#varWrap');
   vb.onclick=()=>{const show=vw.style.display==='none';vw.style.display=show?'':'none';vb.textContent=show?'🔀 hide variations':'🔀 variations';vb.classList.toggle('done',show);};
+  const pb=main.querySelector('#practiceBtn'), pw=main.querySelector('#practiceWrap');
+  pb.onclick=()=>{const show=pw.style.display==='none';
+    if(show&&window.VXPractice&&!pw.firstChild){pw.innerHTML=VXPractice.heatmapBlock()+VXPractice.practiceBlock(p.label,p.practice||[]);VXPractice.wire(pw);}
+    pw.style.display=show?'':'none';pb.textContent=show?'🎯 hide practice':'🎯 practice';pb.classList.toggle('done',show);};
   main.querySelectorAll('.varcopy').forEach(b=>b.onclick=()=>{const v=(VARS[p.label]||[])[+b.dataset.vi];navigator.clipboard.writeText(v.code);b.textContent='✓';setTimeout(()=>b.textContent='copy',1200);});
   const cbtn=main.querySelector('#codeBtn'), split=main.querySelector('#split');
   cbtn.onclick=()=>{const hid=!split.classList.contains('nocode');split.classList.toggle('nocode',hid);cbtn.textContent=hid?'⌨ show code':'⌨ hide code';cbtn.classList.toggle('done',hid);};
@@ -1113,6 +1198,7 @@ render();
 </script>
 
 <!-- visualise: auth gate + what's-next + resizable panels -->
+<script defer src="/practice.js"></script>
 <script src="/supabase-config.js"></script>
 <script src="/auth.js"></script>
 <script src="/whatsnext.js"></script>
