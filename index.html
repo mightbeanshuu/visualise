@@ -159,7 +159,7 @@
     .topic.live .open svg{width:15px;height:15px;transition:transform .25s;}
     .topic.live:hover .open svg{transform:translateX(5px);}
 
-    /* coming soon */
+    /* inactive backlog cards */
     .topic.soon{opacity:.52;box-shadow:var(--neu-sm);}
     .topic.soon .pill{color:var(--faint);}
     .topic.soon:hover{opacity:.72;border-color:var(--line2);transform:translateY(-3px);}
@@ -218,7 +218,7 @@
     <section class="wrap">
       <div class="sectionhead" id="topics">
         <h2>Topics</h2>
-        <span class="note"><b id="liveN">8</b> live · more coming soon</span>
+        <span class="note"><b id="liveN">16</b> live · all core hubs open</span>
       </div>
       <div class="topics" id="liveGrid"></div>
       <div class="topics" id="soonGrid"></div>
@@ -274,16 +274,15 @@
     {h:'/linked-list/',    a:'255,90,205', i:'link',      t:'Linked List',       d:'Reverse, Floyd cycle, middle, remove-nth, dedup, palindrome — animated.'},
     {h:'/trees/',          a:'93,255,143', i:'tree',      t:'Trees',             d:'Traversals, level-order, height/diameter, path sum, LCA, validate BST.'},
     {h:'/dp/',             a:'124,147,255', i:'dp',       t:'Dynamic Programming', d:'Climbing stairs, house robber, coin change, LCS, knapsack — watch the table fill cell by cell.'},
-    {h:'/heap/',           a:'255,209,102', i:'heap',     t:'Heap / Priority Queue', d:'Heapify (O(n)), sift-up push, sift-down pop, heap sort, Kth-largest — array-as-tree swapping live.'}
+    {h:'/heap/',           a:'255,209,102', i:'heap',     t:'Heap / Priority Queue', d:'Heapify (O(n)), sift-up push, sift-down pop, heap sort, Kth-largest — array-as-tree swapping live.'},
+    {h:'/tries/',          a:'0,229,255',   i:'trie',     t:'Tries',                 d:'Insert/search, prefix checks, wildcard DFS, word break and bit trie max-XOR.'},
+    {h:'/backtracking/',   a:'255,90,205',  i:'backtrack',t:'Backtracking',          d:'Subsets, permutations, combination sum, N-Queens, word search and duplicate skip.'},
+    {h:'/greedy/',         a:'93,255,143',  i:'greedy',   t:'Greedy',                d:'Activity selection, jump game, gas station, platforms, Huffman and partition labels.'},
+    {h:'/intervals/',      a:'255,159,10',  i:'intervals',t:'Intervals',             d:'Merge, insert, erase overlap, meeting rooms, arrows and employee free time.'},
+    {h:'/bit-manipulation/', a:'191,90,242', i:'binary',  t:'Bit Manipulation',      d:'XOR cancellation, masks, set-bit count, subset masks and max-XOR bit trie.'},
+    {h:'/math-geometry/',  a:'124,147,255', i:'geo',      t:'Math & Geometry',       d:'GCD, sieve, fast power, spiral matrix, rotate image and orientation tests.'}
   ];
-  const SOON=[
-    {i:'trie',      t:'Tries',               d:'Prefix trees, word search, autocomplete.'},
-    {i:'backtrack', t:'Backtracking',        d:'Subsets, permutations, combinations, N-Queens.'},
-    {i:'greedy',    t:'Greedy',              d:'Exchange argument, intervals, scheduling.'},
-    {i:'intervals', t:'Intervals',           d:'Merge, insert, overlap counting.'},
-    {i:'binary',    t:'Bit Manipulation',    d:'Masks, XOR tricks, subsets via bits.'},
-    {i:'geo',       t:'Math & Geometry',     d:'Number theory, matrices, sweep lines.'}
-  ];
+  const SOON=[];
 
   const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;');
   let n=0;
@@ -298,7 +297,7 @@
   const soon=SOON.map(c=>`
     <div class="topic soon" style="--i:${n++}">
       <div class="ticon">${I[c.i]}</div>
-      <span class="pill">Soon</span>
+      <span class="pill">Queued</span>
       <h3>${esc(c.t)}</h3>
       <p>${esc(c.d)}</p>
     </div>`).join('');
@@ -309,7 +308,7 @@
   const STATS=[
     {num:`<em>${LIVE.length}</em>`, lbl:'Topics live'},
     {num:'40+', lbl:'Patterns'},
-    {num:`<em>${SOON.length}</em>`, lbl:'Coming soon'},
+    {num:'36', lbl:'New patterns'},
     {num:'S+N', lbl:'Striver + NeetCode'}
   ];
   document.getElementById('stats').innerHTML=STATS.map(s=>

@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="apple-touch-icon" href="/favicon.svg">
+  <title>Visualise · Backtracking</title>
+  <meta name="description" content="Interactive DSA pattern hub.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/topic-hub.css">
+  <link rel="stylesheet" href="/glass.css">
+</head>
+<body data-topic="backtracking">
+  <header class="nav"><div class="wrap">
+    <a class="logo" href="/"><span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></span>visualise</a>
+    <nav class="links"><a href="/">Topics</a><a href="#tool">Patterns</a><a class="cta" href="#tool">Open hub</a></nav>
+  </div></header>
+  <section class="wrap hero">
+    <span class="eyebrow" id="eyebrow"></span><h1 id="heroTitle"></h1><p class="sub" id="heroSub"></p>
+    <div class="heroBtns"><a class="btn primary" id="heroPrimary" href="#tool"></a><a class="btn ghost" id="heroGhost" href="#tool"></a></div><div class="featGrid" id="featGrid"></div>
+  </section>
+  <div class="top" id="tool"><div class="row"><a class="backbtn" href="/">← Topics</a><span class="badge" id="badge"></span><h2 id="topTitle"></h2><span class="meta" id="topMeta"></span><button class="copy menuToggle" id="menuToggle">☰ patterns</button></div><p id="topDesc"></p></div>
+  <div class="shell"><aside class="side" id="side"></aside><main class="main" id="main"></main></div>
+  <script src="/topic-data.js"></script><script src="/topic-hub.js"></script><script src="/supabase-config.js"></script><script src="/auth.js"></script>
+</body>
+</html>

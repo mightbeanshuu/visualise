@@ -14,7 +14,13 @@
     { href: "/heap/",        t: "Heap / Priority Queue", d: "Heapify, push, pop, heap sort, top-K.",    a: "255,209,102"},
     { href: "/dp/",          t: "Dynamic Programming",  d: "Tables that fill cell by cell.",            a: "124,147,255"},
     { href: "/stack-queue/", t: "Stack & Queue",        d: "Monotonic stack, queues, parsing.",         a: "56,189,248" },
-    { href: "/linked-list/", t: "Linked List",          d: "Reverse, cycle, middle, palindrome.",       a: "255,90,205" }
+    { href: "/linked-list/", t: "Linked List",          d: "Reverse, cycle, middle, palindrome.",       a: "255,90,205" },
+    { href: "/tries/",       t: "Tries",                d: "Prefix trees, wildcard DFS, word break.",   a: "0,229,255"  },
+    { href: "/backtracking/", t: "Backtracking",        d: "Subsets, permutations, N-Queens.",          a: "255,90,205" },
+    { href: "/greedy/",      t: "Greedy",               d: "Exchange arguments, scheduling, jumps.",    a: "93,255,143" },
+    { href: "/intervals/",   t: "Intervals",            d: "Merge, insert, sweep overlaps.",            a: "255,159,10" },
+    { href: "/bit-manipulation/", t: "Bit Manipulation", d: "XOR, masks, set bits, bit tries.",         a: "191,90,242" },
+    { href: "/math-geometry/", t: "Math & Geometry",    d: "GCD, sieve, matrices, geometry.",           a: "124,147,255"}
   ];
 
   injectStyle();
