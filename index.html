@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="apple-touch-icon" href="/favicon.svg">
-  <title>Visualise · Interactive DSA Topics</title>
-  <meta name="description" content="An interactive roadmap of Data Structures & Algorithms — visual pattern hubs, step-by-step animations synced to a live code trace, and full LeetCode-style code with click-to-reveal comments.">
+  <title>Visualise · Interactive Learning Tracks</title>
+  <meta name="description" content="A glassmorphism learning portal for DSA, web development, AI/ML, AI agents, system design and more. DSA is live now with interactive visual pattern hubs.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -14,174 +14,139 @@
     :root{
       --bg:#06080c; --panel:#0c1016; --line:#19222f; --line2:#243244;
       --text:#eef2f8; --muted:#90a0b3; --faint:#5a6675;
-      --cyan:#00e5ff; --green:#5dff8f; --accent:#7c93ff; --pink:#ff5acd;
+      --cyan:#00e5ff; --green:#5dff8f; --accent:#7c93ff; --pink:#ff5acd; --amber:#ffd166;
       --r:18px;
-      /* neumorphic dual-light shadow tuned for the dark bg */
-      --neu:8px 8px 20px rgba(0,0,0,.5), -6px -6px 18px rgba(255,255,255,.022);
-      --neu-sm:5px 5px 14px rgba(0,0,0,.42), -4px -4px 12px rgba(255,255,255,.02);
-      --glass:linear-gradient(180deg,rgba(22,29,40,.6),rgba(9,12,17,.55));
+      --glass:linear-gradient(180deg,rgba(22,29,40,.64),rgba(9,12,17,.58));
+      --shadow:0 22px 58px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.07);
     }
-    *{box-sizing:border-box;}
-    html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;}
-    html,body{margin:0;padding:0;}
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+    html,body{margin:0;padding:0}
     body{
-      min-height:100vh; color:var(--text);
+      min-height:100vh;color:var(--text);
       font-family:'Inter',ui-sans-serif,system-ui,-apple-system,sans-serif;
       font-feature-settings:"cv02","cv03","cv04","ss01";
-      letter-spacing:-.01em; -webkit-font-smoothing:antialiased;
+      letter-spacing:-.01em;-webkit-font-smoothing:antialiased;overflow-x:hidden;
       background:
-        radial-gradient(820px 540px at 10% -8%, rgba(0,229,255,.12), transparent 60%),
+        radial-gradient(820px 540px at 9% -8%, rgba(0,229,255,.13), transparent 60%),
         radial-gradient(760px 520px at 94% 0%, rgba(255,90,205,.10), transparent 58%),
-        radial-gradient(1100px 760px at 50% 120%, rgba(124,147,255,.10), transparent 62%),
+        radial-gradient(980px 700px at 50% 118%, rgba(93,255,143,.08), transparent 62%),
         var(--bg);
-      background-attachment:fixed; overflow-x:hidden;
+      background-attachment:fixed;
     }
-    .mono{font-family:'JetBrains Mono',ui-monospace,Menlo,monospace;}
-    .wrap{width:min(1140px,calc(100% - 40px));margin:0 auto;}
-    a{color:inherit;}
-    svg{display:block;}
-    :focus-visible{outline:2px solid var(--cyan);outline-offset:3px;border-radius:6px;}
+    a{color:inherit}
+    svg{display:block}
+    code,.mono{font-family:'JetBrains Mono',ui-monospace,Menlo,monospace}
+    :focus-visible{outline:2px solid var(--cyan);outline-offset:3px;border-radius:7px}
+    #bgfx{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0;transition:opacity 1s ease}
+    #bgfx.on{opacity:1}
+    body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+      background-image:linear-gradient(rgba(124,147,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(124,147,255,.045) 1px,transparent 1px);
+      background-size:48px 48px;
+      mask-image:radial-gradient(1000px 640px at 50% -3%,#000 26%,transparent 76%);
+      -webkit-mask-image:radial-gradient(1000px 640px at 50% -3%,#000 26%,transparent 76%);
+    }
+    header,main,footer{position:relative;z-index:1}
+    .wrap{width:min(1160px,calc(100% - 40px));margin:0 auto}
 
-    /* three.js network background canvas */
-    #bgfx{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0;
-      transition:opacity 1.2s ease;}
-    #bgfx.on{opacity:1;}
+    .nav{position:sticky;top:0;z-index:40;border-bottom:1px solid var(--line);background:rgba(6,8,12,.66);backdrop-filter:blur(16px) saturate(140%);-webkit-backdrop-filter:blur(16px) saturate(140%)}
+    .nav .wrap{display:flex;align-items:center;justify-content:space-between;padding:13px 0;gap:18px}
+    .logo{display:flex;align-items:center;gap:11px;text-decoration:none;font-weight:750;font-size:16.5px;letter-spacing:-.35px}
+    .mark{width:30px;height:30px;border-radius:10px;display:grid;place-items:center;color:var(--cyan);border:1px solid rgba(0,229,255,.28);background:linear-gradient(140deg,rgba(0,229,255,.16),rgba(124,147,255,.14));box-shadow:inset 2px 2px 6px rgba(0,0,0,.38),inset -2px -2px 6px rgba(255,255,255,.04)}
+    .mark svg{width:16px;height:16px}
+    .links{display:flex;align-items:center;gap:6px}
+    .links a{color:var(--muted);text-decoration:none;font-size:13.5px;font-weight:600;padding:7px 12px;border-radius:11px;transition:.18s}
+    .links a:hover{color:var(--text);background:rgba(124,147,255,.09)}
 
-    /* faint blueprint grid (sits above the canvas, below content) */
-    body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
-      background-image:
-        linear-gradient(rgba(124,147,255,.045) 1px,transparent 1px),
-        linear-gradient(90deg,rgba(124,147,255,.045) 1px,transparent 1px);
-      background-size:46px 46px;
-      mask-image:radial-gradient(950px 620px at 50% -2%,#000 28%,transparent 76%);
-      -webkit-mask-image:radial-gradient(950px 620px at 50% -2%,#000 28%,transparent 76%);}
-    main,header,footer{position:relative;z-index:1;}
+    .hero{padding:78px 0 28px;display:grid;grid-template-columns:minmax(0,1fr) minmax(320px,430px);gap:28px;align-items:center}
+    .heroCopy{display:grid;gap:20px;justify-items:start}
+    .eyebrow{display:inline-flex;align-items:center;gap:9px;color:var(--green);font-size:11.5px;letter-spacing:2px;text-transform:uppercase;font-weight:800;font-family:'JetBrains Mono',monospace;border:1px solid rgba(93,255,143,.26);background:rgba(93,255,143,.07);padding:7px 15px;border-radius:30px;box-shadow:var(--shadow)}
+    .pulse{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green);animation:blink 1.7s ease-in-out infinite}
+    @keyframes blink{50%{opacity:.25}}
+    h1{margin:0;font-size:clamp(44px,7.4vw,86px);line-height:1.0;letter-spacing:-.035em;font-weight:760;color:#fff;text-wrap:balance}
+    h1 b{color:var(--cyan)}
+    .sub{margin:0;color:var(--muted);line-height:1.68;max-width:690px;font-size:17px}
+    .sub b{color:var(--text);font-weight:650}
+    .cta{display:flex;flex-wrap:wrap;gap:12px}
+    .btn{display:inline-flex;align-items:center;gap:9px;text-decoration:none;font-weight:700;font-size:14px;padding:13px 22px;border-radius:14px;border:1px solid transparent;transition:.22s}
+    .btn svg{width:16px;height:16px;transition:.22s}
+    .btn.primary{color:#04121a;background:linear-gradient(135deg,var(--cyan),var(--accent));box-shadow:0 18px 34px rgba(0,0,0,.32),inset 0 1px 0 rgba(255,255,255,.24)}
+    .btn.ghost{color:var(--text);border-color:var(--line2);background:var(--glass);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:var(--shadow)}
+    .btn:hover{transform:translateY(-3px)}
+    .btn:hover svg{transform:translateX(4px)}
 
-    /* nav */
-    .nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(16px) saturate(140%);-webkit-backdrop-filter:blur(16px) saturate(140%);
-      background:rgba(6,8,12,.62);border-bottom:1px solid var(--line);}
-    .nav .wrap{display:flex;align-items:center;justify-content:space-between;padding:13px 0;}
-    .logo{display:flex;align-items:center;gap:11px;font-weight:700;letter-spacing:-.4px;font-size:16.5px;text-decoration:none;}
-    .logo .mark{width:30px;height:30px;border-radius:10px;display:grid;place-items:center;
-      background:linear-gradient(140deg,rgba(0,229,255,.16),rgba(124,147,255,.14));
-      border:1px solid rgba(0,229,255,.26);
-      box-shadow:inset 2px 2px 6px rgba(0,0,0,.4),inset -2px -2px 6px rgba(255,255,255,.04);}
-    .logo .mark svg{width:16px;height:16px;color:var(--cyan);}
-    .nav .links{display:flex;align-items:center;gap:6px;}
-    .nav .links a{color:var(--muted);text-decoration:none;font-size:13.5px;font-weight:500;
-      padding:7px 12px;border-radius:11px;transition:color .18s,background .18s;}
-    .nav .links a:hover{color:var(--text);background:rgba(124,147,255,.08);}
-    .nav .links a.gh{display:inline-flex;align-items:center;gap:6px;}
-    .nav .links a.gh svg{width:15px;height:15px;}
+    .orbital{position:relative;min-height:390px;border:1px solid rgba(124,147,255,.18);border-radius:22px;background:var(--glass);backdrop-filter:blur(14px) saturate(135%);-webkit-backdrop-filter:blur(14px) saturate(135%);box-shadow:var(--shadow);overflow:hidden}
+    .orbital svg{position:absolute;inset:0;width:100%;height:100%}
+    .orbitLine{fill:none;stroke:rgba(124,147,255,.18);stroke-width:1.4}
+    .hubCore{fill:rgba(0,229,255,.12);stroke:rgba(0,229,255,.8);stroke-width:2}
+    .hubNode{fill:rgba(12,16,22,.92);stroke:rgba(255,255,255,.18);stroke-width:1.4}
+    .hubNode.live{stroke:rgba(93,255,143,.85);fill:rgba(93,255,143,.11)}
+    .hubNode.soon{stroke:rgba(124,147,255,.36)}
+    .hubText{fill:#eef2f8;font:700 12px 'Inter',sans-serif;text-anchor:middle}
+    .hubSmall{fill:#90a0b3;font:700 9px 'JetBrains Mono',monospace;text-anchor:middle;letter-spacing:.8px}
+    .orbitPulse{animation:floatNode 4s ease-in-out infinite}
+    .orbitPulse:nth-child(2n){animation-delay:-1.2s}
+    @keyframes floatNode{50%{transform:translateY(-6px)}}
+    .orbitalCaption{position:absolute;left:22px;right:22px;bottom:20px;display:flex;align-items:center;justify-content:space-between;gap:14px;color:var(--muted);font-size:12px}
+    .orbitalCaption b{color:var(--green)}
 
-    /* hero */
-    .hero{padding:84px 0 30px;display:grid;gap:22px;justify-items:start;}
-    .eyebrow{display:inline-flex;align-items:center;gap:9px;color:var(--green);font-size:11.5px;
-      letter-spacing:2px;text-transform:uppercase;font-weight:700;font-family:'JetBrains Mono',monospace;
-      border:1px solid rgba(93,255,143,.25);background:rgba(93,255,143,.06);padding:7px 15px;border-radius:30px;
-      backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
-      box-shadow:var(--neu-sm);}
-    .eyebrow .pulse{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green);animation:blink 1.7s ease-in-out infinite;}
-    @keyframes blink{50%{opacity:.25;}}
-    h1{margin:0;font-size:clamp(46px,8.4vw,88px);line-height:1.0;letter-spacing:-2.4px;font-weight:700;
-      background:linear-gradient(102deg,#fff 4%,var(--cyan) 38%,var(--accent) 60%,var(--pink) 92%);
-      -webkit-background-clip:text;background-clip:text;color:transparent;background-size:220% auto;
-      animation:shimmer 9s ease-in-out infinite;}
-    @keyframes shimmer{50%{background-position:100% center;}}
-    .sub{margin:0;color:var(--muted);line-height:1.68;max-width:640px;font-size:17px;font-weight:400;}
-    .sub b{color:var(--text);font-weight:600;}
+    .sectionhead{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin:46px 0 18px;flex-wrap:wrap}
+    .sectionhead h2{margin:0;font-size:24px;letter-spacing:-.5px}
+    .sectionhead p{margin:6px 0 0;color:var(--muted);font-size:14px;line-height:1.55;max-width:660px}
+    .note{font-size:12px;color:var(--faint);font-family:'JetBrains Mono',monospace}
+    .note b{color:var(--green)}
 
-    /* CTA row */
-    .cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:2px;}
-    .btn{display:inline-flex;align-items:center;gap:9px;text-decoration:none;font-weight:600;font-size:14px;
-      padding:13px 22px;border-radius:14px;cursor:pointer;border:1px solid transparent;
-      transition:transform .22s cubic-bezier(.2,.7,.3,1),box-shadow .22s,border-color .22s,background .22s;}
-    .btn svg{width:16px;height:16px;}
-    .btn.primary{color:#04121a;
-      background:linear-gradient(135deg,var(--cyan),var(--accent));
-      box-shadow:6px 6px 18px rgba(0,0,0,.45),-4px -4px 14px rgba(255,255,255,.03),inset 0 1px 0 rgba(255,255,255,.25);}
-    .btn.primary:hover{transform:translateY(-3px);
-      box-shadow:9px 11px 26px rgba(0,0,0,.5),-4px -4px 14px rgba(255,255,255,.04),inset 0 1px 0 rgba(255,255,255,.3);}
-    .btn.primary .ar{transition:transform .25s;}
-    .btn.primary:hover .ar{transform:translateY(3px);}
-    .btn.ghost{color:var(--text);border-color:var(--line2);
-      background:var(--glass);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
-      box-shadow:var(--neu-sm);}
-    .btn.ghost:hover{transform:translateY(-3px);border-color:rgba(124,147,255,.4);color:#fff;}
+    .tracks{display:grid;grid-template-columns:1.25fr repeat(2,1fr);gap:14px}
+    .track{--a:124,147,255;position:relative;min-height:246px;border:1px solid rgba(var(--a),.18);border-radius:18px;background:var(--glass);backdrop-filter:blur(14px) saturate(128%);-webkit-backdrop-filter:blur(14px) saturate(128%);box-shadow:var(--shadow);padding:20px;overflow:hidden;display:flex;flex-direction:column;color:inherit;text-decoration:none;transition:.24s}
+    .track::before{content:"";position:absolute;inset:0;background:radial-gradient(440px 240px at 75% 18%,rgba(var(--a),.18),transparent 58%);pointer-events:none}
+    .track.live{grid-row:span 2;min-height:506px}
+    .track.live:hover{transform:translateY(-5px);border-color:rgba(var(--a),.48)}
+    .track.soon{opacity:.74}
+    .track.soon:hover{opacity:.9;transform:translateY(-3px)}
+    .trackTop{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;position:relative}
+    .trackIcon{width:52px;height:52px;border-radius:15px;display:grid;place-items:center;color:rgb(var(--a));background:rgba(var(--a),.10);border:1px solid rgba(var(--a),.30);box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+    .trackIcon svg{width:28px;height:28px}
+    .pill{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1.2px;text-transform:uppercase;font-weight:800;padding:5px 9px;border-radius:20px;color:rgb(var(--a));border:1px solid rgba(var(--a),.36);background:rgba(var(--a),.08)}
+    .track h3{position:relative;margin:20px 0 8px;font-size:21px;letter-spacing:-.5px}
+    .track.live h3{font-size:30px}
+    .track p{position:relative;margin:0;color:var(--muted);font-size:13.5px;line-height:1.6}
+    .trackArt{position:relative;margin-top:auto;padding-top:18px}
+    .trackArt svg{width:100%;height:auto;max-height:200px}
+    .stroke{fill:none;stroke:rgb(var(--a));stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+    .soft{fill:rgba(var(--a),.11);stroke:rgba(var(--a),.38);stroke-width:1.4}
+    .textbit{fill:#c9d1d9;font:700 9px 'JetBrains Mono',monospace}
+    .open{position:relative;margin-top:18px;display:inline-flex;align-items:center;gap:7px;color:rgb(var(--a));font-weight:760;font-size:13px}
+    .open svg{width:15px;height:15px}
 
-    /* stats strip — glass + neumorphic */
-    .stats{display:flex;flex-wrap:wrap;gap:10px 0;border:1px solid var(--line);border-radius:var(--r);
-      background:var(--glass);backdrop-filter:blur(14px) saturate(130%);-webkit-backdrop-filter:blur(14px) saturate(130%);
-      overflow:hidden;margin-top:8px;width:100%;box-shadow:var(--neu);}
-    .stat{flex:1 1 0;min-width:130px;padding:18px 22px;display:flex;flex-direction:column;gap:3px;
-      border-left:1px solid rgba(124,147,255,.1);}
-    .stat:first-child{border-left:none;}
-    .stat .num{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:23px;letter-spacing:-.5px;
-      color:var(--text);}
-    .stat .num em{font-style:normal;color:var(--cyan);}
-    .stat .lbl{font-size:11.5px;color:var(--faint);letter-spacing:.4px;text-transform:uppercase;font-weight:600;}
+    .dsaGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:14px}
+    .dsaLink{--a:0,229,255;min-height:104px;text-decoration:none;color:inherit;border:1px solid rgba(var(--a),.17);border-radius:15px;background:linear-gradient(180deg,rgba(var(--a),.055),rgba(10,13,18,.70));box-shadow:var(--shadow);padding:14px;display:flex;flex-direction:column;gap:8px;transition:.2s}
+    .dsaLink:hover{transform:translateY(-3px);border-color:rgba(var(--a),.46)}
+    .dsaLink b{font-size:13.5px;letter-spacing:-.2px}
+    .dsaLink span{color:var(--muted);font-size:11.5px;line-height:1.45}
 
-    /* section head */
-    .sectionhead{display:flex;align-items:baseline;justify-content:space-between;gap:14px;margin:48px 0 18px;flex-wrap:wrap;scroll-margin-top:80px;}
-    .sectionhead h2{margin:0;font-weight:600;font-size:21px;letter-spacing:-.4px;}
-    .sectionhead .note{font-size:12px;color:var(--faint);font-family:'JetBrains Mono',monospace;}
-    .sectionhead .note b{color:var(--green);}
+    footer{border-top:1px solid var(--line);margin-top:64px}
+    footer .wrap{padding:24px 0 44px;color:var(--faint);font-size:12.5px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+    footer a{color:var(--muted);text-decoration:none}
+    footer a:hover{color:var(--text)}
 
-    /* topic grid */
-    .topics{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
-    .topics+.topics{margin-top:14px;}
-    .topic{--a:124,147,255;position:relative;border:1px solid rgba(var(--a),.16);border-radius:var(--r);
-      background:var(--glass);backdrop-filter:blur(13px) saturate(125%);-webkit-backdrop-filter:blur(13px) saturate(125%);
-      padding:18px;min-height:158px;display:flex;flex-direction:column;gap:9px;
-      text-decoration:none;color:inherit;overflow:hidden;box-shadow:var(--neu);
-      transition:transform .24s cubic-bezier(.2,.7,.3,1),border-color .24s,box-shadow .24s,opacity .24s;}
-    .topic .ticon{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;
-      color:rgb(var(--a));border:1px solid rgba(var(--a),.24);
-      background:linear-gradient(145deg,rgba(var(--a),.12),rgba(9,12,17,.5));
-      box-shadow:inset 2px 2px 5px rgba(0,0,0,.35),inset -2px -2px 5px rgba(255,255,255,.035);
-      transition:transform .24s;}
-    .topic .ticon svg{width:20px;height:20px;}
-    .topic h3{margin:5px 0 0;font-size:15.5px;font-weight:600;letter-spacing:-.3px;}
-    .topic p{margin:0;color:var(--muted);font-size:12.5px;line-height:1.5;}
-    .pill{position:absolute;top:14px;right:14px;font-family:'JetBrains Mono',monospace;font-size:9px;
-      letter-spacing:1.2px;text-transform:uppercase;font-weight:700;padding:4px 9px 4px 8px;border-radius:20px;
-      display:inline-flex;align-items:center;gap:5px;color:var(--faint);border:1px solid var(--line2);background:rgba(11,17,24,.6);}
-    .pill .ld{width:5px;height:5px;border-radius:50%;background:currentColor;}
-
-    /* live cards — restrained lift, NO neon glow halo */
-    .topic.live{cursor:pointer;}
-    .topic.live .pill{color:rgb(var(--a));border-color:rgba(var(--a),.4);background:rgba(var(--a),.08);}
-    .topic.live .pill .ld{box-shadow:0 0 7px currentColor;animation:blink 1.7s ease-in-out infinite;}
-    .topic.live:hover{transform:translateY(-5px);border-color:rgba(var(--a),.42);
-      box-shadow:11px 14px 30px rgba(0,0,0,.55),-6px -6px 18px rgba(255,255,255,.025);}
-    .topic.live:hover .ticon{transform:scale(1.05);}
-    .topic.live .open{margin-top:auto;display:inline-flex;align-items:center;gap:6px;color:rgb(var(--a));font-weight:600;font-size:12.5px;}
-    .topic.live .open svg{width:15px;height:15px;transition:transform .25s;}
-    .topic.live:hover .open svg{transform:translateX(5px);}
-
-    /* inactive backlog cards */
-    .topic.soon{opacity:.52;box-shadow:var(--neu-sm);}
-    .topic.soon .pill{color:var(--faint);}
-    .topic.soon:hover{opacity:.72;border-color:var(--line2);transform:translateY(-3px);}
-
-    footer{border-top:1px solid var(--line);margin-top:64px;}
-    footer .wrap{padding:24px 0 44px;color:var(--faint);font-size:12.5px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;}
-    footer .fl{display:flex;flex-wrap:wrap;gap:14px;}
-    footer a{color:var(--muted);text-decoration:none;transition:color .18s;} footer a:hover{color:var(--text);}
-
-    @media(max-width:980px){.topics{grid-template-columns:repeat(3,1fr);}}
-    @media(max-width:720px){.topics{grid-template-columns:repeat(2,1fr);}.hero{padding:56px 0 26px;}.stat{flex-basis:50%;}.stat:nth-child(odd){border-left:none;}}
-    @media(max-width:440px){.topics{grid-template-columns:1fr;}.btn{flex:1 1 100%;justify-content:center;}}
-
-    /* staggered reveal */
-    @keyframes rise{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:none;}}
-    .hero>*{animation:rise .7s cubic-bezier(.2,.7,.3,1) both;}
-    .hero>*:nth-child(2){animation-delay:.08s;}.hero>*:nth-child(3){animation-delay:.16s;}.hero>*:nth-child(4){animation-delay:.24s;}.hero>*:nth-child(5){animation-delay:.32s;}
-    .topic{animation:rise .6s cubic-bezier(.2,.7,.3,1) both;animation-delay:calc(.1s + var(--i,0)*40ms);}
-
+    @media(max-width:980px){
+      .hero{grid-template-columns:1fr}
+      .orbital{min-height:330px}
+      .tracks{grid-template-columns:1fr 1fr}
+      .track.live{grid-column:1/-1;grid-row:auto;min-height:420px}
+      .dsaGrid{grid-template-columns:repeat(3,1fr)}
+    }
+    @media(max-width:680px){
+      .wrap{width:min(100% - 30px,1160px)}
+      .links a:not(:first-child){display:none}
+      .hero{padding:54px 0 18px}
+      .tracks,.dsaGrid{grid-template-columns:1fr}
+      .btn{width:100%;justify-content:center}
+      .track.live{min-height:390px}
+    }
     @media(prefers-reduced-motion:reduce){
-      *,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important;}
-      #bgfx{display:none;}
+      *,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+      #bgfx{display:none}
     }
   </style>
 </head>
@@ -195,221 +160,226 @@
         visualise
       </a>
       <nav class="links">
-        <a href="/arrays/">Arrays</a>
-        <a href="/graphs/">Graphs</a>
-        <a href="/trees/">Trees</a>
-        <a class="gh" href="https://github.com/mightbeanshuu" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2c-3.3.7-4-1.6-4-1.6-.5-1.4-1.3-1.8-1.3-1.8-1.1-.7 0-.7 0-.7 1.2 0 1.8 1.2 1.8 1.2 1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.7-1.6-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.2-3.2 0-.4-.5-1.6.2-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0C17.3 4.7 18.3 5 18.3 5c.7 1.6.2 2.8.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .5Z"/></svg>GitHub</a>
+        <a href="#tracks">Tracks</a>
+        <a href="#dsa">DSA</a>
+        <a href="https://github.com/mightbeanshuu" target="_blank" rel="noopener">GitHub</a>
       </nav>
     </div>
   </header>
 
   <main>
     <section class="wrap hero">
-      <span class="eyebrow"><span class="pulse"></span> Interactive DSA Roadmap</span>
-      <h1>DSA,<br>visualised.</h1>
-      <p class="sub">Pick a pattern. Get the <b>intuition</b>, watch it run step-by-step synced to a live code trace, then read full <b>LeetCode-style code</b> with click-to-reveal comments — plus variation templates to stress-test what you learned.</p>
-      <div class="cta">
-        <a class="btn primary" href="#topics">Explore topics <span class="ar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg></span></a>
-        <a class="btn ghost" href="https://github.com/mightbeanshuu" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2c-3.3.7-4-1.6-4-1.6-.5-1.4-1.3-1.8-1.3-1.8-1.1-.7 0-.7 0-.7 1.2 0 1.8 1.2 1.8 1.2 1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.7-1.6-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.2-3.2 0-.4-.5-1.6.2-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0C17.3 4.7 18.3 5 18.3 5c.7 1.6.2 2.8.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .5Z"/></svg>View on GitHub</a>
+      <div class="heroCopy">
+        <span class="eyebrow"><span class="pulse"></span> Interactive learning map</span>
+        <h1>One place to <b>visualise</b> hard tech.</h1>
+        <p class="sub">DSA is live now: interactive pattern hubs, vector dry-runs, code traces and Striver-style solutions. Web development, AI/ML, AI agents and more are queued as upcoming tracks.</p>
+        <div class="cta">
+          <a class="btn primary" href="#dsa">Start DSA <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
+          <a class="btn ghost" href="#tracks">View roadmap</a>
+        </div>
       </div>
-      <div class="stats" id="stats"></div>
+
+      <div class="orbital" aria-label="Learning track orbit diagram">
+        <svg viewBox="0 0 430 390" fill="none">
+          <ellipse class="orbitLine" cx="215" cy="182" rx="148" ry="74"/>
+          <ellipse class="orbitLine" cx="215" cy="182" rx="112" ry="145" transform="rotate(38 215 182)"/>
+          <ellipse class="orbitLine" cx="215" cy="182" rx="112" ry="145" transform="rotate(-38 215 182)"/>
+          <g>
+            <circle class="hubCore" cx="215" cy="182" r="58"/>
+            <text class="hubText" x="215" y="174">DSA</text>
+            <text class="hubSmall" x="215" y="194">LIVE NOW</text>
+          </g>
+          <g class="orbitPulse">
+            <circle class="hubNode soon" cx="88" cy="140" r="34"/>
+            <text class="hubText" x="88" y="135">WEB</text>
+            <text class="hubSmall" x="88" y="153">SOON</text>
+          </g>
+          <g class="orbitPulse">
+            <circle class="hubNode soon" cx="337" cy="136" r="34"/>
+            <text class="hubText" x="337" y="132">AI/ML</text>
+            <text class="hubSmall" x="337" y="151">SOON</text>
+          </g>
+          <g class="orbitPulse">
+            <circle class="hubNode soon" cx="118" cy="272" r="34"/>
+            <text class="hubText" x="118" y="268">AGENTS</text>
+            <text class="hubSmall" x="118" y="287">SOON</text>
+          </g>
+          <g class="orbitPulse">
+            <circle class="hubNode soon" cx="320" cy="272" r="34"/>
+            <text class="hubText" x="320" y="268">SYSTEM</text>
+            <text class="hubSmall" x="320" y="287">SOON</text>
+          </g>
+          <path d="M180 181h70M215 146v72" stroke="rgba(0,229,255,.42)" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <div class="orbitalCaption"><span><b>16</b> DSA topic hubs live</span><span class="mono">next tracks queued</span></div>
+      </div>
     </section>
 
-    <section class="wrap">
-      <div class="sectionhead" id="topics">
-        <h2>Topics</h2>
-        <span class="note"><b id="liveN">16</b> live · all core hubs open</span>
+    <section class="wrap" id="tracks">
+      <div class="sectionhead">
+        <div>
+          <h2>Learning tracks</h2>
+          <p>Only DSA is open today. The remaining tracks are laid out as coming-soon lanes so the landing page can grow without changing its structure.</p>
+        </div>
+        <span class="note"><b>1</b> live · 5 queued</span>
       </div>
-      <div class="topics" id="liveGrid"></div>
-      <div class="topics" id="soonGrid"></div>
+
+      <div class="tracks">
+        <a class="track live" href="#dsa" style="--a:0,229,255">
+          <div class="trackTop">
+            <span class="trackIcon"><svg viewBox="0 0 48 48" fill="none"><path class="stroke" d="M10 35h28M14 13h20M24 13v22"/><rect class="soft" x="7" y="31" width="10" height="10" rx="2"/><rect class="soft" x="31" y="31" width="10" height="10" rx="2"/><rect class="soft" x="18" y="7" width="12" height="12" rx="2"/></svg></span>
+            <span class="pill">Live</span>
+          </div>
+          <h3>Data Structures & Algorithms</h3>
+          <p>Pattern-first DSA with live code traces, vector animations, practice links and complete C++ templates across graphs, arrays, trees, DP, heaps, tries, backtracking and more.</p>
+          <div class="trackArt">
+            <svg viewBox="0 0 520 210" fill="none" aria-hidden="true">
+              <path class="stroke" opacity=".45" d="M70 42h140v58h115v68h120"/>
+              <circle class="soft" cx="70" cy="42" r="24"/><text class="textbit" x="58" y="46">BFS</text>
+              <circle class="soft" cx="210" cy="100" r="24"/><text class="textbit" x="199" y="104">DP</text>
+              <circle class="soft" cx="325" cy="168" r="24"/><text class="textbit" x="311" y="172">TRIE</text>
+              <circle class="soft" cx="445" cy="168" r="24"/><text class="textbit" x="432" y="172">BITS</text>
+              <rect class="soft" x="112" y="128" width="78" height="44" rx="10"/><text class="textbit" x="130" y="154">STACK</text>
+              <path class="stroke" d="M92 42h92M234 100h70M349 168h72"/>
+            </svg>
+          </div>
+          <span class="open">Open DSA roadmap <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
+        </a>
+
+        <div class="track soon" style="--a:255,159,10">
+          <div class="trackTop"><span class="trackIcon"><svg viewBox="0 0 48 48" fill="none"><rect class="soft" x="7" y="10" width="34" height="25" rx="4"/><path class="stroke" d="M12 18h11M12 24h21M12 30h14M19 39h10"/></svg></span><span class="pill">Soon</span></div>
+          <h3>Web Development</h3>
+          <p>Frontend fundamentals, APIs, databases, auth, deployment and production UI patterns.</p>
+          <div class="trackArt"><svg viewBox="0 0 260 110" fill="none"><rect class="soft" x="18" y="18" width="92" height="64" rx="10"/><rect class="soft" x="132" y="24" width="98" height="18" rx="5"/><rect class="soft" x="132" y="52" width="70" height="12" rx="4"/><path class="stroke" d="M36 38h56M36 54h38M36 68h50"/></svg></div>
+        </div>
+
+        <div class="track soon" style="--a:191,90,242">
+          <div class="trackTop"><span class="trackIcon"><svg viewBox="0 0 48 48" fill="none"><circle class="soft" cx="24" cy="24" r="13"/><path class="stroke" d="M24 7v7M24 34v7M7 24h7M34 24h7M13 13l5 5M30 30l5 5M35 13l-5 5M18 30l-5 5"/></svg></span><span class="pill">Soon</span></div>
+          <h3>AI / ML</h3>
+          <p>Math intuition, model training, evaluation, embeddings, RAG and applied ML workflows.</p>
+          <div class="trackArt"><svg viewBox="0 0 260 110" fill="none"><path class="stroke" d="M35 78c30-58 62-58 96 0s64 58 94 0"/><circle class="soft" cx="35" cy="78" r="8"/><circle class="soft" cx="130" cy="50" r="8"/><circle class="soft" cx="225" cy="78" r="8"/></svg></div>
+        </div>
+
+        <div class="track soon" style="--a:93,255,143">
+          <div class="trackTop"><span class="trackIcon"><svg viewBox="0 0 48 48" fill="none"><rect class="soft" x="15" y="10" width="18" height="22" rx="5"/><path class="stroke" d="M12 38h24M18 32v6M30 32v6M16 19h.1M24 19h.1M32 19h.1M19 26h10"/></svg></span><span class="pill">Soon</span></div>
+          <h3>AI Agents</h3>
+          <p>Tool use, memory, planning loops, agentic workflows, evaluation and deployment patterns.</p>
+          <div class="trackArt"><svg viewBox="0 0 260 110" fill="none"><circle class="soft" cx="54" cy="54" r="20"/><circle class="soft" cx="134" cy="28" r="18"/><circle class="soft" cx="196" cy="76" r="18"/><path class="stroke" d="M73 48l43-14M151 40l30 24M75 62l102 12"/></svg></div>
+        </div>
+
+        <div class="track soon" style="--a:124,147,255">
+          <div class="trackTop"><span class="trackIcon"><svg viewBox="0 0 48 48" fill="none"><rect class="soft" x="8" y="9" width="12" height="12" rx="2"/><rect class="soft" x="28" y="9" width="12" height="12" rx="2"/><rect class="soft" x="18" y="29" width="12" height="12" rx="2"/><path class="stroke" d="M20 15h8M14 21l8 8M34 21l-8 8"/></svg></span><span class="pill">Soon</span></div>
+          <h3>System Design</h3>
+          <p>Scalable architectures, tradeoffs, queues, caches, databases and reliability patterns.</p>
+          <div class="trackArt"><svg viewBox="0 0 260 110" fill="none"><rect class="soft" x="24" y="36" width="54" height="36" rx="8"/><rect class="soft" x="104" y="18" width="54" height="36" rx="8"/><rect class="soft" x="184" y="56" width="54" height="36" rx="8"/><path class="stroke" d="M78 54h26M158 36l30 28"/></svg></div>
+        </div>
+
+        <div class="track soon" style="--a:255,209,102">
+          <div class="trackTop"><span class="trackIcon"><svg viewBox="0 0 48 48" fill="none"><path class="soft" d="M15 34h20a8 8 0 0 0 1-16 12 12 0 0 0-23-3A9.5 9.5 0 0 0 15 34Z"/><path class="stroke" d="M18 25h12M24 19v12"/></svg></span><span class="pill">Soon</span></div>
+          <h3>Cloud & DevOps</h3>
+          <p>Linux, Docker, CI/CD, observability, infra basics and deploy-ready workflows.</p>
+          <div class="trackArt"><svg viewBox="0 0 260 110" fill="none"><path class="soft" d="M45 70h92a22 22 0 0 0 2-44 33 33 0 0 0-64-7 26 26 0 0 0-30 51Z"/><path class="stroke" d="M152 56h70M188 36v40M172 44l16-8 16 8M172 68l16 8 16-8"/></svg></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="wrap" id="dsa">
+      <div class="sectionhead">
+        <div>
+          <h2>DSA roadmap live now</h2>
+          <p>Jump straight into the active interactive hubs. These keep the existing Visualise UI and open into the detailed pattern pages.</p>
+        </div>
+        <span class="note"><b>16</b> hubs</span>
+      </div>
+      <div class="dsaGrid" id="dsaGrid"></div>
     </section>
   </main>
 
   <footer>
     <div class="wrap">
-      <span>Interactive DSA roadmap · hand-coded, deployed on Vercel</span>
-      <span class="fl">
-        <a href="/graphs/">Graphs</a>
-        <a href="/arrays/">Arrays</a>
-        <a href="/trees/">Trees</a>
-        <a href="/dp/">DP</a>
-        <a href="/heap/">Heap</a>
-        <a href="/linked-list/">Linked List</a>
-        <a href="/stack-queue/">Stack &amp; Queue</a>
-        <a href="https://github.com/mightbeanshuu" target="_blank" rel="noopener">GitHub</a>
-      </span>
+      <span>Visualise learning portal · DSA live, more tracks queued</span>
+      <span><a href="/graphs/">Graphs</a> · <a href="/arrays/">Arrays</a> · <a href="/dp/">DP</a> · <a href="/tries/">Tries</a></span>
     </div>
   </footer>
 
   <script>
-  // ---- inline Lucide-style icon set (24x24, currentColor) ----
-  const S='stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"';
-  const I={
-    network:`<svg viewBox="0 0 24 24" ${S}><rect x="16" y="16" width="6" height="6" rx="1"/><rect x="2" y="16" width="6" height="6" rx="1"/><rect x="9" y="2" width="6" height="6" rx="1"/><path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3"/><path d="M12 12V8"/></svg>`,
-    hash:`<svg viewBox="0 0 24 24" ${S}><line x1="4" x2="20" y1="9" y2="9"/><line x1="4" x2="20" y1="15" y2="15"/><line x1="10" x2="8" y1="3" y2="21"/><line x1="16" x2="14" y1="3" y2="21"/></svg>`,
-    pointers:`<svg viewBox="0 0 24 24" ${S}><path d="m18 8 4 4-4 4"/><path d="M2 12h20"/><path d="m6 8-4 4 4 4"/></svg>`,
-    window:`<svg viewBox="0 0 24 24" ${S}><rect x="2" y="6" width="20" height="12" rx="2"/><rect x="6.5" y="9.5" width="6" height="5" rx="1" fill="currentColor" opacity=".22" stroke="none"/><path d="M12.5 6v12"/></svg>`,
-    layers:`<svg viewBox="0 0 24 24" ${S}><path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/></svg>`,
-    search:`<svg viewBox="0 0 24 24" ${S}><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>`,
-    link:`<svg viewBox="0 0 24 24" ${S}><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>`,
-    tree:`<svg viewBox="0 0 24 24" ${S}><circle cx="12" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><circle cx="18" cy="6" r="3"/><path d="M18 9v1a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V9"/><path d="M12 12v3"/></svg>`,
-    trie:`<svg viewBox="0 0 24 24" ${S}><path d="m6 16 6-12 6 12"/><path d="M8 12h8"/><path d="m15 19 2.5 2.5L22 17"/></svg>`,
-    heap:`<svg viewBox="0 0 24 24" ${S}><path d="M13.73 4a2 2 0 0 0-3.46 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/></svg>`,
-    backtrack:`<svg viewBox="0 0 24 24" ${S}><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5v0a5.5 5.5 0 0 1-5.5 5.5H11"/></svg>`,
-    dp:`<svg viewBox="0 0 24 24" ${S}><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>`,
-    greedy:`<svg viewBox="0 0 24 24" ${S}><circle cx="8" cy="8" r="6"/><path d="M18.09 10.37A6 6 0 1 1 10.34 18"/><path d="M7 6h1v4"/><path d="m16.71 13.88.7.71-2.82 2.82"/></svg>`,
-    intervals:`<svg viewBox="0 0 24 24" ${S}><path d="M3 7h11"/><path d="M9 12h12"/><path d="M5 17h9"/></svg>`,
-    binary:`<svg viewBox="0 0 24 24" ${S}><rect x="14" y="14" width="4" height="6" rx="2"/><rect x="6" y="4" width="4" height="6" rx="2"/><path d="M6 20h4"/><path d="M14 10h4"/><path d="M6 14h2v6"/><path d="M14 4h2v6"/></svg>`,
-    geo:`<svg viewBox="0 0 24 24" ${S}><path d="M8.3 10a.7.7 0 0 1-.626-1.079L11.4 3a.7.7 0 0 1 1.198-.043L16.3 8.9a.7.7 0 0 1-.572 1.1Z"/><rect x="3" y="14" width="7" height="7" rx="1"/><circle cx="17.5" cy="17.5" r="3.5"/></svg>`,
-    arrow:`<svg viewBox="0 0 24 24" ${S}><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>`
-  };
-
-  const LIVE=[
-    {h:'/graphs/',         a:'0,229,255',  i:'network',   t:'Graphs',            d:'BFS & DFS hubs, weighted shortest paths — islands, cycles, topo sort, Dijkstra, MST.'},
-    {h:'/arrays/#hashing', a:'0,229,255',  i:'hash',      t:'Arrays & Hashing',  d:'Two Sum, Kadane, prefix-sum + map — animated, with variations.'},
-    {h:'/arrays/#two-pointers', a:'255,159,10', i:'pointers', t:'Two Pointers', d:'Sorted Two Sum, Container, 3Sum — opposite-ends pointers animated.'},
-    {h:'/arrays/#sliding-window', a:'93,255,143', i:'window', t:'Sliding Window', d:'Fixed & variable windows — longest / shortest, expand & shrink.'},
-    {h:'/stack-queue/',    a:'56,189,248', i:'layers',    t:'Stack & Queue',     d:'Valid parens, min stack, monotonic stack, queue-via-stacks, sliding-window max.'},
-    {h:'/arrays/#binary-search', a:'191,90,242', i:'search', t:'Binary Search',  d:'Classic, rotated array, and binary-search-on-answer (Koko).'},
-    {h:'/linked-list/',    a:'255,90,205', i:'link',      t:'Linked List',       d:'Reverse, Floyd cycle, middle, remove-nth, dedup, palindrome — animated.'},
-    {h:'/trees/',          a:'93,255,143', i:'tree',      t:'Trees',             d:'Traversals, level-order, height/diameter, path sum, LCA, validate BST.'},
-    {h:'/dp/',             a:'124,147,255', i:'dp',       t:'Dynamic Programming', d:'Climbing stairs, house robber, coin change, LCS, knapsack — watch the table fill cell by cell.'},
-    {h:'/heap/',           a:'255,209,102', i:'heap',     t:'Heap / Priority Queue', d:'Heapify (O(n)), sift-up push, sift-down pop, heap sort, Kth-largest — array-as-tree swapping live.'},
-    {h:'/tries/',          a:'0,229,255',   i:'trie',     t:'Tries',                 d:'Insert/search, prefix checks, wildcard DFS, word break and bit trie max-XOR.'},
-    {h:'/backtracking/',   a:'255,90,205',  i:'backtrack',t:'Backtracking',          d:'Subsets, permutations, combination sum, N-Queens, word search and duplicate skip.'},
-    {h:'/greedy/',         a:'93,255,143',  i:'greedy',   t:'Greedy',                d:'Activity selection, jump game, gas station, platforms, Huffman and partition labels.'},
-    {h:'/intervals/',      a:'255,159,10',  i:'intervals',t:'Intervals',             d:'Merge, insert, erase overlap, meeting rooms, arrows and employee free time.'},
-    {h:'/bit-manipulation/', a:'191,90,242', i:'binary',  t:'Bit Manipulation',      d:'XOR cancellation, masks, set-bit count, subset masks and max-XOR bit trie.'},
-    {h:'/math-geometry/',  a:'124,147,255', i:'geo',      t:'Math & Geometry',       d:'GCD, sieve, fast power, spiral matrix, rotate image and orientation tests.'}
-  ];
-  const SOON=[];
-
-  const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;');
-  let n=0;
-  const live=LIVE.map(c=>`
-    <a class="topic live" style="--a:${c.a};--i:${n++}" href="${c.h}">
-      <div class="ticon">${I[c.i]}</div>
-      <span class="pill"><span class="ld"></span>Live</span>
-      <h3>${esc(c.t)}</h3>
-      <p>${esc(c.d)}</p>
-      <span class="open">Open ${I.arrow}</span>
-    </a>`).join('');
-  const soon=SOON.map(c=>`
-    <div class="topic soon" style="--i:${n++}">
-      <div class="ticon">${I[c.i]}</div>
-      <span class="pill">Queued</span>
-      <h3>${esc(c.t)}</h3>
-      <p>${esc(c.d)}</p>
-    </div>`).join('');
-  document.getElementById('liveGrid').innerHTML=live;
-  document.getElementById('soonGrid').innerHTML=soon;
-  document.getElementById('liveN').textContent=LIVE.length;
-
-  const STATS=[
-    {num:`<em>${LIVE.length}</em>`, lbl:'Topics live'},
-    {num:'40+', lbl:'Patterns'},
-    {num:'36', lbl:'New patterns'},
-    {num:'S+N', lbl:'Striver + NeetCode'}
-  ];
-  document.getElementById('stats').innerHTML=STATS.map(s=>
-    `<div class="stat"><span class="num">${s.num}</span><span class="lbl">${s.lbl}</span></div>`).join('');
-
-  // active nav highlight (defensive — harmless on root)
-  const path=location.pathname;
-  document.querySelectorAll('.nav .links a').forEach(a=>{
-    const href=a.getAttribute('href');
-    if(href!=='/'&&href.startsWith('/')&&path.startsWith(href)) a.style.color='var(--text)';
-  });
+    const HUBS=[
+      ['/graphs/','Graphs','BFS, DFS, weighted shortest paths.','0,229,255'],
+      ['/arrays/','Arrays & Hashing','Hashing, two pointers, windows, binary search.','0,229,255'],
+      ['/arrays/#two-pointers','Two Pointers','Sorted pairs, container, 3Sum.','255,159,10'],
+      ['/arrays/#sliding-window','Sliding Window','Fixed and variable windows.','93,255,143'],
+      ['/arrays/#binary-search','Binary Search','Classic, rotated, answer search.','191,90,242'],
+      ['/stack-queue/','Stack & Queue','Parsing, monotonic stack, queues.','56,189,248'],
+      ['/linked-list/','Linked List','Reverse, cycle, middle, palindrome.','255,90,205'],
+      ['/trees/','Trees','Traversals, LCA, BST validation.','93,255,143'],
+      ['/dp/','Dynamic Programming','1-D, 2-D and grid DP tables.','124,147,255'],
+      ['/heap/','Heap / Priority Queue','Heapify, push/pop, top-K.','255,209,102'],
+      ['/tries/','Tries','Prefix trees, wildcard DFS, bit trie.','0,229,255'],
+      ['/backtracking/','Backtracking','Subsets, permutations, N-Queens.','255,90,205'],
+      ['/greedy/','Greedy','Scheduling, jumps, gas station.','93,255,143'],
+      ['/intervals/','Intervals','Merge, insert, sweep overlaps.','255,159,10'],
+      ['/bit-manipulation/','Bit Manipulation','XOR, masks, set bits.','191,90,242'],
+      ['/math-geometry/','Math & Geometry','GCD, sieve, matrices, geometry.','124,147,255']
+    ];
+    document.getElementById('dsaGrid').innerHTML=HUBS.map(([href,t,d,a])=>`
+      <a class="dsaLink" style="--a:${a}" href="${href}">
+        <b>${t}</b><span>${d}</span>
+      </a>`).join('');
   </script>
 
-  <!-- three.js animated graph/particle network background (deferred, non-blocking) -->
   <script type="module">
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const canvas = document.getElementById('bgfx');
-    if (!reduce && canvas) {
-      try {
-        const THREE = await import('https://unpkg.com/three@0.160.0/build/three.module.js');
-        const COUNT = 120;                 // < 150 nodes for perf
-        const LINK_DIST = 2.7;             // edge threshold
-        const COLORS = [[0,0.9,1],[0.49,1,0.56],[0.486,0.576,1],[1,0.353,0.804]]; // cyan/green/accent/pink
-
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(60, innerWidth/innerHeight, 0.1, 100);
-        camera.position.z = 13;
-
-        const renderer = new THREE.WebGLRenderer({canvas, antialias:true, alpha:true});
-        renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5)); // cap DPR
-        renderer.setSize(innerWidth, innerHeight, false);
-
-        // nodes
-        const positions = new Float32Array(COUNT*3);
-        const colors = new Float32Array(COUNT*3);
-        const vel = [];
-        const SPREAD = 11;
-        for (let i=0;i<COUNT;i++){
-          positions[i*3]   = (Math.random()-0.5)*SPREAD;
-          positions[i*3+1] = (Math.random()-0.5)*SPREAD*0.62;
-          positions[i*3+2] = (Math.random()-0.5)*SPREAD*0.5;
-          const c = COLORS[i % COLORS.length];
-          colors[i*3]=c[0]; colors[i*3+1]=c[1]; colors[i*3+2]=c[2];
-          vel.push((Math.random()-0.5)*0.006,(Math.random()-0.5)*0.006,(Math.random()-0.5)*0.006);
+    const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const canvas=document.getElementById('bgfx');
+    if(!reduce&&canvas){
+      try{
+        const THREE=await import('https://unpkg.com/three@0.160.0/build/three.module.js');
+        const scene=new THREE.Scene();
+        const camera=new THREE.PerspectiveCamera(62,innerWidth/innerHeight,.1,100);
+        camera.position.z=12;
+        const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
+        renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
+        renderer.setSize(innerWidth,innerHeight,false);
+        const COUNT=115, SPREAD=11, LINK=2.65, LINK2=LINK*LINK;
+        const positions=new Float32Array(COUNT*3), colors=new Float32Array(COUNT*3), vel=[];
+        const palette=[[0,0.9,1],[0.37,1,0.56],[0.49,0.58,1],[1,0.35,0.8],[1,0.82,0.4]];
+        for(let i=0;i<COUNT;i++){
+          positions[i*3]=(Math.random()-.5)*SPREAD;
+          positions[i*3+1]=(Math.random()-.5)*SPREAD*.62;
+          positions[i*3+2]=(Math.random()-.5)*SPREAD*.48;
+          const c=palette[i%palette.length];
+          colors.set(c,i*3);
+          vel.push((Math.random()-.5)*.006,(Math.random()-.5)*.006,(Math.random()-.5)*.006);
         }
-        const nodeGeo = new THREE.BufferGeometry();
-        nodeGeo.setAttribute('position', new THREE.BufferAttribute(positions,3));
-        nodeGeo.setAttribute('color', new THREE.BufferAttribute(colors,3));
-        const nodeMat = new THREE.PointsMaterial({size:0.12, vertexColors:true, transparent:true, opacity:0.85, depthWrite:false, blending:THREE.AdditiveBlending});
-        const points = new THREE.Points(nodeGeo, nodeMat);
-        scene.add(points);
-
-        // edges — capacity-bound buffer, rebuilt each frame
-        const MAX_LINKS = COUNT*7;
-        const linePos = new Float32Array(MAX_LINKS*6);
-        const lineGeo = new THREE.BufferGeometry();
-        lineGeo.setAttribute('position', new THREE.BufferAttribute(linePos,3));
-        const lineMat = new THREE.LineBasicMaterial({color:0x00e5ff, transparent:true, opacity:0.10, blending:THREE.AdditiveBlending, depthWrite:false});
-        const lines = new THREE.LineSegments(lineGeo, lineMat);
-        scene.add(lines);
-
-        const group = new THREE.Group();
-        scene.add(group); group.add(points); group.add(lines);
-
-        let mx=0, my=0;
-        addEventListener('pointermove', e=>{ mx=(e.clientX/innerWidth-0.5); my=(e.clientY/innerHeight-0.5); }, {passive:true});
-
-        function resize(){
-          camera.aspect = innerWidth/innerHeight; camera.updateProjectionMatrix();
-          renderer.setSize(innerWidth, innerHeight, false);
-        }
-        addEventListener('resize', resize);
-
-        const pos = nodeGeo.attributes.position.array;
-        let running = true, raf = 0;
-        document.addEventListener('visibilitychange', ()=>{
-          running = !document.hidden;
-          if (running){ raf = requestAnimationFrame(loop); }
-        });
-
-        const LD2 = LINK_DIST*LINK_DIST;
+        const nodeGeo=new THREE.BufferGeometry();
+        nodeGeo.setAttribute('position',new THREE.BufferAttribute(positions,3));
+        nodeGeo.setAttribute('color',new THREE.BufferAttribute(colors,3));
+        const points=new THREE.Points(nodeGeo,new THREE.PointsMaterial({size:.115,vertexColors:true,transparent:true,opacity:.82,depthWrite:false,blending:THREE.AdditiveBlending}));
+        const maxLinks=COUNT*7, linePos=new Float32Array(maxLinks*6);
+        const lineGeo=new THREE.BufferGeometry();
+        lineGeo.setAttribute('position',new THREE.BufferAttribute(linePos,3));
+        const lines=new THREE.LineSegments(lineGeo,new THREE.LineBasicMaterial({color:0x7c93ff,transparent:true,opacity:.11,depthWrite:false,blending:THREE.AdditiveBlending}));
+        const group=new THREE.Group(); group.add(points); group.add(lines); scene.add(group);
+        let mx=0,my=0,run=true;
+        addEventListener('pointermove',e=>{mx=e.clientX/innerWidth-.5;my=e.clientY/innerHeight-.5},{passive:true});
+        addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight,false)});
+        document.addEventListener('visibilitychange',()=>{run=!document.hidden;if(run)requestAnimationFrame(loop)});
         function loop(){
-          if(!running) return;
-          // drift nodes, soft-bounce within bounds
+          if(!run)return;
+          const pos=nodeGeo.attributes.position.array;
           for(let i=0;i<COUNT;i++){
             for(let k=0;k<3;k++){
-              const idx=i*3+k; pos[idx]+=vel[i*3+k];
-              const lim = k===0?SPREAD/2 : k===1?SPREAD*0.31 : SPREAD*0.25;
-              if(pos[idx]>lim||pos[idx]<-lim) vel[i*3+k]*=-1;
+              const idx=i*3+k; pos[idx]+=vel[idx];
+              const lim=k===0?SPREAD/2:k===1?SPREAD*.31:SPREAD*.24;
+              if(pos[idx]>lim||pos[idx]<-lim)vel[idx]*=-1;
             }
           }
-          nodeGeo.attributes.position.needsUpdate = true;
-
-          // rebuild edges
+          nodeGeo.attributes.position.needsUpdate=true;
           let li=0;
-          for(let i=0;i<COUNT && li<MAX_LINKS;i++){
+          for(let i=0;i<COUNT&&li<maxLinks;i++){
             const ax=pos[i*3],ay=pos[i*3+1],az=pos[i*3+2];
-            for(let j=i+1;j<COUNT && li<MAX_LINKS;j++){
-              const dx=ax-pos[j*3], dy=ay-pos[j*3+1], dz=az-pos[j*3+2];
-              const d2=dx*dx+dy*dy+dz*dz;
-              if(d2<LD2){
+            for(let j=i+1;j<COUNT&&li<maxLinks;j++){
+              const dx=ax-pos[j*3],dy=ay-pos[j*3+1],dz=az-pos[j*3+2],d2=dx*dx+dy*dy+dz*dz;
+              if(d2<LINK2){
                 const o=li*6;
                 linePos[o]=ax;linePos[o+1]=ay;linePos[o+2]=az;
                 linePos[o+3]=pos[j*3];linePos[o+4]=pos[j*3+1];linePos[o+5]=pos[j*3+2];
@@ -417,27 +387,21 @@
               }
             }
           }
-          lineGeo.setDrawRange(0, li*2);
-          lineGeo.attributes.position.needsUpdate = true;
-
-          // gentle rotation + parallax toward pointer
-          group.rotation.y += 0.0009;
-          group.rotation.x = my*0.18;
-          camera.position.x += (mx*1.6 - camera.position.x)*0.04;
-          camera.position.y += (-my*1.0 - camera.position.y)*0.04;
+          lineGeo.setDrawRange(0,li*2);
+          lineGeo.attributes.position.needsUpdate=true;
+          group.rotation.y+=.0009; group.rotation.x=my*.16;
+          camera.position.x+=(mx*1.4-camera.position.x)*.04;
+          camera.position.y+=(-my*.9-camera.position.y)*.04;
           camera.lookAt(scene.position);
-
-          renderer.render(scene, camera);
-          raf = requestAnimationFrame(loop);
+          renderer.render(scene,camera);
+          requestAnimationFrame(loop);
         }
-        canvas.classList.add('on');
-        raf = requestAnimationFrame(loop);
-      } catch(e){ /* CDN/WebGL unavailable — static gradient background remains */ }
+        canvas.classList.add('on'); requestAnimationFrame(loop);
+      }catch(e){}
     }
   </script>
 
-<!-- visualise: auth (login/logout chip; landing stays public) -->
-<script src="/supabase-config.js"></script>
-<script src="/auth.js"></script>
+  <script src="/supabase-config.js"></script>
+  <script src="/auth.js"></script>
 </body>
 </html>
