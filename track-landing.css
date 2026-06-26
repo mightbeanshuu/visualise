@@ -73,9 +73,50 @@ h1 b{color:var(--track)}
 .note{font-size:12px;color:var(--faint);font-family:'JetBrains Mono',monospace}.note b{color:var(--track)}
 .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
 .card{--a:var(--track-rgb);position:relative;min-height:122px;text-decoration:none;color:inherit;border:1px solid rgba(var(--a),.17);border-radius:16px;background:linear-gradient(180deg,rgba(var(--a),.055),rgba(10,13,18,.70));box-shadow:var(--shadow);padding:15px;display:flex;flex-direction:column;gap:9px;overflow:hidden;transition:.2s}
+.card::before{content:"";position:absolute;inset:0;background:rgba(4,7,12,.24);pointer-events:none}
+.card>*{position:relative}
 .card:hover{transform:translateY(-3px);border-color:rgba(var(--a),.46)}
 .card b{font-size:14px;letter-spacing:-.2px}.card span{color:var(--muted);font-size:12px;line-height:1.45}
 .card .tag{margin-top:auto;font-family:'JetBrains Mono',monospace;font-size:10px;color:rgb(var(--a));font-weight:800}
+.flowBand{display:grid;grid-template-columns:1.2fr .8fr;gap:14px;margin:0 0 18px}
+.flowPanel,.lesson,.pathCard,.stackCard{border:1px solid rgba(var(--track-rgb),.18);border-radius:18px;background:var(--glass);box-shadow:var(--shadow);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);padding:20px}
+.flowPanel h3,.lesson h3,.pathCard h3,.stackCard h3{margin:0 0 8px;font-size:18px;letter-spacing:-.3px}
+.flowPanel p,.lesson p,.pathCard p,.stackCard p{margin:0;color:var(--muted);line-height:1.6;font-size:13.5px}
+.flowSvg{margin-top:16px;border:1px solid rgba(var(--track-rgb),.14);border-radius:14px;background:rgba(5,8,12,.45);overflow:hidden}
+.flowSvg svg{width:100%;height:auto}
+.routeList{display:grid;gap:10px}
+.routeItem{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid rgba(var(--track-rgb),.15);border-radius:12px;background:rgba(7,10,15,.45)}
+.routeItem b{font-size:13px}.routeItem span{font-size:12px;color:var(--muted)}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--track);box-shadow:0 0 12px var(--track)}
+.pathGrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.pathCard{min-height:210px;display:flex;flex-direction:column;gap:14px}
+.pathTop{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.pathPill{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--track);font-weight:800;border:1px solid rgba(var(--track-rgb),.26);border-radius:999px;padding:5px 9px;background:rgba(var(--track-rgb),.08)}
+.stackGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:14px 0}
+.stackCard{min-height:132px;padding:16px}
+.stackCard .mono{color:var(--track);font-size:11px;font-weight:800}
+.lesson{margin-top:14px}
+.lessonHeader{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;margin-bottom:16px}
+.lessonHeader h2{margin:0;font-size:26px;letter-spacing:-.6px}
+.lessonHeader p{margin:8px 0 0;color:var(--muted);line-height:1.6}
+.lessonGrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,.72fr);gap:14px}
+.lessonSection{border:1px solid rgba(var(--track-rgb),.14);border-radius:14px;background:rgba(6,9,14,.56);padding:16px;margin-bottom:12px}
+.lessonSection h3{font-size:15px;margin:0 0 8px;color:var(--text)}
+.lessonSection ol,.lessonSection ul{margin:8px 0 0;padding-left:20px;color:var(--muted);line-height:1.7;font-size:13px}
+.diagram{font-family:'JetBrains Mono',ui-monospace,Menlo,monospace;white-space:pre;overflow:auto;margin:0;background:#05080d;border:1px solid rgba(var(--track-rgb),.16);border-radius:12px;padding:14px;color:#dce8f8;font-size:12px;line-height:1.55}
+.codeBlock{margin:10px 0 0;background:#05080d;border:1px solid rgba(var(--track-rgb),.16);border-radius:12px;padding:14px;overflow:auto;color:#e6edf3;font:12px/1.65 'JetBrains Mono',ui-monospace,Menlo,monospace}
+.explainTable{width:100%;border-collapse:collapse;margin-top:10px;font-size:12.5px;color:var(--muted)}
+.explainTable th,.explainTable td{border-bottom:1px solid rgba(var(--track-rgb),.12);padding:9px;text-align:left;vertical-align:top}
+.explainTable th{color:var(--text)}
+.assignment{border-color:rgba(93,255,143,.25);background:rgba(93,255,143,.06)}
+.mistake{border-color:rgba(255,90,90,.22);background:rgba(255,90,90,.045)}
+.lessonSide{position:sticky;top:86px;align-self:start}
+.projectCard{border:1px solid rgba(255,209,102,.24);background:rgba(255,209,102,.06);border-radius:14px;padding:16px}
+.projectCard b{color:#ffd166}
+.projectSteps{display:grid;gap:9px;margin-top:12px}
+.projectSteps span{font-size:12.5px;color:var(--muted);border:1px solid rgba(255,209,102,.14);border-radius:10px;padding:9px;background:rgba(5,8,12,.36)}
+.flowDot{animation:pulseDot 1.8s ease-in-out infinite}
+@keyframes pulseDot{50%{opacity:.35;transform:scale(.92)}}
 .preview{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
 .preview .card{min-height:180px}
 .soonBox{border:1px solid rgba(var(--track-rgb),.18);border-radius:20px;background:var(--glass);box-shadow:var(--shadow);padding:24px;display:grid;grid-template-columns:minmax(0,1fr) minmax(260px,390px);gap:24px;align-items:center}
@@ -91,12 +132,16 @@ footer a{color:var(--muted);text-decoration:none}footer a:hover{color:var(--text
   .visual{min-height:330px}
   .grid{grid-template-columns:repeat(2,1fr)}
   .preview{grid-template-columns:1fr}
+  .flowBand,.pathGrid,.lessonGrid{grid-template-columns:1fr}
+  .stackGrid{grid-template-columns:repeat(2,1fr)}
+  .lessonSide{position:static}
 }
 @media(max-width:620px){
   .wrap{width:min(100% - 30px,1160px)}
   .links a:not(:first-child){display:none}
   .hero{padding:52px 0 22px}
   .grid{grid-template-columns:1fr}
+  .stackGrid{grid-template-columns:1fr}
   .btn{width:100%;justify-content:center}
 }
 @media(prefers-reduced-motion:reduce){

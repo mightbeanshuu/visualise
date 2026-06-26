@@ -40,15 +40,40 @@
       ]
     },
     web:{
-      title:'Web Development', path:'/web-development/', status:'Coming soon', accent:'#ff9f0a', rgb:'255,159,10',
+      title:'Web Development', path:'/web-development/', status:'Building now', accent:'#ff9f0a', rgb:'255,159,10',
       docTitle:'Visualise · Web Development',
-      description:'Coming soon web development track landing page for frontend, backend, databases, auth, deployment and production UI workflows.',
-      eyebrow:'Web development · coming soon',
-      h1:'Build for the <b>web</b>, visually.',
-      sub:'This track will cover frontend fundamentals, APIs, databases, authentication, deployment and production UI patterns with the same visual-first approach as DSA.',
-      primary:['Back to portal','/'], secondary:['Open DSA now','/dsa/'],
-      visual:`<svg ${A}><rect class="soft" x="52" y="62" width="146" height="102" rx="16"/><rect class="soft" x="232" y="70" width="126" height="30" rx="8"/><rect class="soft" x="232" y="118" width="92" height="18" rx="6"/><rect class="soft" x="232" y="150" width="116" height="18" rx="6"/><path class="stroke" d="M75 92h80M75 118h58M75 144h72M198 112h34"/><text class="small" x="124" y="205">HTML · CSS · JS · APIs · DEPLOY</text></svg>`,
-      modules:['Frontend foundations','React and state','APIs and backend','Databases and auth','Deployment workflow','Production UI systems']
+      description:'Web development track landing page for frontend, backend, languages, databases, auth, deployment, and project-based backend teaching.',
+      eyebrow:'Web development · frontend + backend',
+      h1:'Build full-stack <b>web systems</b>.',
+      sub:'This track starts from first principles: browser, server, database, APIs, auth and deployment. Frontend and backend get separate paths, then lessons teach through real projects instead of memorized snippets.',
+      primary:['Start Backend Lesson','#backend-lesson'], secondary:['Frontend path','#frontend-path'],
+      visual:`<svg ${A}>
+        <rect class="soft" x="42" y="76" width="112" height="84" rx="16"/><text class="label" x="98" y="106">CLIENT</text><text class="small" x="98" y="126">HTML CSS JS</text>
+        <rect class="soft" x="176" y="54" width="112" height="84" rx="16"/><text class="label" x="232" y="84">SERVER</text><text class="small" x="232" y="104">API AUTH</text>
+        <rect class="soft" x="292" y="194" width="96" height="76" rx="16"/><text class="label" x="340" y="224">DB</text><text class="small" x="340" y="244">SQL DOCS</text>
+        <path class="stroke" d="M154 118h22M232 138v46M288 96c58 10 78 42 62 96M154 134c66 54 126 76 176 72"/>
+        <g class="float"><circle class="soft" cx="78" cy="238" r="28"/><text class="small" x="78" y="235">REACT</text><text class="small" x="78" y="250">NEXT</text></g>
+        <g class="float"><circle class="soft" cx="216" cy="246" r="28"/><text class="small" x="216" y="243">NODE</text><text class="small" x="216" y="258">JAVA</text></g>
+        <text class="small" x="214" y="322">FRONTEND · BACKEND · DATABASE · DEPLOY</text>
+      </svg>`,
+      frontend:[
+        ['HTML','Page structure and semantic meaning.'],
+        ['CSS','Layout, responsive UI, motion and visual systems.'],
+        ['JavaScript','Browser behavior, events, DOM, async requests.'],
+        ['TypeScript','Safer JavaScript for large codebases.'],
+        ['React','Component-driven UI and state.'],
+        ['Next.js','Routing, server rendering and production app structure.']
+      ],
+      backend:[
+        ['JavaScript / TypeScript','Node.js, Express/Fastify, REST APIs.'],
+        ['Python','FastAPI/Django for APIs, data and AI services.'],
+        ['Java','Spring Boot for enterprise-grade backend systems.'],
+        ['Go','Small, fast services and concurrent systems.'],
+        ['SQL','PostgreSQL/MySQL schema, joins and transactions.'],
+        ['NoSQL','MongoDB/Redis for document data and caching.']
+      ],
+      modules:['Internet and HTTP','Frontend foundations','Backend APIs','Databases','Authentication','Deployment'],
+      project:'Smart Recommendation Engine'
     },
     aiml:{
       title:'AI / ML', path:'/ai-ml/', status:'Coming soon', accent:'#bf5af2', rgb:'191,90,242',
@@ -114,14 +139,262 @@
   const status=document.getElementById('statusPill'); if(status) status.textContent=t.status;
   const title=document.getElementById('trackTitle'); if(title) title.textContent=t.title;
   const nav=document.getElementById('navTrack'); if(nav){nav.href=t.path;nav.textContent=t.title;}
-  if(id==='dsa') renderDsa(t); else renderSoon(t);
+  if(id==='dsa') renderDsa(t);
+  else if(id==='web') renderWeb(t);
+  else renderSoon(t);
 
   function renderDsa(t){
     set('mainSectionTitle','DSA hubs');
     set('mainSectionCopy','Each hub opens into a detailed interactive visualizer with explanations, vector dry-runs and code traces.');
     const grid=document.getElementById('contentGrid');
-    if(grid) grid.innerHTML=t.cards.map(([href,name,copy,a])=>`<a class="card" style="--a:${a}" href="${href}"><b>${name}</b><span>${copy}</span><em class="tag">OPEN HUB</em></a>`).join('');
+    if(grid) grid.innerHTML=`
+      <div class="flowBand" style="grid-column:1/-1">
+        <div class="flowPanel">
+          <h3>How DSA is meant to be learned here</h3>
+          <p>Every topic moves from pattern recognition to a dry-run, then to code. The landing page should feel alive because the route is a map, not a flat index.</p>
+          <div class="flowSvg">
+            <svg viewBox="0 0 720 210" fill="none">
+              <rect class="soft" x="34" y="72" width="120" height="58" rx="14"/><text class="label" x="94" y="97">PATTERN</text><text class="small" x="94" y="116">recognize</text>
+              <rect class="soft" x="204" y="72" width="120" height="58" rx="14"/><text class="label" x="264" y="97">DRY RUN</text><text class="small" x="264" y="116">visualize</text>
+              <rect class="soft" x="374" y="72" width="120" height="58" rx="14"/><text class="label" x="434" y="97">CODE</text><text class="small" x="434" y="116">derive</text>
+              <rect class="soft" x="544" y="72" width="120" height="58" rx="14"/><text class="label" x="604" y="97">PRACTICE</text><text class="small" x="604" y="116">repeat</text>
+              <path class="stroke" d="M154 101h50M324 101h50M494 101h50"/>
+              <circle class="soft flowDot" cx="179" cy="101" r="7"/><circle class="soft flowDot" cx="349" cy="101" r="7"/><circle class="soft flowDot" cx="519" cy="101" r="7"/>
+            </svg>
+          </div>
+        </div>
+        <div class="flowPanel">
+          <h3>Current live coverage</h3>
+          <div class="routeList">
+            <div class="routeItem"><i class="dot"></i><div><b>Graphs + weighted graphs</b><br><span>BFS, DFS, Dijkstra, MST</span></div></div>
+            <div class="routeItem"><i class="dot"></i><div><b>Core structures</b><br><span>Arrays, stacks, linked lists, trees, heaps</span></div></div>
+            <div class="routeItem"><i class="dot"></i><div><b>Advanced patterns</b><br><span>DP, tries, backtracking, greedy, bits</span></div></div>
+          </div>
+        </div>
+      </div>` + t.cards.map(([href,name,copy,a])=>`<a class="card" style="--a:${a}" href="${href}"><b>${name}</b><span>${copy}</span><em class="tag">OPEN HUB</em></a>`).join('');
   }
+
+  function renderWeb(t){
+    set('mainSectionTitle','Web Development paths');
+    set('mainSectionCopy','Frontend and backend are separate learning lanes. Each lane starts from first principles, then moves into industrial tools and project-based lessons.');
+    const grid=document.getElementById('contentGrid');
+    if(!grid) return;
+    const soon=document.getElementById('soonBox');
+    if(soon) soon.style.display='none';
+    grid.className='grid';
+    grid.innerHTML=`
+      <div class="pathGrid" style="grid-column:1/-1">
+        <section class="pathCard" id="frontend-path">
+          <div class="pathTop"><div><h3>Frontend path</h3><p>The browser side: what users see, click, type and feel.</p></div><span class="pathPill">UI LANE</span></div>
+          <div class="flowSvg">
+            <svg viewBox="0 0 520 170" fill="none">
+              <rect class="soft" x="28" y="52" width="96" height="54" rx="12"/><text class="label" x="76" y="76">HTML</text><text class="small" x="76" y="94">structure</text>
+              <rect class="soft" x="154" y="52" width="96" height="54" rx="12"/><text class="label" x="202" y="76">CSS</text><text class="small" x="202" y="94">layout</text>
+              <rect class="soft" x="280" y="52" width="96" height="54" rx="12"/><text class="label" x="328" y="76">JS/TS</text><text class="small" x="328" y="94">behavior</text>
+              <rect class="soft" x="406" y="52" width="86" height="54" rx="12"/><text class="label" x="449" y="76">REACT</text><text class="small" x="449" y="94">app</text>
+              <path class="stroke" d="M124 79h30M250 79h30M376 79h30"/>
+            </svg>
+          </div>
+        </section>
+        <section class="pathCard">
+          <div class="pathTop"><div><h3>Backend path</h3><p>The server side: APIs, data, authentication, queues and deployment.</p></div><span class="pathPill">SERVER LANE</span></div>
+          <div class="flowSvg">
+            <svg viewBox="0 0 520 170" fill="none">
+              <rect class="soft" x="30" y="54" width="92" height="52" rx="12"/><text class="label" x="76" y="78">CLIENT</text>
+              <rect class="soft" x="152" y="54" width="92" height="52" rx="12"/><text class="label" x="198" y="78">API</text>
+              <rect class="soft" x="274" y="54" width="92" height="52" rx="12"/><text class="label" x="320" y="78">LOGIC</text>
+              <rect class="soft" x="396" y="54" width="92" height="52" rx="12"/><text class="label" x="442" y="78">DB</text>
+              <path class="stroke" d="M122 80h30M244 80h30M366 80h30"/>
+            </svg>
+          </div>
+        </section>
+      </div>
+      <div class="stackGrid" style="grid-column:1/-1">
+        ${t.frontend.map(([name,copy])=>`<div class="stackCard"><span class="mono">FRONTEND</span><h3>${name}</h3><p>${copy}</p></div>`).join('')}
+        ${t.backend.map(([name,copy])=>`<div class="stackCard"><span class="mono">BACKEND</span><h3>${name}</h3><p>${copy}</p></div>`).join('')}
+      </div>
+      ${backendLesson(t)}
+    `;
+  }
+
+  function backendLesson(t){
+    return `
+      <section class="lesson" id="backend-lesson" style="grid-column:1/-1">
+        <div class="lessonHeader">
+          <div>
+            <h2>Backend Lesson 01: JavaScript API for a ${t.project}</h2>
+            <p>Senior mentor mode: derive the backend from the problem, not from memorized Express snippets.</p>
+          </div>
+          <span class="pathPill">PROJECT-BASED</span>
+        </div>
+        <div class="lessonGrid">
+          <div>
+            <section class="lessonSection">
+              <h3>1. Big Picture</h3>
+              <p>A backend exists because the browser should not own secrets, databases or business rules. For a Smart Recommendation Engine, the frontend sends user context, the backend validates it, reads product data, runs recommendation logic, stores feedback later, and returns clean JSON.</p>
+            </section>
+            <section class="lessonSection">
+              <h3>2. Visualization</h3>
+              <pre class="diagram">Browser UI
+   │  GET /recommendations?interest=backend
+   ▼
+Express Server
+   │
+   ▼
+Router
+   │
+   ▼
+Controller
+   │
+   ▼
+Recommendation Service
+   │
+   ▼
+Database / Cache
+   │
+   ▼
+JSON Response</pre>
+            </section>
+            <section class="lessonSection">
+              <h3>3. Real World Analogy</h3>
+              <p>Restaurant: the customer does not enter the kitchen. The waiter receives the order, checks it, sends it to the kitchen, and returns the prepared dish. The backend is the waiter plus kitchen workflow.</p>
+            </section>
+            <section class="lessonSection">
+              <h3>4. Thinking Process</h3>
+              <ol>
+                <li>I need to receive requests from the frontend.</li>
+                <li>I should not put all logic in one file.</li>
+                <li>I need a route for recommendation requests.</li>
+                <li>I need a controller to translate HTTP into application logic.</li>
+                <li>I need a service where recommendation thinking lives.</li>
+                <li>I need a database later, but first I can use sample data.</li>
+              </ol>
+            </section>
+            <section class="lessonSection">
+              <h3>5. English Algorithm</h3>
+              <pre class="diagram">Receive request
+↓
+Read interest
+↓
+Validate interest exists
+↓
+Fetch candidate products
+↓
+Score or filter products
+↓
+Return top recommendations as JSON</pre>
+            </section>
+            <section class="lessonSection">
+              <h3>6. Code</h3>
+              <pre class="codeBlock">import express from "express";
+
+const app = express();
+const PORT = 3000;
+
+const products = [
+  { id: 1, name: "React Mastery", tags: ["frontend", "react"] },
+  { id: 2, name: "Node API Builder", tags: ["backend", "node"] },
+  { id: 3, name: "System Design Basics", tags: ["backend", "architecture"] }
+];
+
+app.get("/recommendations", (req, res) => {
+  const userInterest = req.query.interest;
+
+  if (!userInterest) {
+    return res.status(400).json({ error: "interest is required" });
+  }
+
+  const recommendations = products.filter(product =>
+    product.tags.includes(userInterest)
+  );
+
+  return res.json({ recommendations });
+});
+
+app.listen(PORT, () => {
+  console.log(\`Server running on port \${PORT}\`);
+});</pre>
+              <table class="explainTable">
+                <tr><th>Line</th><th>Why it exists</th></tr>
+                <tr><td><code>import express</code></td><td>Imports the server library. Raw Node HTTP is lower-level; Express gives clean routing.</td></tr>
+                <tr><td><code>app.get</code></td><td>Creates one route: browser asks, backend responds.</td></tr>
+                <tr><td><code>req.query</code></td><td>Reads small URL inputs like <code>interest=backend</code>.</td></tr>
+                <tr><td><code>res.status(400)</code></td><td>Sends a client-error response when input is missing.</td></tr>
+                <tr><td><code>res.json</code></td><td>Returns structured data that frontend code can consume.</td></tr>
+              </table>
+            </section>
+            <section class="lessonSection">
+              <h3>7. How Could I Write This Myself?</h3>
+              <p>Start from: “When the browser asks for recommendations, I return matching products.” Nouns become data: products, tags, recommendations. Verbs become routes/functions: ask, filter, return. Express only connects HTTP to that thinking.</p>
+            </section>
+            <section class="lessonSection mistake">
+              <h3>8. Common Beginner Mistakes</h3>
+              <ul>
+                <li>Putting database logic, route logic and scoring logic in one file forever.</li>
+                <li>Returning HTML instead of JSON for an API route.</li>
+                <li>Not validating query/body inputs.</li>
+                <li>Thinking Express is the backend; Express is only the HTTP layer.</li>
+                <li>Skipping project thinking and memorizing syntax first.</li>
+              </ul>
+            </section>
+            <section class="lessonSection">
+              <h3>9. Interview Questions</h3>
+              <ol>
+                <li>What is the job of a backend server?</li>
+                <li>What is the difference between route, controller and service?</li>
+                <li>Why should recommendation scoring not live directly inside a route handler in a large app?</li>
+              </ol>
+            </section>
+            <section class="lessonSection assignment">
+              <h3>10. Mini Assignment</h3>
+              <p>Add support for <code>GET /recommendations?interest=frontend</code> and return only frontend-related products. Do not add a database yet. First make the in-memory version correct.</p>
+            </section>
+            <section class="lessonSection">
+              <h3>11. If I Get Stuck</h3>
+              <ol>
+                <li>Hint 1: Where does the request input live?</li>
+                <li>Hint 2: Which array method keeps matching items?</li>
+                <li>Hint 3: What should happen if interest is missing?</li>
+                <li>Answer comes only after you try.</li>
+              </ol>
+            </section>
+            <section class="lessonSection">
+              <h3>12. Visual Code Flow</h3>
+              <pre class="diagram">GET /recommendations?interest=backend
+↓
+Route handler
+↓
+Validate interest
+↓
+Filter products by tag
+↓
+Return JSON</pre>
+            </section>
+          </div>
+          <aside class="lessonSide">
+            <div class="projectCard">
+              <b>Project path: Smart Recommendation Engine</b>
+              <p style="margin-top:8px">You will learn backend by gradually turning this endpoint into a real system.</p>
+              <div class="projectSteps">
+                <span>1. In-memory recommendations</span>
+                <span>2. Routes and controllers</span>
+                <span>3. PostgreSQL product storage</span>
+                <span>4. Authenticated users</span>
+                <span>5. Feedback events</span>
+                <span>6. Scoring service</span>
+                <span>7. Redis cache</span>
+                <span>8. Deploy and observe</span>
+              </div>
+            </div>
+            <div class="lessonSection" style="margin-top:12px"><h3>13. Code Rules</h3><ul><li>Modern JavaScript.</li><li>ES Modules.</li><li>Professional names.</li><li>No unnecessary code.</li><li>Explain every new keyword.</li></ul></div>
+            <div class="lessonSection" style="margin-top:12px"><h3>14. Response Style</h3><p>Short explanations, direct flow, visual diagrams, and no moving forward until the current concept is clear.</p></div>
+            <div class="lessonSection" style="margin-top:12px"><h3>15. First-principles rule</h3><p>Whenever a keyword appears, ask: what problem forced engineers to invent this idea?</p></div>
+          </aside>
+        </div>
+      </section>
+    `;
+  }
+
   function renderSoon(t){
     set('mainSectionTitle','Track landing page');
     set('mainSectionCopy','This track is not open yet, but its landing page is ready and the roadmap modules are staged below.');
