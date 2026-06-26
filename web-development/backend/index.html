@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="apple-touch-icon" href="/favicon.svg">
+  <title>Visualise · Backend Development</title>
+  <meta name="description" content="Backend development path: JavaScript/TypeScript, Python, Java, Go, SQL, NoSQL, APIs, auth, databases and Recommendation Engine project.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/track-landing.css">
+</head>
+<body style="--track:#ff9f0a;--track-rgb:255,159,10">
+  <canvas id="bgfx" aria-hidden="true"></canvas>
+  <header class="nav"><div class="wrap"><a class="logo" href="/"><span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="6" rx="2"/><rect x="4" y="14" width="16" height="6" rx="2"/><path d="M8 7h.01M8 17h.01"/></svg></span>visualise</a><nav class="links"><a href="/web-development/">Web Development</a><a href="/web-development/frontend/">Frontend</a><a href="/dsa/">DSA</a></nav></div></header>
+  <main>
+    <section class="wrap hero">
+      <div class="heroCopy">
+        <span class="eyebrow"><span class="pulse"></span> Backend path · server side</span>
+        <h1>Build APIs that <b>think</b>.</h1>
+        <p class="sub">Backend is the part users do not see: HTTP, APIs, validation, databases, authentication, queues, caching and deployment. Learn it from first principles, then build a Smart Recommendation Engine.</p>
+        <div class="cta"><a class="btn primary" href="#backend-lesson">Start lesson <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a><a class="btn ghost" href="#recommendation-engine">Project path</a></div>
+      </div>
+      <div class="visual">
+        <svg viewBox="0 0 430 360" fill="none">
+          <rect class="soft" x="38" y="82" width="92" height="62" rx="14"/><text class="label" x="84" y="110">CLIENT</text>
+          <rect class="soft" x="168" y="82" width="92" height="62" rx="14"/><text class="label" x="214" y="110">API</text>
+          <rect class="soft" x="298" y="82" width="92" height="62" rx="14"/><text class="label" x="344" y="110">AUTH</text>
+          <rect class="soft" x="104" y="224" width="92" height="62" rx="14"/><text class="label" x="150" y="252">SERVICE</text>
+          <rect class="soft" x="236" y="224" width="92" height="62" rx="14"/><text class="label" x="282" y="252">DB</text>
+          <path class="stroke" d="M130 113h38M260 113h38M214 144l-64 80M344 144l-62 80M196 255h40"/>
+          <circle class="soft flowDot" cx="150" cy="113" r="7"/><circle class="soft flowDot" cx="214" cy="176" r="7"/><circle class="soft flowDot" cx="216" cy="255" r="7"/>
+        </svg>
+      </div>
+    </section>
+    <section class="wrap">
+      <div class="sectionhead"><div><h2>Backend languages and tools</h2><p>Different companies choose different backend stacks. The underlying ideas stay the same: request, validate, compute, store, respond.</p></div><span class="note"><b>SERVER</b> lane</span></div>
+      <div class="stackGrid">
+        <div class="stackCard"><span class="mono">LANGUAGE</span><h3>JavaScript / TypeScript</h3><p>Node.js, Express/Fastify, REST APIs and full-stack TypeScript apps.</p></div>
+        <div class="stackCard"><span class="mono">LANGUAGE</span><h3>Python</h3><p>FastAPI/Django for APIs, scripting, data and AI services.</p></div>
+        <div class="stackCard"><span class="mono">LANGUAGE</span><h3>Java</h3><p>Spring Boot for enterprise services, typed architecture and large teams.</p></div>
+        <div class="stackCard"><span class="mono">LANGUAGE</span><h3>Go</h3><p>Small, fast backend services with simple concurrency.</p></div>
+        <div class="stackCard"><span class="mono">DATABASE</span><h3>SQL</h3><p>PostgreSQL/MySQL schemas, joins, constraints and transactions.</p></div>
+        <div class="stackCard"><span class="mono">DATABASE</span><h3>NoSQL</h3><p>MongoDB for documents, Redis for cache and fast lookups.</p></div>
+      </div>
+    </section>
+    <section class="wrap lesson" id="backend-lesson">
+      <div class="lessonHeader"><div><h2>Lesson 01: API for Smart Recommendation Engine</h2><p>Follow the mentor structure. Do not memorize code; derive it from the backend job.</p></div><span class="pathPill">FIRST PRINCIPLES</span></div>
+      <div class="lessonGrid">
+        <div>
+          <section class="lessonSection"><h3>1. Big Picture</h3><p>A backend exists because the browser should not own secrets, databases or business rules. For a Smart Recommendation Engine, the frontend sends user context, the backend validates it, reads product data, runs recommendation logic, stores feedback later, and returns clean JSON.</p></section>
+          <section class="lessonSection"><h3>2. Visualization</h3><pre class="diagram">Browser UI
+   │  GET /recommendations?interest=backend
+   ▼
+Express Server
+   ▼
+Router
+   ▼
+Controller
+   ▼
+Recommendation Service
+   ▼
+Database / Cache
+   ▼
+JSON Response</pre></section>
+          <section class="lessonSection"><h3>3. Real World Analogy</h3><p>Restaurant: the customer does not enter the kitchen. The waiter receives the order, checks it, sends it to the kitchen, and returns the prepared dish. The backend is the waiter plus kitchen workflow.</p></section>
+          <section class="lessonSection"><h3>4. Thinking Process</h3><ol><li>I need to receive requests from the frontend.</li><li>I should not put all logic in one file.</li><li>I need a route for recommendation requests.</li><li>I need a controller to translate HTTP into application logic.</li><li>I need a service where recommendation thinking lives.</li><li>I need a database later, but first I can use sample data.</li></ol></section>
+          <section class="lessonSection"><h3>5. English Algorithm</h3><pre class="diagram">Receive request
+↓
+Read interest
+↓
+Validate interest exists
+↓
+Fetch candidate products
+↓
+Score or filter products
+↓
+Return top recommendations as JSON</pre></section>
+          <section class="lessonSection"><h3>6. Code</h3><pre class="codeBlock">import express from "express";
+
+const app = express();
+const PORT = 3000;
+
+const products = [
+  { id: 1, name: "React Mastery", tags: ["frontend", "react"] },
+  { id: 2, name: "Node API Builder", tags: ["backend", "node"] },
+  { id: 3, name: "System Design Basics", tags: ["backend", "architecture"] }
+];
+
+app.get("/recommendations", (req, res) => {
+  const userInterest = req.query.interest;
+
+  if (!userInterest) {
+    return res.status(400).json({ error: "interest is required" });
+  }
+
+  const recommendations = products.filter(product =>
+    product.tags.includes(userInterest)
+  );
+
+  return res.json({ recommendations });
+});
+
+app.listen(PORT, () => {
+  console.log(\`Server running on port \${PORT}\`);
+});</pre></section>
+          <section class="lessonSection"><h3>7. How Could I Write This Myself?</h3><p>Start from: “When the browser asks for recommendations, I return matching products.” Nouns become data: products, tags, recommendations. Verbs become routes/functions: ask, filter, return. Express only connects HTTP to that thinking.</p></section>
+          <section class="lessonSection mistake"><h3>8. Common Beginner Mistakes</h3><ul><li>Putting database logic, route logic and scoring logic in one file forever.</li><li>Returning HTML instead of JSON for an API route.</li><li>Not validating query/body inputs.</li><li>Thinking Express is the backend; Express is only the HTTP layer.</li><li>Skipping project thinking and memorizing syntax first.</li></ul></section>
+          <section class="lessonSection"><h3>9. Interview Questions</h3><ol><li>What is the job of a backend server?</li><li>What is the difference between route, controller and service?</li><li>Why should recommendation scoring not live directly inside a route handler in a large app?</li></ol></section>
+          <section class="lessonSection assignment"><h3>10. Mini Assignment</h3><p>Add support for <code>GET /recommendations?interest=frontend</code> and return only frontend-related products. Do not add a database yet.</p></section>
+          <section class="lessonSection"><h3>11. If I Get Stuck</h3><ol><li>Hint 1: Where does request input live?</li><li>Hint 2: Which array method keeps matching items?</li><li>Hint 3: What should happen if interest is missing?</li><li>Answer comes only after you try.</li></ol></section>
+          <section class="lessonSection"><h3>12. Visual Code Flow</h3><pre class="diagram">GET /recommendations?interest=backend
+↓
+Route handler
+↓
+Validate interest
+↓
+Filter products by tag
+↓
+Return JSON</pre></section>
+        </div>
+        <aside class="lessonSide" id="recommendation-engine"><div class="projectCard"><b>Project path: Smart Recommendation Engine</b><p style="margin-top:8px">Backend learning path with one project that grows from simple API to production system.</p><div class="projectSteps"><span>1. In-memory recommendations</span><span>2. Routes and controllers</span><span>3. PostgreSQL product storage</span><span>4. Authenticated users</span><span>5. Feedback events</span><span>6. Scoring service</span><span>7. Redis cache</span><span>8. Deploy and observe</span></div></div></aside>
+      </div>
+    </section>
+  </main>
+  <footer><div class="wrap"><span>Backend path · Web Development</span><span><a href="/web-development/">Web track</a> · <a href="/web-development/frontend/">Frontend</a></span></div></footer>
+  <script type="module" src="/track-bg.js"></script><script src="/supabase-config.js"></script><script src="/auth.js"></script>
+</body>
+</html>

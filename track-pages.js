@@ -46,7 +46,7 @@
       eyebrow:'Web development · frontend + backend',
       h1:'Build full-stack <b>web systems</b>.',
       sub:'This track starts from first principles: browser, server, database, APIs, auth and deployment. Frontend and backend get separate paths, then lessons teach through real projects instead of memorized snippets.',
-      primary:['Start Backend Lesson','#backend-lesson'], secondary:['Frontend path','#frontend-path'],
+      primary:['Start Backend Path','/web-development/backend/'], secondary:['Frontend path','/web-development/frontend/'],
       visual:`<svg ${A}>
         <rect class="soft" x="42" y="76" width="112" height="84" rx="16"/><text class="label" x="98" y="106">CLIENT</text><text class="small" x="98" y="126">HTML CSS JS</text>
         <rect class="soft" x="176" y="54" width="112" height="84" rx="16"/><text class="label" x="232" y="84">SERVER</text><text class="small" x="232" y="104">API AUTH</text>
@@ -184,7 +184,7 @@
     grid.className='grid';
     grid.innerHTML=`
       <div class="pathGrid" style="grid-column:1/-1">
-        <section class="pathCard" id="frontend-path">
+        <a class="pathCard" id="frontend-path" href="/web-development/frontend/" style="text-decoration:none;color:inherit">
           <div class="pathTop"><div><h3>Frontend path</h3><p>The browser side: what users see, click, type and feel.</p></div><span class="pathPill">UI LANE</span></div>
           <div class="flowSvg">
             <svg viewBox="0 0 520 170" fill="none">
@@ -195,8 +195,8 @@
               <path class="stroke" d="M124 79h30M250 79h30M376 79h30"/>
             </svg>
           </div>
-        </section>
-        <section class="pathCard">
+        </a>
+        <a class="pathCard" href="/web-development/backend/" style="text-decoration:none;color:inherit">
           <div class="pathTop"><div><h3>Backend path</h3><p>The server side: APIs, data, authentication, queues and deployment.</p></div><span class="pathPill">SERVER LANE</span></div>
           <div class="flowSvg">
             <svg viewBox="0 0 520 170" fill="none">
@@ -207,13 +207,20 @@
               <path class="stroke" d="M122 80h30M244 80h30M366 80h30"/>
             </svg>
           </div>
-        </section>
+        </a>
       </div>
       <div class="stackGrid" style="grid-column:1/-1">
         ${t.frontend.map(([name,copy])=>`<div class="stackCard"><span class="mono">FRONTEND</span><h3>${name}</h3><p>${copy}</p></div>`).join('')}
         ${t.backend.map(([name,copy])=>`<div class="stackCard"><span class="mono">BACKEND</span><h3>${name}</h3><p>${copy}</p></div>`).join('')}
       </div>
-      ${backendLesson(t)}
+      <div class="flowPanel" style="grid-column:1/-1">
+        <h3>Project-based learning options</h3>
+        <p>Start with small concepts, then learn through one project so the architecture has a reason to exist.</p>
+        <div class="routeList" style="margin-top:12px">
+          <a class="routeItem" href="/web-development/backend/#recommendation-engine" style="text-decoration:none;color:inherit"><i class="dot"></i><div><b>Smart Recommendation Engine</b><br><span>Backend-first API, database, scoring, cache, feedback loop.</span></div></a>
+          <a class="routeItem" href="/web-development/frontend/#recommendation-ui" style="text-decoration:none;color:inherit"><i class="dot"></i><div><b>Recommendation UI</b><br><span>Frontend-first cards, filters, state, loading and error handling.</span></div></a>
+        </div>
+      </div>
     `;
   }
 

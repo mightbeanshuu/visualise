@@ -10,6 +10,8 @@ Separate routes:
 
 - DSA track: https://visualise.vercel.app/dsa/
 - Web development track: https://visualise.vercel.app/web-development/
+- Frontend development path: https://visualise.vercel.app/web-development/frontend/
+- Backend development path: https://visualise.vercel.app/web-development/backend/
 - AI/ML track: https://visualise.vercel.app/ai-ml/
 - AI agents track: https://visualise.vercel.app/ai-agents/
 - System design track: https://visualise.vercel.app/system-design/

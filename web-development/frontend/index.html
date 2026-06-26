@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="apple-touch-icon" href="/favicon.svg">
+  <title>Visualise · Frontend Development</title>
+  <meta name="description" content="Frontend development path: HTML, CSS, JavaScript, TypeScript, React, Next.js, UI state and project-based learning.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/track-landing.css">
+</head>
+<body style="--track:#ff9f0a;--track-rgb:255,159,10">
+  <canvas id="bgfx" aria-hidden="true"></canvas>
+  <header class="nav"><div class="wrap"><a class="logo" href="/"><span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M8 20h8M12 18v2"/></svg></span>visualise</a><nav class="links"><a href="/web-development/">Web Development</a><a href="/web-development/backend/">Backend</a><a href="/dsa/">DSA</a></nav></div></header>
+  <main>
+    <section class="wrap hero">
+      <div class="heroCopy">
+        <span class="eyebrow"><span class="pulse"></span> Frontend path · browser side</span>
+        <h1>Build interfaces users can <b>understand</b>.</h1>
+        <p class="sub">Frontend is the part of software that runs in the browser. You learn structure, styling, behavior, state, data fetching and production frameworks through small visuals and a Recommendation UI project.</p>
+        <div class="cta"><a class="btn primary" href="#frontend-roadmap">Start roadmap <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a><a class="btn ghost" href="#recommendation-ui">Project option</a></div>
+      </div>
+      <div class="visual">
+        <svg viewBox="0 0 430 360" fill="none">
+          <rect class="soft" x="44" y="66" width="132" height="92" rx="16"/><text class="label" x="110" y="100">HTML</text><text class="small" x="110" y="120">structure</text>
+          <rect class="soft" x="220" y="66" width="132" height="92" rx="16"/><text class="label" x="286" y="100">CSS</text><text class="small" x="286" y="120">visuals</text>
+          <rect class="soft" x="84" y="212" width="116" height="76" rx="16"/><text class="label" x="142" y="242">JS/TS</text><text class="small" x="142" y="262">behavior</text>
+          <rect class="soft" x="246" y="212" width="116" height="76" rx="16"/><text class="label" x="304" y="242">REACT</text><text class="small" x="304" y="262">state</text>
+          <path class="stroke" d="M176 112h44M146 158l-4 54M286 158l18 54M200 250h46"/>
+          <circle class="soft flowDot" cx="198" cy="112" r="7"/><circle class="soft flowDot" cx="223" cy="250" r="7"/>
+        </svg>
+      </div>
+    </section>
+    <section class="wrap" id="frontend-roadmap">
+      <div class="sectionhead"><div><h2>Frontend roadmap</h2><p>Learn the browser in layers. Each layer solves one concrete problem.</p></div><span class="note"><b>UI</b> lane</span></div>
+      <div class="stackGrid">
+        <div class="stackCard"><span class="mono">FOUNDATION</span><h3>HTML</h3><p>What exists on the page: headings, forms, lists, buttons and semantic layout.</p></div>
+        <div class="stackCard"><span class="mono">FOUNDATION</span><h3>CSS</h3><p>How things look and respond: layout, spacing, typography, animation and media queries.</p></div>
+        <div class="stackCard"><span class="mono">LANGUAGE</span><h3>JavaScript</h3><p>How the page behaves: events, DOM, async requests and browser APIs.</p></div>
+        <div class="stackCard"><span class="mono">LANGUAGE</span><h3>TypeScript</h3><p>How teams keep large JavaScript projects safer and easier to refactor.</p></div>
+        <div class="stackCard"><span class="mono">FRAMEWORK</span><h3>React</h3><p>Build UI from components and state instead of manually updating every DOM node.</p></div>
+        <div class="stackCard"><span class="mono">FRAMEWORK</span><h3>Next.js</h3><p>Routing, server rendering, data loading and production app structure.</p></div>
+      </div>
+    </section>
+    <section class="wrap lesson" id="recommendation-ui">
+      <div class="lessonHeader"><div><h2>Project Option: Recommendation UI</h2><p>Frontend project paired with the backend Recommendation Engine.</p></div><span class="pathPill">PROJECT</span></div>
+      <div class="lessonGrid">
+        <div>
+          <section class="lessonSection"><h3>Big Picture</h3><p>A frontend recommendation UI exists to turn backend JSON into something a user can scan, filter and act on. It solves the problem of making data usable.</p></section>
+          <section class="lessonSection"><h3>Visualization</h3><pre class="diagram">User clicks interest
+↓
+React state updates
+↓
+Frontend calls /recommendations
+↓
+Loading state appears
+↓
+Cards render
+↓
+User gives feedback</pre></section>
+          <section class="lessonSection"><h3>Analogy</h3><p>Storefront shelf: the backend chooses products from the warehouse, but frontend decides how the shelf looks, how filters work and what the shopper sees first.</p></section>
+          <section class="lessonSection"><h3>Thinking Process</h3><ol><li>I need to show recommendations.</li><li>I need state for selected interest.</li><li>I need loading and error states.</li><li>I need a reusable card component.</li><li>I need feedback buttons later.</li></ol></section>
+          <section class="lessonSection assignment"><h3>Mini Assignment</h3><p>Design the card data shape for one recommendation. Include id, title, tags and reason. Do not code the component yet.</p></section>
+        </div>
+        <aside class="lessonSide"><div class="projectCard"><b>Frontend build path</b><div class="projectSteps"><span>1. Static cards</span><span>2. Filter state</span><span>3. Fetch API</span><span>4. Loading and error UI</span><span>5. Feedback buttons</span><span>6. Deploy with backend URL</span></div></div></aside>
+      </div>
+    </section>
+  </main>
+  <footer><div class="wrap"><span>Frontend path · Web Development</span><span><a href="/web-development/">Web track</a> · <a href="/web-development/backend/">Backend</a></span></div></footer>
+  <script type="module" src="/track-bg.js"></script><script src="/supabase-config.js"></script><script src="/auth.js"></script>
+</body>
+</html>
