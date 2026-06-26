@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Graph & Grid BFS — Pattern Revision Hub</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="apple-touch-icon" href="/favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -197,6 +199,9 @@
   .gd{display:flex;flex-direction:column;gap:3px;}
   .gdrow{display:flex;gap:3px;}
     .ghere{position:absolute;top:-17px;left:50%;transform:translateX(-50%);color:#ffd60a;font-size:13px;animation:bob .9s ease-in-out infinite;pointer-events:none;}
+  /* step-gist label anchored to the active grid cell / graph node (subtle, no glow) */
+  .gstep{position:absolute;bottom:-15px;left:50%;transform:translateX(-50%);color:#bfefff;opacity:.9;font-size:9px;font-weight:600;white-space:nowrap;font-family:'JetBrains Mono',monospace;pointer-events:none;letter-spacing:.2px;}
+  .scene .ptrGist{fill:#bfefff;opacity:.9;font-size:9px;font-weight:600;letter-spacing:.2px;text-transform:none;font-family:'JetBrains Mono',monospace;}
   .gc{position:relative;width:42px;height:42px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;background:#1a212b;color:#3a4452;border:1.5px solid transparent;transition:background .35s,color .35s,border-color .35s,transform .25s;}
   .demoside{flex:1;min-width:190px;}
   .demoinfo{font-size:12px;line-height:1.6;color:var(--text);min-height:46px;background:var(--panel);border:1px solid var(--border);border-radius:6px;padding:10px 12px;margin-bottom:10px;}
@@ -874,6 +879,113 @@ vector<int> zeroOneBFS(int V, vector<vector<pair<int,int>>>& adj, int src) {
 }
 ];
 
+/* ── per-pattern practice problems · order rendered GFG → LeetCode → NeetCode ──
+   GFG uses guaranteed-no-404 search URLs; LeetCode uses direct slug links. ── */
+const GS = q => 'https://www.geeksforgeeks.org/?s=' + encodeURIComponent(q);
+const LC = s => 'https://leetcode.com/problems/' + s + '/';
+const NC = s => 'https://neetcode.io/problems/' + s;
+const PRACTICE = {
+  'Basic Graph BFS':[
+    {name:'BFS of Graph',diff:'Easy',gfg:GS('bfs of graph')},
+    {name:'Clone Graph',diff:'Medium',gfg:GS('clone graph'),lc:LC('clone-graph'),neet:NC('clone-graph')},
+    {name:'Find if Path Exists in Graph',diff:'Easy',gfg:GS('find if path exists in graph'),lc:LC('find-if-path-exists-in-graph')},
+    {name:'Find Center of Star Graph',diff:'Easy',gfg:GS('find center of star graph'),lc:LC('find-center-of-star-graph')}
+  ],
+  'Connected Components (Graph)':[
+    {name:'Number of Provinces',diff:'Medium',gfg:GS('number of provinces'),lc:LC('number-of-provinces')},
+    {name:'Number of Connected Components in an Undirected Graph',diff:'Medium',gfg:GS('connected components undirected graph'),lc:LC('number-of-connected-components-in-an-undirected-graph')},
+    {name:'Count the Number of Complete Components',diff:'Medium',gfg:GS('count number of complete components'),lc:LC('count-the-number-of-complete-components')},
+    {name:'Graph Valid Tree',diff:'Medium',gfg:GS('graph valid tree'),lc:LC('graph-valid-tree')}
+  ],
+  'Flood Fill / Plain Grid BFS':[
+    {name:'Flood Fill',diff:'Easy',gfg:GS('flood fill algorithm'),lc:LC('flood-fill')},
+    {name:'Number of Islands',diff:'Medium',gfg:GS('number of islands'),lc:LC('number-of-islands'),neet:NC('count-number-of-islands')},
+    {name:'Number of Closed Islands',diff:'Medium',gfg:GS('number of closed islands'),lc:LC('number-of-closed-islands')}
+  ],
+  'Number of Islands / Components':[
+    {name:'Number of Islands',diff:'Medium',gfg:GS('number of islands'),lc:LC('number-of-islands')},
+    {name:'Number of Closed Islands',diff:'Medium',gfg:GS('number of closed islands'),lc:LC('number-of-closed-islands')},
+    {name:'Count Sub Islands',diff:'Medium',gfg:GS('count sub islands'),lc:LC('count-sub-islands')},
+    {name:'Making A Large Island',diff:'Hard',gfg:GS('making a large island'),lc:LC('making-a-large-island')}
+  ],
+  'Max Area / Component Size':[
+    {name:'Max Area of Island',diff:'Medium',gfg:GS('max area of island'),lc:LC('max-area-of-island')},
+    {name:'Island Perimeter',diff:'Easy',gfg:GS('island perimeter'),lc:LC('island-perimeter')},
+    {name:'Count Sub Islands',diff:'Medium',gfg:GS('count sub islands'),lc:LC('count-sub-islands')},
+    {name:'Number of Distinct Islands',diff:'Medium',gfg:GS('number of distinct islands'),lc:LC('number-of-distinct-islands')}
+  ],
+  'Two-Grid BFS (Count Sub Islands)':[
+    {name:'Count Sub Islands',diff:'Medium',gfg:GS('count sub islands'),lc:LC('count-sub-islands')},
+    {name:'Find All Groups of Farmland',diff:'Medium',gfg:GS('find all groups of farmland'),lc:LC('find-all-groups-of-farmland')},
+    {name:'Coloring A Border',diff:'Medium',gfg:GS('coloring a border'),lc:LC('coloring-a-border')}
+  ],
+  'Grid BFS — 8-Directional':[
+    {name:'Shortest Path in Binary Matrix',diff:'Medium',gfg:GS('shortest path in binary matrix'),lc:LC('shortest-path-in-binary-matrix')},
+    {name:'Minimum Knight Moves',diff:'Medium',gfg:GS('minimum knight moves'),lc:LC('minimum-knight-moves')},
+    {name:'As Far from Land as Possible',diff:'Medium',gfg:GS('as far from land as possible'),lc:LC('as-far-from-land-as-possible')}
+  ],
+  'Multi-Source + Distance BFS':[
+    {name:'01 Matrix',diff:'Medium',gfg:GS('distance of nearest cell having 1'),lc:LC('01-matrix')},
+    {name:'Rotting Oranges',diff:'Medium',gfg:GS('rotten oranges'),lc:LC('rotting-oranges'),neet:NC('rotting-fruit')},
+    {name:'Walls and Gates',diff:'Medium',gfg:GS('walls and gates'),lc:LC('walls-and-gates'),neet:NC('islands-and-treasure')},
+    {name:'As Far from Land as Possible',diff:'Medium',gfg:GS('as far from land as possible'),lc:LC('as-far-from-land-as-possible')},
+    {name:'Map of Highest Peak',diff:'Medium',gfg:GS('map of highest peak'),lc:LC('map-of-highest-peak')}
+  ],
+  'Level-by-Level BFS':[
+    {name:'Rotting Oranges',diff:'Medium',gfg:GS('rotten oranges'),lc:LC('rotting-oranges')},
+    {name:'Binary Tree Level Order Traversal',diff:'Medium',gfg:GS('level order traversal'),lc:LC('binary-tree-level-order-traversal')},
+    {name:'Shortest Path in Binary Matrix',diff:'Medium',gfg:GS('shortest path in binary matrix'),lc:LC('shortest-path-in-binary-matrix')},
+    {name:'Word Ladder',diff:'Hard',gfg:GS('word ladder'),lc:LC('word-ladder')}
+  ],
+  'Boundary BFS (Reverse Thinking)':[
+    {name:'Surrounded Regions',diff:'Medium',gfg:GS('replace o with x surrounded regions'),lc:LC('surrounded-regions')},
+    {name:'Number of Enclaves',diff:'Medium',gfg:GS('number of enclaves'),lc:LC('number-of-enclaves')},
+    {name:'Pacific Atlantic Water Flow',diff:'Medium',gfg:GS('pacific atlantic water flow'),lc:LC('pacific-atlantic-water-flow')},
+    {name:'Number of Closed Islands',diff:'Medium',gfg:GS('number of closed islands'),lc:LC('number-of-closed-islands')}
+  ],
+  'Shortest Path — Unweighted Graph':[
+    {name:'Shortest Path in Unweighted Graph',diff:'Medium',gfg:GS('shortest path in unweighted graph')},
+    {name:'Word Ladder',diff:'Hard',gfg:GS('word ladder'),lc:LC('word-ladder')},
+    {name:'Open the Lock',diff:'Medium',gfg:GS('open the lock bfs'),lc:LC('open-the-lock')},
+    {name:'Jump Game III',diff:'Medium',gfg:GS('jump game iii'),lc:LC('jump-game-iii')}
+  ],
+  '0-1 BFS — Deque':[
+    {name:'Minimum Obstacle Removal to Reach Corner',diff:'Hard',gfg:GS('0-1 bfs minimum obstacle removal'),lc:LC('minimum-obstacle-removal-to-reach-corner')},
+    {name:'Minimum Cost to Make at Least One Valid Path in a Grid',diff:'Hard',gfg:GS('minimum cost valid path grid'),lc:LC('minimum-cost-to-make-at-least-one-valid-path-in-a-grid')},
+    {name:'0-1 BFS (Shortest Path)',diff:'Medium',gfg:GS('0-1 bfs shortest path')}
+  ],
+  'State-Space BFS (Word Ladder)':[
+    {name:'Word Ladder',diff:'Hard',gfg:GS('word ladder'),lc:LC('word-ladder')},
+    {name:'Open the Lock',diff:'Medium',gfg:GS('open the lock bfs'),lc:LC('open-the-lock')},
+    {name:'Minimum Genetic Mutation',diff:'Medium',gfg:GS('minimum genetic mutation'),lc:LC('minimum-genetic-mutation')},
+    {name:'Sliding Puzzle',diff:'Hard',gfg:GS('sliding puzzle bfs'),lc:LC('sliding-puzzle')}
+  ],
+  'Bidirectional BFS':[
+    {name:'Word Ladder',diff:'Hard',gfg:GS('word ladder bidirectional bfs'),lc:LC('word-ladder')},
+    {name:'Open the Lock',diff:'Medium',gfg:GS('open the lock bfs'),lc:LC('open-the-lock')},
+    {name:'Minimum Genetic Mutation',diff:'Medium',gfg:GS('minimum genetic mutation'),lc:LC('minimum-genetic-mutation')},
+    {name:'Minimum Knight Moves',diff:'Medium',gfg:GS('minimum knight moves'),lc:LC('minimum-knight-moves')}
+  ],
+  'Cycle Detection — Undirected (BFS)':[
+    {name:'Detect Cycle in an Undirected Graph',diff:'Medium',gfg:GS('detect cycle in undirected graph')},
+    {name:'Redundant Connection',diff:'Medium',gfg:GS('redundant connection'),lc:LC('redundant-connection')},
+    {name:'Graph Valid Tree',diff:'Medium',gfg:GS('graph valid tree'),lc:LC('graph-valid-tree')}
+  ],
+  'Bipartite Check (Coloring)':[
+    {name:'Is Graph Bipartite?',diff:'Medium',gfg:GS('bipartite graph'),lc:LC('is-graph-bipartite')},
+    {name:'Possible Bipartition',diff:'Medium',gfg:GS('possible bipartition'),lc:LC('possible-bipartition')},
+    {name:'Flower Planting With No Adjacent',diff:'Medium',gfg:GS('m coloring problem'),lc:LC('flower-planting-with-no-adjacent')}
+  ],
+  "Topological Sort — Kahn's (BFS)":[
+    {name:'Topological Sort (Kahn’s Algorithm)',diff:'Medium',gfg:GS('topological sort kahn algorithm')},
+    {name:'Course Schedule',diff:'Medium',gfg:GS('course schedule prerequisites'),lc:LC('course-schedule'),neet:NC('course-schedule')},
+    {name:'Course Schedule II',diff:'Medium',gfg:GS('course schedule ii'),lc:LC('course-schedule-ii'),neet:NC('course-schedule-ii')},
+    {name:'Find Eventual Safe States',diff:'Medium',gfg:GS('find eventual safe states'),lc:LC('find-eventual-safe-states')},
+    {name:'Alien Dictionary',diff:'Hard',gfg:GS('alien dictionary'),lc:LC('alien-dictionary')}
+  ]
+};
+P.forEach(p=>{ if(PRACTICE[p.label]) p.practice = PRACTICE[p.label]; });
+
 /* ───── trace code shown beside the animation (line highlights as it runs) ───── */
 const TRACE = {
   distance:[
@@ -935,6 +1047,16 @@ function hl(code){
   }).join('');
 }
 
+/* short, plain-text gist of a step message — anchored to the active node/cell in
+   the animation. Strips HTML/entities, keeps the lead clause, trims to ~24 chars. */
+function vxGist(html){
+  if(!html) return '';
+  let t=String(html).replace(/<[^>]+>/g,'').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/\s+/g,' ').trim();
+  t=t.split(/[—–.:!]/)[0].trim();
+  if(t.length>24) t=t.slice(0,23).trim()+'…';
+  return t;
+}
+
 /* ───────────────────────── RENDER ───────────────────────── */
 const side=document.getElementById('side');
 const main=document.getElementById('main');
@@ -959,6 +1081,17 @@ function buildSidebar(){
   side.innerHTML=html;
   side.querySelectorAll('.catlabel').forEach(el=>el.onclick=()=>el.parentElement.classList.toggle('open'));
   side.querySelectorAll('.navitem').forEach(el=>el.onclick=e=>{e.stopPropagation();active=+el.dataset.i;render();if(window.innerWidth<=860)side.classList.remove('open');});
+}
+
+// inject the shared practice block (heatmap + problem list) for the active pattern.
+// practice.js is deferred, so VXPractice may be absent on the very first render —
+// DOMContentLoaded re-runs this once it's available. Idempotent.
+function fillPractice(){
+  if(!window.VXPractice) return;
+  const body=document.getElementById('practiceBody'); if(!body) return;
+  const p=P[active];
+  body.innerHTML = VXPractice.heatmapBlock() + VXPractice.practiceBlock(p.label, p.practice||[]);
+  VXPractice.wire(main);
 }
 
 function render(){
@@ -1004,12 +1137,14 @@ function render(){
       </div>
       <div class="pheadbtns">
         <button class="copy" id="notesBtn">📝 show notes</button>
+        <button class="copy" id="practiceBtn">🎯 practice</button>
         <button class="copy" id="codeBtn">⌨ hide code</button>
         <button class="copy" id="copyBtn">copy code</button>
       </div>
     </div>
 
     <div class="notesWrap" id="notesWrap" style="display:none">${notesHtml}</div>
+    <div class="notesWrap" id="practiceWrap" style="display:none"><div id="practiceBody"></div></div>
 
     <div class="split">
       <div class="splitcol"><div class="demo" id="demoHost"></div></div>
@@ -1028,6 +1163,12 @@ function render(){
   { const nb=document.getElementById('notesBtn'), nw=document.getElementById('notesWrap');
     nb.onclick=()=>{ const show=nw.style.display==='none'; nw.style.display=show?'':'none';
       nb.textContent=show?'📝 hide notes':'📝 show notes'; nb.classList.toggle('done',show); }; }
+
+  // 🎯 practice panel — heatmap + GFG/LeetCode/NeetCode list (lazy: practice.js loads deferred)
+  { const pb=document.getElementById('practiceBtn'), pw=document.getElementById('practiceWrap');
+    pb.onclick=()=>{ const show=pw.style.display==='none'; pw.style.display=show?'':'none';
+      pb.textContent=show?'🎯 hide practice':'🎯 practice'; pb.classList.toggle('done',show); if(show) fillPractice(); }; }
+  fillPractice();
 
   // code column collapses → animation takes the whole width (persisted)
   { const cb2=document.getElementById('codeBtn'), sp=document.querySelector('.split');
@@ -1795,7 +1936,7 @@ function vizSVG(spec,frames){
     if(spec.target!=null&&i===spec.target) s+=`<text x="${p[0]}" y="${p[1]-r-8}" fill="#69ff47" font-size="10" text-anchor="middle">target</text>`;
   });
   // "we are here" pointer — glides from node to node as the algorithm walks
-  s+=`<g id="ptr" class="ptr" opacity="0"><path d="M0,2 L-8,-12 L8,-12 Z"/><text x="0" y="-19" text-anchor="middle">here</text></g>`;
+  s+=`<g id="ptr" class="ptr" opacity="0"><path d="M0,2 L-8,-12 L8,-12 Z"/><text x="0" y="-19" text-anchor="middle">here</text><text id="ptrGist" class="ptrGist" x="0" y="-30" text-anchor="middle"></text></g>`;
   s+=`</g>`;
   // ── Queue column (front of queue at the top) ──
   const qx=500, qw=120, qh=40;
@@ -1995,6 +2136,8 @@ document.getElementById('menuToggle').onclick=()=>side.classList.toggle('open');
 buildSidebar();
 render();
 initBG();
+// practice.js is deferred — populate the current pattern's practice block once it's ready
+window.addEventListener('DOMContentLoaded',fillPractice);
 </script>
 
 <!-- visualise: auth gate + what's-next + resizable panels -->
@@ -2002,6 +2145,7 @@ initBG();
 <script src="/auth.js"></script>
 <script src="/whatsnext.js"></script>
 <script src="/panels.js"></script>
+<script defer src="/practice.js"></script>
 <script defer src="/ask-widget.js"></script>
 </body>
 </html>
