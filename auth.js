@@ -136,3 +136,17 @@
     document.head.appendChild(st);
   }
 })();
+
+/* ---- LimitPlane beacon ----------------------------------------------------
+   Reports each page view to a locally running LimitPlane gateway
+   (github.com/mightbeanshuu/LimitPlane) so real visualise traffic shows up
+   on its live dashboard. Fails silently when no gateway is listening, so
+   normal visitors never notice it. Change the origin if the gateway moves. */
+(function () {
+  try {
+    fetch(
+      "http://localhost:3000/b?k=lp_visualise_a91f3c&p=" + encodeURIComponent(location.pathname),
+      { mode: "no-cors" }
+    ).catch(function () {});
+  } catch (e) {}
+})();
