@@ -143,10 +143,17 @@
    on its live dashboard. Fails silently when no gateway is listening, so
    normal visitors never notice it. Change the origin if the gateway moves. */
 (function () {
+  var url = "http://localhost:3000/b?k=lp_visualise_a91f3c&p=" + encodeURIComponent(location.pathname);
+  function fire(opts) { return fetch(url, opts); }
   try {
-    fetch(
-      "http://localhost:3000/b?k=lp_visualise_a91f3c&p=" + encodeURIComponent(location.pathname),
-      { mode: "no-cors" }
-    ).catch(function () {});
-  } catch (e) {}
+    /* Chrome gates public-site -> localhost behind Local Network Access:
+       the request must be tagged with targetAddressSpace, and the browser
+       shows a one-time permission prompt. Fall back for other browsers. */
+    fire({ mode: "no-cors", targetAddressSpace: "local" })
+      .catch(function () { return fire({ mode: "no-cors", targetAddressSpace: "private" }); })
+      .catch(function () { return fire({ mode: "no-cors" }); })
+      .catch(function () {});
+  } catch (e) {
+    try { fire({ mode: "no-cors" }).catch(function () {}); } catch (e2) {}
+  }
 })();
