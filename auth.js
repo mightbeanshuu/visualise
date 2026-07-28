@@ -138,22 +138,15 @@
 })();
 
 /* ---- LimitPlane beacon ----------------------------------------------------
-   Reports each page view to a locally running LimitPlane gateway
-   (github.com/mightbeanshuu/LimitPlane) so real visualise traffic shows up
-   on its live dashboard. Fails silently when no gateway is listening, so
-   normal visitors never notice it. Change the origin if the gateway moves. */
+   Reports each page view to the public LimitPlane gateway
+   (github.com/mightbeanshuu/LimitPlane) so real visualise traffic shows on
+   its live dashboard, from every visitor. Fails silently if the gateway is
+   asleep or unreachable — normal visitors never notice it. */
 (function () {
-  var url = "http://localhost:3000/b?k=lp_visualise_a91f3c&p=" + encodeURIComponent(location.pathname);
-  function fire(opts) { return fetch(url, opts); }
   try {
-    /* Chrome gates public-site -> localhost behind Local Network Access:
-       the request must be tagged with targetAddressSpace, and the browser
-       shows a one-time permission prompt. Fall back for other browsers. */
-    fire({ mode: "no-cors", targetAddressSpace: "local" })
-      .catch(function () { return fire({ mode: "no-cors", targetAddressSpace: "private" }); })
-      .catch(function () { return fire({ mode: "no-cors" }); })
-      .catch(function () {});
-  } catch (e) {
-    try { fire({ mode: "no-cors" }).catch(function () {}); } catch (e2) {}
-  }
+    fetch(
+      "https://limitplane.onrender.com/b?k=lp_visualise_a91f3c&p=" + encodeURIComponent(location.pathname),
+      { mode: "no-cors" }
+    ).catch(function () {});
+  } catch (e) {}
 })();
